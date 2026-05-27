@@ -14,7 +14,7 @@ class ProjectPageTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_projects_page_lists_active_project_and_detail_link(): void
+    public function test_projects_page_lists_active_project_as_gallery_item_without_detail_link(): void
     {
         $category = $this->category();
         $this->category(['name' => 'Hidden Category', 'slug' => 'hidden-category', 'is_active' => false]);
@@ -39,8 +39,9 @@ class ProjectPageTest extends TestCase
             ->assertSee('Cilegon, Banten')
             ->assertSee('Tahun:')
             ->assertSee('2025')
-            ->assertSee(route('projects.show', $project->slug))
-            ->assertSee('View Project');
+            ->assertSee('gallery-popup')
+            ->assertDontSee(route('projects.show', $project->slug))
+            ->assertDontSee('View Project');
     }
 
     public function test_project_detail_displays_metadata_gallery_and_related_project(): void
@@ -97,6 +98,7 @@ class ProjectPageTest extends TestCase
 
         $project = Project::where('slug', 'fabrication-project')->firstOrFail();
         $this->assertSame($category->id, $project->project_category_id);
+        $this->assertNull($project->short_description);
         Storage::disk('public')->assertExists($project->featured_image);
         $this->assertStringEndsWith('.webp', $project->featured_image);
 

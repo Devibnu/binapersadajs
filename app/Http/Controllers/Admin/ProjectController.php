@@ -6,6 +6,7 @@ use App\Helpers\ImageUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectCategory;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -37,7 +38,8 @@ class ProjectController extends Controller
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
         $this->storeUploads($request, $validated);
-        Project::create($validated);
+        $project = Project::create($validated);
+        app(ActivityLogger::class)->log('create', 'Projects', 'Project ditambahkan: ' . $project->title, $project);
 
         return redirect()
             ->route('paneladmin.projects.index')
@@ -67,6 +69,7 @@ class ProjectController extends Controller
 
         $this->storeUploads($request, $validated, $project);
         $project->update($validated);
+        app(ActivityLogger::class)->log('update', 'Projects', 'Project diperbarui: ' . $project->title, $project);
 
         return redirect()
             ->route('paneladmin.projects.index')
@@ -75,7 +78,8 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        foreach ($this->imageFields() as $field) {
+        app(ActivityLogger::class)->log('delete', 'Projects', 'Project dihapus: ' . $project->title, $project);
+        foreach ($this->storedImageFields() as $field) {
             ImageUploadHelper::deleteStoredImage($project->{$field});
         }
 
@@ -96,8 +100,6 @@ class ProjectController extends Controller
                 'max:255',
                 Rule::unique('projects', 'slug')->ignore($project),
             ],
-            'short_description' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
             'client_name' => ['nullable', 'string', 'max:255'],
             'project_location' => ['nullable', 'string', 'max:255'],
             'project_year' => ['nullable', 'string', 'max:20'],
@@ -106,9 +108,6 @@ class ProjectController extends Controller
                 Rule::exists('project_categories', 'id')->where(fn ($query) => $query->where('is_active', true)),
             ],
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
-            'gallery_image_1' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
-            'gallery_image_2' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
-            'gallery_image_3' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
@@ -133,7 +132,7 @@ class ProjectController extends Controller
 
     private function storeUploads(Request $request, array &$validated, ?Project $project = null): void
     {
-        foreach ($this->imageFields() as $field) {
+        foreach ($this->editableImageFields() as $field) {
             if (! $request->hasFile($field)) {
                 unset($validated[$field]);
 
@@ -148,7 +147,12 @@ class ProjectController extends Controller
         }
     }
 
-    private function imageFields(): array
+    private function editableImageFields(): array
+    {
+        return ['featured_image'];
+    }
+
+    private function storedImageFields(): array
     {
         return ['featured_image', 'gallery_image_1', 'gallery_image_2', 'gallery_image_3'];
     }
@@ -163,7 +167,7 @@ class ProjectController extends Controller
 
     private function successMessage(string $message, Request $request): string
     {
-        foreach ($this->imageFields() as $field) {
+        foreach ($this->editableImageFields() as $field) {
             if ($request->hasFile($field)) {
                 return $message . ' Gambar berhasil diupload dan dioptimasi.';
             }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProjectCategory;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,8 @@ class ProjectCategoryController extends Controller
         $validated['slug'] = $this->slugFor($validated['slug'] ?? null, $validated['name']);
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
-        ProjectCategory::create($validated);
+        $projectCategory = ProjectCategory::create($validated);
+        app(ActivityLogger::class)->log('create', 'Project Categories', 'Kategori project ditambahkan: ' . $projectCategory->name, $projectCategory);
 
         return redirect()
             ->route('paneladmin.project-categories.index')
@@ -55,6 +57,7 @@ class ProjectCategoryController extends Controller
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
         $projectCategory->update($validated);
+        app(ActivityLogger::class)->log('update', 'Project Categories', 'Kategori project diperbarui: ' . $projectCategory->name, $projectCategory);
 
         return redirect()
             ->route('paneladmin.project-categories.index')
@@ -63,6 +66,7 @@ class ProjectCategoryController extends Controller
 
     public function destroy(ProjectCategory $projectCategory)
     {
+        app(ActivityLogger::class)->log('delete', 'Project Categories', 'Kategori project dihapus: ' . $projectCategory->name, $projectCategory);
         $projectCategory->delete();
 
         return redirect()

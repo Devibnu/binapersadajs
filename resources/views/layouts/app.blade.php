@@ -1,30 +1,24 @@
 <!DOCTYPE html>
 
-@if (\Request::is('rtl'))
-  <html dir="rtl" lang="ar">
-@else
-  <html lang="en" >
-@endif
+<html lang="id">
 
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="theme-color" content="#0c1e35">
+  <meta name="theme-color" content="#0d1b2f">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="BPJS Admin">
+  <meta name="apple-mobile-web-app-title" content="Bina Persada">
 
-  @if (env('IS_DEMO'))
-      <x-demo-metas></x-demo-metas>
-  @endif
-
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" sizes="192x192" href="/pwa/icons/icon-192x192.png">
-  @if(!empty($websiteSetting?->favicon))
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $websiteSetting->favicon) }}">
-  @else
-    <link rel="icon" type="image/png" href="{{ asset('web/images/favicon.png') }}">
-  @endif
+  <link rel="manifest" href="{{ asset('manifest.json') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/favicon-16x16.png') }}">
+  <link rel="shortcut icon" href="{{ asset('icons/favicon-32x32.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}">
+  <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}" color="#0d1b2f">
+  <meta name="msapplication-TileColor" content="#0d1b2f">
+  <meta name="msapplication-config" content="{{ asset('browserconfig.xml') }}">
   <title>{{ $websiteSetting?->nama_perusahaan ?? 'Bina Persada JS' }} - Panel Admin</title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -39,7 +33,7 @@
   <link id="pagestyle" href="{{ asset('assets/css/soft-ui-dashboard.css') }}?v=1.0.3" rel="stylesheet" />
 </head>
 
-<body class="g-sidenav-show  bg-gray-100 {{ (\Request::is('rtl') ? 'rtl' : (Request::is('virtual-reality') ? 'virtual-reality' : '')) }} ">
+<body class="g-sidenav-show bg-gray-100">
   @auth
     @yield('auth')
   @endauth
@@ -54,7 +48,6 @@
   <script src="{{ asset('assets/js/plugins/smooth-scrollbar.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/fullcalendar.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
-  @stack('rtl')
   @stack('dashboard')
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
@@ -66,9 +59,6 @@
     }
   </script>
 
-	  <!-- Github buttons -->
-	  <script async defer src="https://buttons.github.io/buttons.js"></script>
-	  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
 	  <script src="{{ asset('assets/js/soft-ui-dashboard.min.js') }}?v=1.0.3"></script>
 	  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	  @if(session('success'))
@@ -147,6 +137,9 @@
 	            reverseButtons: true
 	          }).then(function (result) {
 	            if (result.isConfirmed) {
+	              if (window.tinymce) {
+	                window.tinymce.triggerSave();
+	              }
 	              form.submit();
 	            }
 	          });
@@ -174,6 +167,7 @@
 	      });
 	    });
 	  </script>
+	  @stack('scripts')
 	  <script>
 	    if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {

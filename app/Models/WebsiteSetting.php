@@ -33,6 +33,6 @@ class WebsiteSetting extends Model
 
     public function faviconUrl(): string
     {
-        return $this->favicon ? Storage::url($this->favicon) : asset('web/images/favicon.png');
+        return $this->favicon ? Storage::url($this->favicon) : asset('icons/favicon-32x32.png');
     }
 }

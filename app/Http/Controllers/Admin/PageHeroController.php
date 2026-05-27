@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\ImageUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\PageHero;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -33,7 +34,8 @@ class PageHeroController extends Controller
         $validated = $this->validatedData($request);
         $this->storeBackgroundImage($request, $validated);
 
-        PageHero::create($validated);
+        $pageHero = PageHero::create($validated);
+        app(ActivityLogger::class)->log('create', 'Page Heroes', 'Page hero ditambahkan: ' . $pageHero->page_key, $pageHero);
 
         return redirect()
             ->route('paneladmin.page-heroes.index')
@@ -51,6 +53,7 @@ class PageHeroController extends Controller
         $this->storeBackgroundImage($request, $validated, $pageHero);
 
         $pageHero->update($validated);
+        app(ActivityLogger::class)->log('update', 'Page Heroes', 'Page hero diperbarui: ' . $pageHero->page_key, $pageHero);
 
         return redirect()
             ->route('paneladmin.page-heroes.index')
@@ -59,6 +62,7 @@ class PageHeroController extends Controller
 
     public function destroy(PageHero $pageHero)
     {
+        app(ActivityLogger::class)->log('delete', 'Page Heroes', 'Page hero dihapus: ' . $pageHero->page_key, $pageHero);
         if ($pageHero->background_image && ! $this->isPublicAsset($pageHero->background_image)) {
             ImageUploadHelper::deleteStoredImage($pageHero->background_image);
         }
@@ -80,10 +84,15 @@ class PageHeroController extends Controller
             ],
             'title' => ['required', 'string', 'max:255'],
             'breadcrumb_text' => ['nullable', 'string', 'max:255'],
-            'background_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'background_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:20480'],
             'overlay_opacity' => ['nullable', 'numeric', 'min:0', 'max:1'],
             'text_position' => ['nullable', Rule::in(['center', 'left', 'right'])],
             'is_active' => ['required', 'boolean'],
+        ], [
+            'background_image.uploaded' => 'Gambar gagal diunggah. Ukuran gambar terlalu besar. Maksimal 20MB.',
+            'background_image.image' => 'File background harus berupa gambar.',
+            'background_image.mimes' => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+            'background_image.max' => 'Ukuran gambar terlalu besar. Maksimal 20MB.',
         ]);
     }
 
@@ -99,7 +108,12 @@ class PageHeroController extends Controller
             ImageUploadHelper::deleteStoredImage($pageHero->background_image);
         }
 
-        $validated['background_image'] = ImageUploadHelper::uploadAndCompress($request->file('background_image'), 'page-heroes', 1600);
+        $validated['background_image'] = ImageUploadHelper::uploadAndCompress(
+            $request->file('background_image'),
+            'page-heroes',
+            1920,
+            80
+        );
     }
 
     private function isPublicAsset(string $path): bool

@@ -31,7 +31,11 @@
                       <img src="{{ $project->featuredImageUrl() }}" class="avatar avatar-lg me-3" alt="{{ $project->title }}">
                       <div class="d-flex flex-column justify-content-center">
                         <h6 class="mb-0 text-sm">{{ $project->title }}</h6>
-                        <p class="text-xs text-secondary mb-0">{{ \Illuminate\Support\Str::limit($project->short_description ?: '-', 55) }}</p>
+                        @if($project->client_name || $project->project_year)
+                          <p class="text-xs text-secondary mb-0">
+                            {{ collect([$project->client_name, $project->project_year])->filter()->implode(' - ') }}
+                          </p>
+                        @endif
                       </div>
                     </div>
                   </td>

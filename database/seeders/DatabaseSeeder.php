@@ -19,6 +19,12 @@ class DatabaseSeeder extends Seeder
             HeroBannerSeeder::class,
             ServiceSeeder::class,
             ProjectCategorySeeder::class,
+            BlogSeeder::class,
+            ContactPageSettingSeeder::class,
+            HomepageSettingSeeder::class,
+            HomepageVideoSeeder::class,
+            AboutPageSettingSeeder::class,
+            RolePermissionSeeder::class,
         ]);
     }
 }

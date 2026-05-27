@@ -22,9 +22,102 @@
     margin-right: 5px;
   }
 
-  @media (max-width: 575px) {
+  .project-item-title span {
+    color: #fff;
+  }
+
+  .projects-gallery .project-img-container .project-item-info {
+    align-items: center;
+    bottom: 0;
+    display: flex;
+    margin-top: 0;
+    top: 0;
+  }
+
+  .projects-gallery .project-item-info-content {
+    width: 100%;
+  }
+
+  @media (max-width: 767px) {
+    .projects-gallery {
+      padding-top: 42px;
+    }
+
+    .projects-gallery .shuffle-btn-group {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 5px;
+      margin: 0 0 28px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .projects-gallery .shuffle-btn-group::-webkit-scrollbar {
+      display: none;
+    }
+
+    .projects-gallery .shuffle-btn-group label {
+      flex: 0 0 auto;
+      padding: 11px 14px;
+      white-space: nowrap;
+    }
+
+    .projects-gallery .shuffle-item {
+      width: 100%;
+    }
+
+    .projects-gallery .project-img-container {
+      aspect-ratio: 1 / 1;
+    }
+
+    .projects-gallery .project-img-container .gallery-popup {
+      display: block;
+      height: 100%;
+    }
+
+    .projects-gallery .project-img-container img {
+      height: 100%;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .projects-gallery .project-img-container:after,
+    .projects-gallery .project-img-container .gallery-popup .gallery-icon,
+    .projects-gallery .project-img-container .project-item-info-content {
+      opacity: 1;
+    }
+
+    .projects-gallery .project-img-container .gallery-popup .gallery-icon,
+    .projects-gallery .project-img-container .project-item-info-content {
+      -webkit-transform: perspective(1px) translate3d(0, 0, 0);
+      transform: perspective(1px) translate3d(0, 0, 0);
+    }
+
+    .projects-gallery .project-img-container .gallery-popup .gallery-icon {
+      -webkit-transform: perspective(1px) scale3d(1, 1, 1);
+      transform: perspective(1px) scale3d(1, 1, 1);
+    }
+
+    .projects-gallery .project-img-container .project-item-info {
+      align-items: flex-end;
+      padding: 22px 20px;
+    }
+
+    .projects-gallery .project-item-title {
+      font-size: 17px !important;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
     .project-card-meta {
       margin: 7px 0 10px;
+    }
+
+    .project-card-meta p {
+      font-size: 12px;
+      line-height: 1.5;
     }
   }
 </style>
@@ -39,12 +132,12 @@
   $pageHeroBreadcrumbClass = $pageHero?->breadcrumbClass() ?? 'justify-content-center';
   $pageHeroOpacity = $pageHero?->overlay_opacity ?? 1;
   $fallbackProjects = [
-    ['Capital Teltway Building', 'Fabrication', 'Industrial construction and project execution support.', 'project1.jpg'],
-    ['Ghum Touch Hospital', 'Maintenance', 'Facility installation and maintenance support.', 'project2.jpg'],
-    ['TNT East Facility', 'Piping', 'Site execution and industrial coordination work.', 'project3.jpg'],
-    ['Narriot Headquarters', 'Scaffolding', 'Construction and fabrication project support.', 'project4.jpg'],
-    ['Kalas Metrorail', 'Mechanical', 'Mechanical and civil installation works.', 'project5.jpg'],
-    ['Ancraft Avenue House', 'Electrical', 'Building execution and maintenance support.', 'project6.jpg'],
+    ['title' => 'Industrial Fabrication Work', 'category' => 'Fabrication', 'image' => 'project1.jpg', 'client' => null, 'location' => 'Cilegon, Banten', 'year' => '2025'],
+    ['title' => 'Plant Maintenance Support', 'category' => 'Maintenance', 'image' => 'project2.jpg', 'client' => null, 'location' => null, 'year' => '2025'],
+    ['title' => 'Pipe Installation Project', 'category' => 'Piping', 'image' => 'project3.jpg', 'client' => null, 'location' => 'Banten', 'year' => null],
+    ['title' => 'Scaffolding Site Access', 'category' => 'Scaffolding', 'image' => 'project4.jpg', 'client' => null, 'location' => null, 'year' => null],
+    ['title' => 'Mechanical Equipment Work', 'category' => 'Mechanical', 'image' => 'project5.jpg', 'client' => null, 'location' => null, 'year' => null],
+    ['title' => 'Electrical Installation Work', 'category' => 'Electrical', 'image' => 'project6.jpg', 'client' => null, 'location' => null, 'year' => null],
   ];
 @endphp
 <div id="banner-area" class="banner-area page-hero-managed" style="background-image:url({{ $pageHeroBackground }}); --page-hero-overlay: {{ $pageHeroOpacity }};">
@@ -68,7 +161,7 @@
   </div>
 </div>
 
-<section id="main-container" class="main-container">
+<section id="main-container" class="main-container projects-gallery">
   <div class="container">
     <div class="row">
       <div class="col-12">
@@ -83,7 +176,7 @@
               </label>
             @endforeach
           @elseif($showProjectFallback)
-            @foreach(['Commercial', 'Healthcare', 'Government', 'Infrastructure', 'Residential'] as $category)
+            @foreach(['Fabrication', 'Maintenance', 'Piping', 'Scaffolding', 'Mechanical', 'Electrical', 'Construction'] as $category)
               <label for="project-category-{{ strtolower($category) }}">
                 <input type="radio" name="shuffle-filter" id="project-category-{{ strtolower($category) }}" value="{{ strtolower($category) }}">{{ $category }}
               </label>
@@ -103,7 +196,7 @@
                   </a>
                   <div class="project-item-info">
                     <div class="project-item-info-content">
-                      <h3 class="project-item-title"><a href="{{ route('projects.show', $project->slug) }}">{{ $project->title }}</a></h3>
+                      <h3 class="project-item-title"><span>{{ $project->title }}</span></h3>
                       <p class="project-cat">{{ $project->categoryName() }}</p>
                       @if($project->client_name || $project->project_location || $project->project_year)
                         <div class="project-card-meta">
@@ -118,7 +211,6 @@
                           @endif
                         </div>
                       @endif
-                      <a class="btn btn-primary btn-sm" href="{{ route('projects.show', $project->slug) }}">View Project</a>
                     </div>
                   </div>
                 </div>
@@ -126,16 +218,29 @@
             @endforeach
           @elseif($showProjectFallback)
             @foreach($fallbackProjects as $project)
-              <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["{{ strtolower($project[1]) }}"]'>
+              <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["{{ strtolower($project['category']) }}"]'>
                 <div class="project-img-container">
-                  <a class="gallery-popup" href="{{ asset('web/images/projects/' . $project[3]) }}">
-                    <img class="img-fluid" src="{{ asset('web/images/projects/' . $project[3]) }}" alt="{{ $project[0] }}">
+                  <a class="gallery-popup" href="{{ asset('web/images/projects/' . $project['image']) }}">
+                    <img class="img-fluid" src="{{ asset('web/images/projects/' . $project['image']) }}" alt="{{ $project['title'] }}">
                     <span class="gallery-icon"><i class="fa fa-plus"></i></span>
                   </a>
                   <div class="project-item-info">
                     <div class="project-item-info-content">
-                      <h3 class="project-item-title"><a href="#">{{ $project[0] }}</a></h3>
-                      <p class="project-cat">{{ $project[1] }}</p>
+                      <h3 class="project-item-title"><span>{{ $project['title'] }}</span></h3>
+                      <p class="project-cat">{{ $project['category'] }}</p>
+                      @if($project['client'] || $project['location'] || $project['year'])
+                        <div class="project-card-meta">
+                          @if($project['client'])
+                            <p><span class="project-card-meta-label">Client:</span>{{ $project['client'] }}</p>
+                          @endif
+                          @if($project['location'])
+                            <p><span class="project-card-meta-label">Lokasi:</span>{{ $project['location'] }}</p>
+                          @endif
+                          @if($project['year'])
+                            <p><span class="project-card-meta-label">Tahun:</span>{{ $project['year'] }}</p>
+                          @endif
+                        </div>
+                      @endif
                     </div>
                   </div>
                 </div>

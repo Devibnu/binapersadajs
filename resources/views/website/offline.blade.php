@@ -3,10 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0c1e35">
-    <title>Bina Persada JS - Offline</title>
+    <meta name="theme-color" content="#0d1b2f">
+    <title>PT. Bina Persada Jaya Sejahtera - Offline</title>
     <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png" href="/pwa/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="shortcut icon" href="/icons/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
     <style>
         body {
             align-items: center;
@@ -45,7 +47,7 @@
 </head>
 <body>
     <main class="offline-card">
-        <img src="/pwa/icons/icon-192x192.png" alt="Bina Persada JS">
+        <img src="/icons/android-chrome-192x192.png" alt="PT. Bina Persada Jaya Sejahtera">
         <h1>Anda sedang offline</h1>
         <p>Koneksi internet tidak tersedia. Beberapa halaman yang pernah dibuka masih dapat diakses dari cache aplikasi.</p>
     </main>

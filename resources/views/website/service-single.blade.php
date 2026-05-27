@@ -1,6 +1,44 @@
 @extends('layouts.website')
 
+@php
+  $serviceSeoSetting = \App\Models\SeoSetting::current();
+  $serviceCanonical = $serviceSeoSetting->canonicalUrl(route('services.show', $service->slug));
+@endphp
+
 @section('title', $service->title . ' - PT. Bina Persada Jaya Sejahtera')
+@if($service->short_content || $service->short_description || $service->description)
+  @section('meta_description', $service->short_content ?: $service->short_description ?: strip_tags($service->description))
+@endif
+@section('og_image', $service->imageUrl())
+
+@push('schema')
+  @include('website.partials.breadcrumb-schema', ['items' => [
+    ['name' => 'Beranda', 'url' => $serviceSeoSetting->canonicalUrl(route('website.home'))],
+    ['name' => 'Layanan', 'url' => $serviceSeoSetting->canonicalUrl(route('services.index'))],
+    ['name' => $service->title, 'url' => $serviceCanonical],
+  ]])
+@endpush
+
+@push('styles')
+<style>
+  .service-rich-content img {
+    height: auto;
+    max-width: 100%;
+  }
+
+  .service-rich-content table {
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    width: 100%;
+  }
+
+  .service-rich-content td,
+  .service-rich-content th {
+    border: 1px solid #e5e5e5;
+    padding: 10px 12px;
+  }
+</style>
+@endpush
 
 @section('content')
 @php
@@ -8,11 +46,19 @@
   $pageHeroTextClass = $pageHero?->textClass() ?? 'text-center';
   $pageHeroBreadcrumbClass = $pageHero?->breadcrumbClass() ?? 'justify-content-center';
   $pageHeroOpacity = $pageHero?->overlay_opacity ?? 1;
-  $detailContent = $service->content ?: ($service->description ?: $service->short_description);
-  $paragraphs = array_values(array_filter(preg_split('/\R{2,}/', trim($detailContent ?? ''))));
+  $summary = $service->short_content ?: $service->short_description;
+  $detailParagraphs = array_values(array_filter(preg_split('/\R{2,}/', trim($service->content ?? ''))));
   $galleryImages = $service->galleryImages();
   $features = $service->features();
   $faqs = $service->faqs();
+  $legacyCtaTexts = ['interested with this service?', 'interested with this service'];
+  $legacyCtaButtons = ['get a quote', 'get quote'];
+  $ctaText = ! $service->cta_text || in_array(strtolower(trim($service->cta_text)), $legacyCtaTexts, true)
+    ? 'Butuh dukungan layanan untuk proyek industri Anda?'
+    : $service->cta_text;
+  $ctaButtonText = ! $service->cta_button_text || in_array(strtolower(trim($service->cta_button_text)), $legacyCtaButtons, true)
+    ? 'Hubungi Kami'
+    : $service->cta_button_text;
 @endphp
 <div id="banner-area" class="banner-area page-hero-managed" style="background-image:url({{ $pageHeroBackground }}); --page-hero-overlay: {{ $pageHeroOpacity }};">
   <div class="banner-text">
@@ -23,8 +69,8 @@
             <h1 class="banner-title">{{ $service->title }}</h1>
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb {{ $pageHeroBreadcrumbClass }}">
-                <li class="breadcrumb-item"><a href="{{ route('website.home') }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('services.index') }}">Services</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('website.home') }}">Beranda</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('services.index') }}">Layanan</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ $service->title }}</li>
               </ol>
             </nav>
@@ -41,7 +87,7 @@
       <div class="col-xl-3 col-lg-4">
         <div class="sidebar sidebar-left">
           <div class="widget">
-            <h3 class="widget-title">Services</h3>
+            <h3 class="widget-title">Layanan Kami</h3>
             <ul class="nav service-menu">
               @foreach($relatedServices as $relatedService)
                 <li class="{{ $relatedService->is($service) ? 'active' : '' }}">
@@ -60,10 +106,15 @@
           <div class="row">
             <div class="col-md-12">
               <img loading="lazy" class="img-fluid mb-4" src="{{ $service->imageUrl() }}" alt="{{ $service->title }}">
-              @if($service->short_content)
-                <p class="lead">{{ $service->short_content }}</p>
+              @if($summary)
+                <p class="lead">{{ $summary }}</p>
               @endif
-              @foreach($paragraphs as $paragraph)
+              @if($service->description)
+                <div class="service-rich-content">
+                  {!! $service->description !!}
+                </div>
+              @endif
+              @foreach($detailParagraphs as $paragraph)
                 <p>{!! nl2br(e($paragraph)) !!}</p>
               @endforeach
             </div>
@@ -74,7 +125,7 @@
             <div id="page-slider" class="page-slider">
               @foreach($galleryImages as $galleryImage)
                 <div class="item">
-                  <img loading="lazy" class="img-fluid" src="{{ $galleryImage }}" alt="{{ $service->title }} gallery image">
+                  <img loading="lazy" class="img-fluid" src="{{ $galleryImage }}" alt="Galeri {{ $service->title }}">
                 </div>
               @endforeach
             </div>
@@ -85,7 +136,7 @@
             <div class="row">
               @if($features)
                 <div class="col-md-6">
-                  <h3 class="column-title-small">What We Provide</h3>
+                  <h3 class="column-title-small">Keunggulan Layanan</h3>
                   <ul class="list-arrow">
                     @foreach($features as $feature)
                       <li>{{ $feature }}</li>
@@ -96,7 +147,7 @@
 
               @if($faqs)
                 <div class="col-md-6 {{ $features ? 'mt-5 mt-md-0' : '' }}">
-                  <h3 class="column-title-small">You Should Know</h3>
+                  <h3 class="column-title-small">Informasi Penting</h3>
                   <div class="accordion accordion-group accordion-classic" id="service-faq-accordion">
                     @foreach($faqs as $index => $faq)
                       <div class="card">
@@ -125,12 +176,12 @@
             <div class="row align-items-center">
               <div class="col-md-8 text-center text-md-left">
                 <div class="call-to-action-text">
-                  <h3 class="action-title">{{ $service->cta_text ?: 'Interested with this service?' }}</h3>
+                  <h3 class="action-title">{{ $ctaText }}</h3>
                 </div>
               </div>
               <div class="col-md-4 text-center text-md-right mt-3 mt-md-0">
                 <div class="call-to-action-btn">
-                  <a class="btn btn-primary" href="{{ $service->cta_button_link ?: route('website.contact') }}">{{ $service->cta_button_text ?: 'Get a Quote' }}</a>
+                  <a class="btn btn-primary" href="{{ $service->cta_button_link ?: route('website.contact') }}">{{ $ctaButtonText }}</a>
                 </div>
               </div>
             </div>

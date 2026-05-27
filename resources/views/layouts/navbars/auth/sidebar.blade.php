@@ -13,159 +13,125 @@
   </div>
   <hr class="horizontal dark mt-0">
   <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
+    @php
+      $adminUser = auth()->user();
+      $can = fn (string $permission): bool => (bool) $adminUser?->canAccess($permission);
+      $hasWebsiteMenus = $can('website-settings.view') || $can('homepage-sections.view') || $can('hero-banners.view') || $can('page-heroes.view') || $can('contact-page.view') || $can('seo-settings.view') || $can('media-library.view');
+      $hasContentMenus = $can('homepage-video.view') || $can('services.view') || $can('project-categories.view') || $can('projects.view') || $can('blogs.view') || $can('blog-comments.view') || $can('about-page.view') || $can('about-teams.view');
+      $hasCommunicationMenus = $can('contact-messages.view') || $can('leads.view');
+      $hasAnalyticsMenus = $can('analytics.view') || $can('activity-logs.view');
+      $hasSystemMenus = $can('email-settings.view') || $can('roles.view') || $can('users.view') || $adminUser;
+    @endphp
     <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link {{ (Request::is('paneladmin') || Request::is('paneladmin/dashboard') ? 'active' : '') }}" href="{{ route('paneladmin.dashboard') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg">
-              <title>shop </title>
-              <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g transform="translate(-1716.000000, -439.000000)" fill="#FFFFFF" fill-rule="nonzero">
-                  <g transform="translate(1716.000000, 291.000000)">
-                    <g transform="translate(0.000000, 148.000000)">
-                      <path class="color-background opacity-6" d="M46.7199583,10.7414583 L40.8449583,0.949791667 C40.4909749,0.360605034 39.8540131,0 39.1666667,0 L7.83333333,0 C7.1459869,0 6.50902508,0.360605034 6.15504167,0.949791667 L0.280041667,10.7414583 C0.0969176761,11.0460037 -1.23209662e-05,11.3946378 -1.23209662e-05,11.75 C-0.00758042603,16.0663731 3.48367543,19.5725301 7.80004167,19.5833333 L7.81570833,19.5833333 C9.75003686,19.5882688 11.6168794,18.8726691 13.0522917,17.5760417 C16.0171492,20.2556967 20.5292675,20.2556967 23.494125,17.5760417 C26.4604562,20.2616016 30.9794188,20.2616016 33.94575,17.5760417 C36.2421905,19.6477597 39.5441143,20.1708521 42.3684437,18.9103691 C45.1927731,17.649886 47.0084685,14.8428276 47.0000295,11.75 C47.0000295,11.3946378 46.9030823,11.0460037 46.7199583,10.7414583 Z"></path>
-                      <path class="color-background" d="M39.198,22.4912623 C37.3776246,22.4928106 35.5817531,22.0149171 33.951625,21.0951667 L33.92225,21.1107282 C31.1430221,22.6838032 27.9255001,22.9318916 24.9844167,21.7998837 C24.4750389,21.605469 23.9777983,21.3722567 23.4960833,21.1018359 L23.4745417,21.1129513 C20.6961809,22.6871153 17.4786145,22.9344611 14.5386667,21.7998837 C14.029926,21.6054643 13.533337,21.3722507 13.0522917,21.1018359 C11.4250962,22.0190609 9.63246555,22.4947009 7.81570833,22.4912623 C7.16510551,22.4842162 6.51607673,22.4173045 5.875,22.2911849 L5.875,44.7220845 C5.875,45.9498589 6.7517757,46.9451667 7.83333333,46.9451667 L19.5833333,46.9451667 L19.5833333,33.6066734 L27.4166667,33.6066734 L27.4166667,46.9451667 L39.1666667,46.9451667 C40.2482243,46.9451667 41.125,45.9498589 41.125,44.7220845 L41.125,22.2822926 C40.4887822,22.4116582 39.8442868,22.4815492 39.198,22.4912623 Z"></path>
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </svg>
-          </div>
-          <span class="nav-link-text ms-1">Dashboard</span>
-        </a>
-      </li>
-      <li class="nav-item mt-2">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Manajemen Website</h6>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Request::is('paneladmin/settings') ? 'active' : '' }}" href="{{ route('paneladmin.settings.edit') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-cog text-dark text-sm opacity-10 {{ Request::is('paneladmin/settings') ? 'text-white' : 'text-dark' }}"></i>
-          </div>
-          <span class="nav-link-text ms-1">Pengaturan Website</span>
-        </a>
-      </li>
-	      <li class="nav-item">
-	        <a class="nav-link {{ Request::is('paneladmin/hero-banners*') ? 'active' : '' }}" href="{{ route('paneladmin.hero-banners.index') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-image text-dark text-sm opacity-10 {{ Request::is('paneladmin/hero-banners*') ? 'text-white' : 'text-dark' }}"></i>
-          </div>
-	          <span class="nav-link-text ms-1">Hero Banner</span>
-	        </a>
-	      </li>
-	      <li class="nav-item">
-	        <a class="nav-link {{ Request::is('paneladmin/services*') ? 'active' : '' }}" href="{{ route('paneladmin.services.index') }}">
-	          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-	            <i class="fas fa-tools text-dark text-sm opacity-10 {{ Request::is('paneladmin/services*') ? 'text-white' : 'text-dark' }}"></i>
-	          </div>
-	          <span class="nav-link-text ms-1">Services</span>
-	        </a>
-	      </li>
-	      <li class="nav-item">
-	        <a class="nav-link {{ Request::is('paneladmin/project-categories*') ? 'active' : '' }}" href="{{ route('paneladmin.project-categories.index') }}">
-	          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-	            <i class="fas fa-tags text-dark text-sm opacity-10 {{ Request::is('paneladmin/project-categories*') ? 'text-white' : 'text-dark' }}"></i>
-	          </div>
-	          <span class="nav-link-text ms-1">Project Categories</span>
-	        </a>
-	      </li>
-	      <li class="nav-item">
-	        <a class="nav-link {{ Request::is('paneladmin/projects*') ? 'active' : '' }}" href="{{ route('paneladmin.projects.index') }}">
-	          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-	            <i class="fas fa-hard-hat text-dark text-sm opacity-10 {{ Request::is('paneladmin/projects*') ? 'text-white' : 'text-dark' }}"></i>
-	          </div>
-	          <span class="nav-link-text ms-1">Projects</span>
-	        </a>
-	      </li>
-	      <li class="nav-item">
-	        <a class="nav-link {{ Request::is('paneladmin/page-heroes*') ? 'active' : '' }}" href="{{ route('paneladmin.page-heroes.index') }}">
-	          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-	            <i class="fas fa-images text-dark text-sm opacity-10 {{ Request::is('paneladmin/page-heroes*') ? 'text-white' : 'text-dark' }}"></i>
-	          </div>
-	          <span class="nav-link-text ms-1">Page Hero</span>
-	        </a>
-	      </li>
-	      <li class="nav-item mt-2">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Laravel Examples</h6>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Request::is('paneladmin/user-profile') ? 'active' : '' }} " href="{{ route('paneladmin.user-profile') }}">
+      @if($can('dashboard.view'))
+        <li class="nav-item mt-2 mb-2">
+          <h6 class="ps-4 ms-2 mb-0 text-uppercase text-xs font-weight-bolder opacity-6">Dashboard</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ Request::is('paneladmin') || Request::is('paneladmin/dashboard') ? 'active' : '' }}" href="{{ route('paneladmin.dashboard') }}">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-user text-dark text-sm opacity-10 {{ Request::is('paneladmin/user-profile') ? 'text-white' : 'text-dark' }}"></i>
+              <i class="fas fa-chart-pie text-dark text-sm opacity-10 {{ Request::is('paneladmin') || Request::is('paneladmin/dashboard') ? 'text-white' : 'text-dark' }}"></i>
             </div>
-            <span class="nav-link-text ms-1">User Profile</span>
-        </a>
-      </li>
-      <li class="nav-item pb-2">
-        <a class="nav-link {{ Request::is('paneladmin/user-management') ? 'active' : '' }}" href="{{ route('paneladmin.user-management') }}">
-            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-users text-dark text-sm opacity-10 {{ Request::is('paneladmin/user-management') ? 'text-white' : 'text-dark' }} " aria-hidden="true"></i>
-            </div>
-            <span class="nav-link-text ms-1">User Management</span>
-        </a>
-      </li>
-      <li class="nav-item mt-2">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Example pages</h6>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Request::is('paneladmin/tables') ? 'active' : '' }}" href="{{ route('paneladmin.tables') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-table text-dark text-sm opacity-10 {{ Request::is('paneladmin/tables') ? 'text-white' : 'text-dark' }}"></i>
-          </div>
-          <span class="nav-link-text ms-1">Tables</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Request::is('paneladmin/billing') ? 'active' : '' }}" href="{{ route('paneladmin.billing') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-credit-card text-dark text-sm opacity-10 {{ Request::is('paneladmin/billing') ? 'text-white' : 'text-dark' }}"></i>
-          </div>
-          <span class="nav-link-text ms-1">Billing</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Request::is('paneladmin/virtual-reality') ? 'active' : '' }}" href="{{ route('paneladmin.virtual-reality') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-cube text-dark text-sm opacity-10 {{ Request::is('paneladmin/virtual-reality') ? 'text-white' : 'text-dark' }}"></i>
-          </div>
-          <span class="nav-link-text ms-1">Virtual Reality</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Request::is('paneladmin/rtl') ? 'active' : '' }}" href="{{ route('paneladmin.rtl') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-tools text-dark text-sm {{ Request::is('paneladmin/rtl') ? 'text-white' : 'text-dark' }}"></i>
-          </div>
-          <span class="nav-link-text ms-1">RTL</span>
-        </a>
-      </li>
-      <li class="nav-item mt-3">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Request::is('paneladmin/profile') ? 'active' : '' }}" href="{{ route('paneladmin.profile') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-user text-dark text-sm {{ Request::is('paneladmin/profile') ? 'text-white' : 'text-dark' }}"></i>
-          </div>
-          <span class="nav-link-text ms-1">Profile</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link  " href="{{ route('paneladmin.sign-in') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-file-alt text-dark text-sm"></i>
-          </div>
-          <span class="nav-link-text ms-1">Sign In</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link  " href="{{ route('paneladmin.sign-up') }}">
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-rocket text-dark text-sm"></i>
-          </div>
-          <span class="nav-link-text ms-1">Sign Up</span>
-        </a>
-      </li>
+            <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+        </li>
+      @endif
+      @if($hasWebsiteMenus)
+        <li class="nav-item mt-3 mb-2">
+          <h6 class="ps-4 ms-2 mb-0 text-uppercase text-xs font-weight-bolder opacity-6">Manajemen Website</h6>
+        </li>
+        @if($can('website-settings.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/settings') ? 'active' : '' }}" href="{{ route('paneladmin.settings.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-cog text-sm opacity-10 {{ Request::is('paneladmin/settings') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Pengaturan Website</span></a></li>
+        @endif
+        @if($can('homepage-sections.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/homepage-sections') ? 'active' : '' }}" href="{{ route('paneladmin.homepage-sections.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-home text-sm opacity-10 {{ Request::is('paneladmin/homepage-sections') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Homepage Sections</span></a></li>
+        @endif
+        @if($can('hero-banners.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/hero-banners*') ? 'active' : '' }}" href="{{ route('paneladmin.hero-banners.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-image text-sm opacity-10 {{ Request::is('paneladmin/hero-banners*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Hero Banner</span></a></li>
+        @endif
+        @if($can('page-heroes.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/page-heroes*') ? 'active' : '' }}" href="{{ route('paneladmin.page-heroes.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-images text-sm opacity-10 {{ Request::is('paneladmin/page-heroes*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Page Heroes</span></a></li>
+        @endif
+        @if($can('contact-page.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/contact-page') ? 'active' : '' }}" href="{{ route('paneladmin.contact-page.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-address-book text-sm opacity-10 {{ Request::is('paneladmin/contact-page') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Contact Page</span></a></li>
+        @endif
+        @if($can('seo-settings.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/seo-settings') ? 'active' : '' }}" href="{{ route('paneladmin.seo-settings.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-search text-sm opacity-10 {{ Request::is('paneladmin/seo-settings') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">SEO Settings</span></a></li>
+        @endif
+        @if($can('media-library.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/media-library*') ? 'active' : '' }}" href="{{ route('paneladmin.media-library.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-photo-video text-sm opacity-10 {{ Request::is('paneladmin/media-library*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Media Library</span></a></li>
+        @endif
+      @endif
+
+      @if($hasContentMenus)
+        <li class="nav-item mt-3 mb-2">
+          <h6 class="ps-4 ms-2 mb-0 text-uppercase text-xs font-weight-bolder opacity-6">Konten Website</h6>
+        </li>
+        @if($can('homepage-video.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/homepage-video*') ? 'active' : '' }}" href="{{ route('paneladmin.homepage-video.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-play-circle text-sm opacity-10 {{ Request::is('paneladmin/homepage-video*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Homepage Video</span></a></li>
+        @endif
+        @if($can('services.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/services*') ? 'active' : '' }}" href="{{ route('paneladmin.services.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-tools text-sm opacity-10 {{ Request::is('paneladmin/services*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Services</span></a></li>
+        @endif
+        @if($can('project-categories.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/project-categories*') ? 'active' : '' }}" href="{{ route('paneladmin.project-categories.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-tags text-sm opacity-10 {{ Request::is('paneladmin/project-categories*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Project Categories</span></a></li>
+        @endif
+        @if($can('projects.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/projects*') ? 'active' : '' }}" href="{{ route('paneladmin.projects.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-hard-hat text-sm opacity-10 {{ Request::is('paneladmin/projects*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Projects</span></a></li>
+        @endif
+        @if($can('blogs.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/blogs*') ? 'active' : '' }}" href="{{ route('paneladmin.blogs.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-newspaper text-sm opacity-10 {{ Request::is('paneladmin/blogs*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Blogs</span></a></li>
+        @endif
+        @if($can('blog-comments.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/blog-comments*') ? 'active' : '' }}" href="{{ route('paneladmin.blog-comments.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-comments text-sm opacity-10 {{ Request::is('paneladmin/blog-comments*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Blog Comments</span></a></li>
+        @endif
+        @if($can('about-page.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/about-page') ? 'active' : '' }}" href="{{ route('paneladmin.about-page.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-building text-sm opacity-10 {{ Request::is('paneladmin/about-page') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">About Page</span></a></li>
+        @endif
+        @if($can('about-teams.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/about-teams*') ? 'active' : '' }}" href="{{ route('paneladmin.about-teams.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-users text-sm opacity-10 {{ Request::is('paneladmin/about-teams*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">About Teams</span></a></li>
+        @endif
+      @endif
+
+      @if($hasCommunicationMenus)
+        <li class="nav-item mt-3 mb-2">
+          <h6 class="ps-4 ms-2 mb-0 text-uppercase text-xs font-weight-bolder opacity-6">Komunikasi</h6>
+        </li>
+        @if($can('contact-messages.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/contact-messages*') ? 'active' : '' }}" href="{{ route('paneladmin.contact-messages.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-envelope text-sm opacity-10 {{ Request::is('paneladmin/contact-messages*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Contact Messages</span></a></li>
+        @endif
+        @if($can('leads.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/leads*') ? 'active' : '' }}" href="{{ route('paneladmin.leads.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-user-plus text-sm opacity-10 {{ Request::is('paneladmin/leads*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Leads / Newsletter</span></a></li>
+        @endif
+      @endif
+
+      @if($hasAnalyticsMenus)
+        <li class="nav-item mt-3 mb-2">
+          <h6 class="ps-4 ms-2 mb-0 text-uppercase text-xs font-weight-bolder opacity-6">Analytics &amp; Log</h6>
+        </li>
+        @if($can('analytics.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/analytics*') ? 'active' : '' }}" href="{{ route('paneladmin.analytics.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-chart-line text-sm opacity-10 {{ Request::is('paneladmin/analytics*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Analytics Visitor</span></a></li>
+        @endif
+        @if($can('activity-logs.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/activity-logs*') ? 'active' : '' }}" href="{{ route('paneladmin.activity-logs.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-history text-sm opacity-10 {{ Request::is('paneladmin/activity-logs*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Activity Logs</span></a></li>
+        @endif
+      @endif
+
+      @if($hasSystemMenus)
+        <li class="nav-item mt-3 mb-2">
+          <h6 class="ps-4 ms-2 mb-0 text-uppercase text-xs font-weight-bolder opacity-6">Sistem</h6>
+        </li>
+        @if($can('email-settings.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/email-settings') ? 'active' : '' }}" href="{{ route('paneladmin.email-settings.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-at text-sm opacity-10 {{ Request::is('paneladmin/email-settings') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Email Settings</span></a></li>
+        @endif
+        @if($can('roles.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/roles*') ? 'active' : '' }}" href="{{ route('paneladmin.roles.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-user-shield text-sm opacity-10 {{ Request::is('paneladmin/roles*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Roles &amp; Permissions</span></a></li>
+        @endif
+        @if($can('users.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/users*') ? 'active' : '' }}" href="{{ route('paneladmin.users.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-user-cog text-sm opacity-10 {{ Request::is('paneladmin/users*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Users</span></a></li>
+        @endif
+        <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/profile*') ? 'active' : '' }}" href="{{ route('paneladmin.profile') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-id-badge text-sm opacity-10 {{ Request::is('paneladmin/profile*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Profile Saya</span></a></li>
+      @endif
     </ul>
   </div>
 </aside>

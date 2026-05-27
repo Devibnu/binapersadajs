@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\WebsiteSetting;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -51,6 +52,7 @@ class WebsiteSettingController extends Controller
 
         $setting->fill($validated);
         $setting->save();
+        app(ActivityLogger::class)->log('update', 'Website Settings', 'Pengaturan website diperbarui.', $setting);
 
         return redirect()
             ->route('paneladmin.settings.edit')

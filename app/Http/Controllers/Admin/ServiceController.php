@@ -5,17 +5,31 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\ImageUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::orderBy('sort_order')->latest()->get();
+        $status = in_array($request->query('status'), ['active', 'inactive'], true)
+            ? $request->query('status')
+            : null;
 
-        return view('paneladmin.services.index', compact('services'));
+        $services = Service::query()
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->orderBy('sort_order')
+            ->latest()
+            ->get();
+
+        $counts = Service::query()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return view('paneladmin.services.index', compact('services', 'counts', 'status'));
     }
 
     public function create()
@@ -23,6 +37,7 @@ class ServiceController extends Controller
         return view('paneladmin.services.create', [
             'service' => new Service([
                 'is_active' => true,
+                'status' => 'active',
                 'sort_order' => 0,
             ]),
         ]);
@@ -33,14 +48,16 @@ class ServiceController extends Controller
         $validated = $this->validatedData($request);
         $validated['slug'] = $this->slugFor($validated['slug'] ?? null, $validated['title']);
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        $validated['is_active'] = $validated['status'] === 'active';
 
         $this->storeUploads($request, $validated);
 
-        Service::create($validated);
+        $service = Service::create($validated);
+        app(ActivityLogger::class)->log('create', 'Services', 'Layanan ditambahkan: ' . $service->title, $service);
 
         return redirect()
             ->route('paneladmin.services.index')
-            ->with('success', $this->successMessage('Service berhasil ditambahkan.', $request));
+            ->with('success', $this->successMessage('Layanan berhasil ditambahkan.', $request));
     }
 
     public function edit(Service $service)
@@ -48,23 +65,31 @@ class ServiceController extends Controller
         return view('paneladmin.services.edit', compact('service'));
     }
 
+    public function show(Service $service)
+    {
+        return view('paneladmin.services.show', compact('service'));
+    }
+
     public function update(Request $request, Service $service)
     {
         $validated = $this->validatedData($request, $service);
         $validated['slug'] = $this->slugFor($validated['slug'] ?? null, $validated['title'], $service);
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        $validated['is_active'] = $validated['status'] === 'active';
 
         $this->storeUploads($request, $validated, $service);
 
         $service->update($validated);
+        app(ActivityLogger::class)->log('update', 'Services', 'Layanan diperbarui: ' . $service->title, $service);
 
         return redirect()
             ->route('paneladmin.services.index')
-            ->with('success', $this->successMessage('Service berhasil diperbarui.', $request));
+            ->with('success', $this->successMessage('Layanan berhasil diperbarui.', $request));
     }
 
     public function destroy(Service $service)
     {
+        app(ActivityLogger::class)->log('delete', 'Services', 'Layanan dihapus: ' . $service->title, $service);
         foreach ($this->uploadFields() as $field) {
             if ($service->{$field}) {
                 ImageUploadHelper::deleteStoredImage($service->{$field});
@@ -75,7 +100,7 @@ class ServiceController extends Controller
 
         return redirect()
             ->route('paneladmin.services.index')
-            ->with('success', 'Service berhasil dihapus.');
+            ->with('success', 'Layanan berhasil dihapus.');
     }
 
     private function validatedData(Request $request, ?Service $service = null): array
@@ -110,7 +135,7 @@ class ServiceController extends Controller
             'cta_text' => ['nullable', 'string', 'max:255'],
             'cta_button_text' => ['nullable', 'string', 'max:255'],
             'cta_button_link' => ['nullable', 'string', 'max:255'],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
     }

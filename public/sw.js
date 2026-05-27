@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bpjs-pwa-v6';
+const CACHE_NAME = 'bpjs-pwa-v10';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [
@@ -15,8 +15,11 @@ const PRECACHE_URLS = [
   '/assets/js/soft-ui-dashboard.min.js',
   '/assets/js/core/bootstrap.min.js',
   '/assets/js/core/popper.min.js',
-  '/pwa/icons/icon-192x192.png',
-  '/pwa/icons/icon-512x512.png'
+  '/icons/favicon-32x32.png',
+  '/icons/apple-touch-icon.png',
+  '/icons/android-chrome-192x192.png',
+  '/icons/android-chrome-512x512.png',
+  '/icons/maskable-icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -38,6 +41,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
+
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    return;
+  }
 
   if (request.method !== 'GET') {
     return;

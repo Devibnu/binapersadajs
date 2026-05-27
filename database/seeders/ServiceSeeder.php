@@ -65,6 +65,7 @@ class ServiceSeeder extends Seeder
                 ['slug' => $service['slug']],
                 array_merge($service, [
                     'is_active' => true,
+                    'status' => 'active',
                     'sort_order' => $index + 1,
                 ])
             );

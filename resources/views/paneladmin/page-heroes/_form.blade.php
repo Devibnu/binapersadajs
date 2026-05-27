@@ -45,8 +45,8 @@
   <div class="col-md-8">
     <div class="form-group">
       <label>Background Image</label>
-      <input type="file" name="background_image" class="form-control" accept="image/*">
-      <small class="text-secondary">Gambar akan otomatis dioptimasi dan dikompres.</small>
+      <input type="file" name="background_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+      <small class="text-secondary">Gambar akan otomatis dioptimasi dan dikompres. Rekomendasi ukuran 1920x700px, maksimal upload 20MB.</small>
       @if($pageHero->exists)
         <img src="{{ $pageHero->backgroundUrl() }}" alt="{{ $pageHero->title }}" class="img-fluid border-radius-lg mt-3" style="max-height: 180px;">
       @endif

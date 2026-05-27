@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\ImageUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\HeroBanner;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -38,7 +39,8 @@ class HeroBannerController extends Controller
             $validated['image'] = ImageUploadHelper::uploadAndCompress($request->file('image'), 'hero-banners', 1600);
         }
 
-        HeroBanner::create($this->withLegacyFields($validated));
+        $heroBanner = HeroBanner::create($this->withLegacyFields($validated));
+        app(ActivityLogger::class)->log('create', 'Hero Banner', 'Hero banner ditambahkan: ' . $heroBanner->title, $heroBanner);
 
         return redirect()
             ->route('paneladmin.hero-banners.index')
@@ -63,6 +65,7 @@ class HeroBannerController extends Controller
         }
 
         $heroBanner->update($this->withLegacyFields($validated));
+        app(ActivityLogger::class)->log('update', 'Hero Banner', 'Hero banner diperbarui: ' . $heroBanner->title, $heroBanner);
 
         return redirect()
             ->route('paneladmin.hero-banners.index')
@@ -71,6 +74,7 @@ class HeroBannerController extends Controller
 
     public function destroy(HeroBanner $heroBanner)
     {
+        app(ActivityLogger::class)->log('delete', 'Hero Banner', 'Hero banner dihapus: ' . $heroBanner->title, $heroBanner);
         foreach (array_filter([$heroBanner->image, $heroBanner->gambar_background]) as $image) {
             ImageUploadHelper::deleteStoredImage($image);
         }

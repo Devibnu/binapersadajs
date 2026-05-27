@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\EmailSetting;
 use App\Models\WebsiteSetting;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -27,12 +28,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $setting = null;
-
         try {
+            EmailSetting::applyActiveConfiguration();
+
             if (Schema::hasTable('website_settings')) {
                 $setting = WebsiteSetting::first();
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $setting = null;
         }
 

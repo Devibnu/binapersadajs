@@ -33,6 +33,7 @@ class Service extends Model
         'icon',
         'image',
         'is_active',
+        'status',
         'sort_order',
     ];
 
@@ -40,6 +41,11 @@ class Service extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
 
     public function imageUrl(): string
     {

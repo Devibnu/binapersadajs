@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContactPageSetting;
+use App\Models\AboutPageSetting;
+use App\Models\AboutTeam;
 use App\Models\HeroBanner;
+use App\Models\HomepageSetting;
+use App\Models\HomepageVideo;
 use App\Models\PageHero;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
@@ -25,13 +30,23 @@ class WebsiteController extends Controller
 
         [$services, $showServiceFallback] = $this->servicesForWebsite();
 
-        return view('website.home', compact('heroBanners', 'services', 'showServiceFallback'));
+        return view('website.home', [
+            'heroBanners' => $heroBanners,
+            'services' => $services,
+            'showServiceFallback' => $showServiceFallback,
+            'homepageSetting' => HomepageSetting::current(),
+            'homepageVideo' => HomepageVideo::current(),
+        ]);
     }
 
     public function about()
     {
         return view('website.about', [
             'pageHero' => $this->pageHero('about'),
+            'aboutPageSetting' => AboutPageSetting::current(),
+            'aboutTeams' => Schema::hasTable('about_teams')
+                ? AboutTeam::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get()
+                : collect(),
         ]);
     }
 
@@ -62,6 +77,7 @@ class WebsiteController extends Controller
     {
         return view('website.contact', [
             'pageHero' => $this->pageHero('contact'),
+            'contactPageSetting' => ContactPageSetting::current(),
         ]);
     }
 
@@ -72,7 +88,7 @@ class WebsiteController extends Controller
         }
 
         $hasServices = Service::exists();
-        $services = Service::where('is_active', true)
+        $services = Service::where('status', 'active')
             ->orderBy('sort_order')
             ->orderBy('title')
             ->get();

@@ -15,7 +15,6 @@
           </div>
           <div class="col-lg-7">
             <h4>{{ $project->title }}</h4>
-            <p class="text-sm text-secondary">{{ $project->short_description ?: '-' }}</p>
             <p class="text-sm mb-1"><strong>Client:</strong> {{ $project->client_name ?: '-' }}</p>
             <p class="text-sm mb-1"><strong>Lokasi:</strong> {{ $project->project_location ?: '-' }}</p>
             <p class="text-sm mb-1"><strong>Tahun:</strong> {{ $project->project_year ?: '-' }}</p>
@@ -24,12 +23,6 @@
               {{ $project->isActive() ? 'Aktif' : 'Nonaktif' }}
             </span>
           </div>
-          @if($project->description)
-            <div class="col-12 mt-4">
-              <h6>Deskripsi Lengkap</h6>
-              <p class="text-sm">{!! nl2br(e($project->description)) !!}</p>
-            </div>
-          @endif
         </div>
       </div>
     </div>

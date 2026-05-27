@@ -1,6 +1,6 @@
 @extends('layouts.website')
 
-@section('title', 'Constra - Blog')
+@section('title', 'Blog - PT. Bina Persada Jaya Sejahtera')
 
 @section('content')
 @php
@@ -20,7 +20,7 @@
             <h1 class="banner-title">{{ $pageHeroTitle }}</h1>
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb {{ $pageHeroBreadcrumbClass }}">
-                <li class="breadcrumb-item"><a href="{{ route('website.home') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('website.home') }}">Beranda</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ $pageHeroBreadcrumb }}</li>
               </ol>
             </nav>
@@ -33,38 +33,46 @@
 
 <section id="main-container" class="main-container">
   <div class="container">
-    <div class="row text-center">
-      <div class="col-12">
-        <h2 class="section-title">Company Updates</h2>
-        <h3 class="section-sub-title">Latest Articles</h3>
-      </div>
-    </div>
-
     <div class="row">
-      @foreach ($posts as $post)
-        <div class="col-lg-4 col-md-6 mb-5">
-          <div class="latest-post">
-            <div class="latest-post-media">
-              <a href="{{ route('website.blog.show', $post['slug']) }}" class="latest-post-img">
-                <img loading="lazy" class="img-fluid" src="{{ asset($post['image']) }}" alt="{{ $post['title'] }}">
+      <aside class="col-lg-4 order-1 order-lg-0 mb-5 mb-lg-0">
+        @include('website.blog._sidebar')
+      </aside>
+
+      <div class="col-lg-8 order-0 order-lg-1 mb-5 mb-lg-0">
+        @forelse($posts as $post)
+          <div class="post">
+            <div class="post-media post-image">
+              <a href="{{ route('website.blog.show', $post->slug) }}">
+                <img loading="lazy" src="{{ $post->featuredImageUrl() }}" class="img-fluid" alt="{{ $post->title }}">
               </a>
             </div>
             <div class="post-body">
-              <div class="post-meta">
-                <span><i class="far fa-calendar"></i> {{ $post['date'] }}</span>
-                <span class="post-comment"><i class="far fa-folder-open"></i> {{ $post['category'] }}</span>
+              <div class="entry-header">
+                <div class="post-meta">
+                  <span class="post-author"><i class="far fa-user"></i> {{ $post->displayAuthor() }}</span>
+                  <span class="post-cat"><i class="far fa-folder-open"></i> {{ $post->category }}</span>
+                  <span class="post-meta-date"><i class="far fa-calendar"></i> {{ $post->displayDate() }}</span>
+                </div>
+                <h2 class="entry-title">
+                  <a href="{{ route('website.blog.show', $post->slug) }}">{{ $post->title }}</a>
+                </h2>
               </div>
-              <h4 class="post-title">
-                <a href="{{ route('website.blog.show', $post['slug']) }}" class="d-inline-block">{{ $post['title'] }}</a>
-              </h4>
-              <p>{{ $post['excerpt'] }}</p>
+              <div class="entry-content">
+                <p>{{ $post->excerpt }}</p>
+              </div>
               <div class="post-footer">
-                <a class="btn btn-primary" href="{{ route('website.blog.show', $post['slug']) }}">Read More</a>
+                <a href="{{ route('website.blog.show', $post->slug) }}" class="btn btn-primary">Lanjutkan Membaca</a>
               </div>
             </div>
           </div>
-        </div>
-      @endforeach
+        @empty
+          <div class="post">
+            <div class="post-body">
+              <p class="mb-0">Belum ada artikel yang tersedia.</p>
+            </div>
+          </div>
+        @endforelse
+      </div>
     </div>
   </div>
 </section>

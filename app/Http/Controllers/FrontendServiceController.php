@@ -22,10 +22,10 @@ class FrontendServiceController extends Controller
     public function show(string $slug)
     {
         $service = Service::where('slug', $slug)
-            ->where('is_active', true)
+            ->where('status', 'active')
             ->firstOrFail();
 
-        $relatedServices = Service::where('is_active', true)
+        $relatedServices = Service::where('status', 'active')
             ->orderBy('sort_order')
             ->orderBy('title')
             ->get();
@@ -44,7 +44,7 @@ class FrontendServiceController extends Controller
         }
 
         $hasServices = Service::exists();
-        $services = Service::where('is_active', true)
+        $services = Service::where('status', 'active')
             ->orderBy('sort_order')
             ->orderBy('title')
             ->get();

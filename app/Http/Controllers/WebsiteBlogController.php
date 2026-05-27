@@ -2,88 +2,113 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Blog;
 use App\Models\PageHero;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 
 class WebsiteBlogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('website.blog.index', [
-            'posts' => $this->posts(),
-            'pageHero' => $this->pageHero('blog'),
-        ]);
+        $allBlogs = $this->publishedBlogs();
+        $posts = $allBlogs;
+
+        if ($request->filled('kategori')) {
+            $posts = $posts->where('category', $request->string('kategori')->toString());
+        }
+
+        if ($request->filled('tag')) {
+            $tag = $request->string('tag')->toString();
+            $posts = $posts->filter(fn (Blog $blog) => in_array($tag, $blog->tagList(), true));
+        }
+
+        if ($request->filled('arsip')) {
+            $archive = $request->string('arsip')->toString();
+            $posts = $posts->filter(fn (Blog $blog) => $blog->published_at?->format('Y-m') === $archive);
+        }
+
+        return view('website.blog.index', array_merge([
+            'posts' => $posts->values(),
+            'pageHero' => $this->pageHero(),
+        ], $this->sidebarData($allBlogs)));
     }
 
-    private function pageHero(string $pageKey): ?PageHero
+    public function show(string $slug)
+    {
+        abort_unless(Schema::hasTable('blogs'), 404);
+
+        $post = Blog::published()->where('slug', $slug)->firstOrFail();
+        $allBlogs = $this->publishedBlogs();
+        $comments = $post->comments()
+            ->approved()
+            ->whereNull('parent_id')
+            ->with(['replies' => fn ($query) => $query->approved()->oldest()])
+            ->latest('approved_at')
+            ->latest()
+            ->get();
+
+        return view('website.blog.show', array_merge([
+            'post' => $post,
+            'pageHero' => $this->pageHero(),
+            'comments' => $comments,
+        ], $this->sidebarData($allBlogs, $post)));
+    }
+
+    private function publishedBlogs(): Collection
+    {
+        if (! Schema::hasTable('blogs')) {
+            return collect();
+        }
+
+        return Blog::published()
+            ->orderBy('sort_order')
+            ->latest('published_at')
+            ->get();
+    }
+
+    private function sidebarData(Collection $blogs, ?Blog $current = null): array
+    {
+        $recentPosts = $blogs
+            ->sortByDesc(fn (Blog $blog) => ($blog->published_at ?: $blog->created_at)?->timestamp ?? 0)
+            ->when($current, fn (Collection $items) => $items->where('id', '!=', $current->id))
+            ->take(5)
+            ->values();
+
+        $categories = $blogs
+            ->countBy('category')
+            ->sortDesc();
+
+        $archives = $blogs
+            ->filter(fn (Blog $blog) => $blog->published_at)
+            ->groupBy(fn (Blog $blog) => $blog->published_at->format('Y-m'))
+            ->map(function (Collection $items, string $key) {
+                return [
+                    'key' => $key,
+                    'label' => $items->first()->published_at->locale('id')->translatedFormat('F Y'),
+                    'count' => $items->count(),
+                ];
+            })
+            ->sortKeysDesc()
+            ->values();
+
+        $tags = $blogs
+            ->flatMap(fn (Blog $blog) => $blog->tagList())
+            ->countBy()
+            ->sortDesc();
+
+        return compact('recentPosts', 'categories', 'archives', 'tags');
+    }
+
+    private function pageHero(): ?PageHero
     {
         if (! Schema::hasTable('page_heroes')) {
             return null;
         }
 
-        return PageHero::where('page_key', $pageKey)
+        return PageHero::where('page_key', 'blog')
             ->where('is_active', true)
             ->first();
-    }
-
-    public function show(string $slug)
-    {
-        $posts = $this->posts();
-        $post = collect($posts)->firstWhere('slug', $slug);
-
-        abort_if(! $post, 404);
-
-        return view('website.blog.show', [
-            'post' => $post,
-            'relatedPosts' => collect($posts)
-                ->where('slug', '!=', $slug)
-                ->take(2)
-                ->values(),
-        ]);
-    }
-
-    private function posts(): array
-    {
-        return [
-            [
-                'title' => 'Project Maintenance PT Sankyu',
-                'slug' => 'project-maintenance-pt-sankyu',
-                'date' => '22 May 2026',
-                'category' => 'Project Update',
-                'image' => 'web/images/news/news1.jpg',
-                'excerpt' => 'Update pekerjaan maintenance area industri dengan fokus pada reliability equipment, safety control, dan koordinasi lapangan.',
-                'content' => [
-                    'PT Bina Persada JS menjalankan pekerjaan maintenance untuk mendukung kelancaran operasional area industri PT Sankyu. Aktivitas dilakukan melalui inspeksi awal, perencanaan tenaga kerja, pengaturan material, dan pelaksanaan pekerjaan sesuai prosedur keselamatan.',
-                    'Tim lapangan memastikan setiap tahapan maintenance berjalan terukur, mulai dari pengecekan kondisi equipment, preventive action, hingga dokumentasi hasil pekerjaan. Pendekatan ini membantu menekan risiko downtime dan menjaga produktivitas area kerja.',
-                    'Koordinasi harian bersama pihak terkait menjadi bagian penting dari pekerjaan ini agar target mutu, waktu, dan keselamatan dapat tercapai dengan baik.',
-                ],
-            ],
-            [
-                'title' => 'Safety Work Procedure in Industrial Area',
-                'slug' => 'safety-work-procedure-in-industrial-area',
-                'date' => '18 May 2026',
-                'category' => 'Safety & HSE',
-                'image' => 'web/images/news/news2.jpg',
-                'excerpt' => 'Ringkasan prosedur keselamatan kerja untuk pekerjaan fabrication, maintenance, dan installation di lingkungan industri.',
-                'content' => [
-                    'Keselamatan kerja menjadi fondasi utama dalam setiap aktivitas PT Bina Persada JS. Sebelum pekerjaan dimulai, tim melakukan toolbox meeting, pemeriksaan alat kerja, validasi izin kerja, dan identifikasi potensi bahaya di area kerja.',
-                    'Pekerjaan di area industri membutuhkan disiplin tinggi terhadap penggunaan APD, pengendalian energi, housekeeping, serta komunikasi antar pekerja. Setiap temuan risiko dicatat dan ditindaklanjuti sebelum pekerjaan dilanjutkan.',
-                    'Dengan penerapan prosedur HSE yang konsisten, produktivitas dapat berjalan berdampingan dengan perlindungan tenaga kerja dan aset pelanggan.',
-                ],
-            ],
-            [
-                'title' => 'Fabrication & Pipe Installation Project',
-                'slug' => 'fabrication-pipe-installation-project',
-                'date' => '12 May 2026',
-                'category' => 'Fabrication',
-                'image' => 'web/images/news/news3.jpg',
-                'excerpt' => 'Dokumentasi singkat pekerjaan fabrikasi dan instalasi pipa, termasuk persiapan material, fit-up, welding, dan final inspection.',
-                'content' => [
-                    'Pekerjaan fabrication dan pipe installation dilakukan dengan tahapan yang rapi, mulai dari pembacaan drawing, pengukuran material, cutting, fit-up, welding, sampai pemasangan di lokasi kerja.',
-                    'Setiap sambungan dan jalur pipa diperiksa untuk memastikan kesesuaian terhadap spesifikasi teknis. Tim juga menjaga area kerja tetap tertata agar proses instalasi berjalan efisien dan aman.',
-                    'Dokumentasi hasil kerja menjadi bagian dari quality control sekaligus referensi untuk maintenance berikutnya.',
-                ],
-            ],
-        ];
     }
 }
