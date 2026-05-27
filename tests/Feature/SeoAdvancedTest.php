@@ -116,9 +116,13 @@ class SeoAdvancedTest extends TestCase
         $this->assertSame(1, substr_count($html, '<meta name="twitter:title"'));
     }
 
-    public function test_sitemap_and_robots_respect_active_content_and_index_setting(): void
+    public function test_sitemap_filters_active_content_and_robots_exposes_clean_public_sitemap_url(): void
     {
-        $this->seoSetting(['robots_index' => false, 'robots_follow' => false]);
+        $this->seoSetting([
+            'robots_index' => false,
+            'robots_follow' => false,
+            'canonical_url' => 'https://binapersadajs.co.id?utm_source=test',
+        ]);
         Service::create(['title' => 'Mechanical Work', 'slug' => 'mechanical-work', 'status' => 'active']);
         Service::create(['title' => 'Hidden Work', 'slug' => 'hidden-work', 'status' => 'inactive']);
         Blog::create([
@@ -146,9 +150,11 @@ class SeoAdvancedTest extends TestCase
 
         $this->get(route('website.robots'))
             ->assertOk()
+            ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
             ->assertSee("User-agent: *")
-            ->assertSee("Disallow: /")
-            ->assertSee('Sitemap: https://binapersadajs.co.id/sitemap.xml');
+            ->assertSee("Allow: /")
+            ->assertSee('Sitemap: https://binapersadajs.co.id/sitemap.xml')
+            ->assertDontSee('utm_source');
     }
 
     public function test_empty_seo_setting_uses_safe_defaults_without_optional_google_scripts(): void

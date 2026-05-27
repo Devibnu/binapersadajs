@@ -13,7 +13,7 @@ class SeoController extends Controller
     public function sitemap(): Response
     {
         $setting = SeoSetting::current();
-        $baseUrl = rtrim($setting->canonical_url ?: url('/'), '/');
+        $baseUrl = $this->cleanBaseUrl($setting->canonical_url ?: url('/'));
         $urls = collect([
             ['location' => $baseUrl . '/', 'priority' => '1.0'],
             ['location' => $baseUrl . '/about', 'priority' => '0.8'],
@@ -53,15 +53,20 @@ class SeoController extends Controller
     public function robots(): Response
     {
         $setting = SeoSetting::current();
-        $baseUrl = rtrim($setting->canonical_url ?: url('/'), '/');
+        $baseUrl = $this->cleanBaseUrl($setting->canonical_url ?: url('/'));
         $lines = [
             'User-agent: *',
-            $setting->robots_index ? 'Allow: /' : 'Disallow: /',
+            'Allow: /',
             '',
             'Sitemap: ' . $baseUrl . '/sitemap.xml',
         ];
 
         return response(implode("\n", $lines) . "\n", 200)
             ->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
+    private function cleanBaseUrl(string $url): string
+    {
+        return rtrim((string) preg_replace('/[?#].*$/', '', $url), '/');
     }
 }
