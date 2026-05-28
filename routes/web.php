@@ -35,8 +35,16 @@ use App\Http\Controllers\ResetController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\WebsiteBlogController;
 use App\Http\Controllers\WebsiteController;
+use App\Models\WebsiteSetting;
 use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/favicon.ico', function () {
+    $websiteSetting = WebsiteSetting::first();
+    $faviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
+    $faviconVersion = $websiteSetting?->updated_at?->timestamp ?? filemtime(public_path('icons/favicon-32x32.png'));
+    return redirect()->to($faviconUrl . '?v=' . $faviconVersion);
+});
 
 Route::get('/', [WebsiteController::class, 'home'])->middleware('analytics.track')->name('website.home');
 Route::get('/about', [WebsiteController::class, 'about'])->middleware('analytics.track')->name('website.about');

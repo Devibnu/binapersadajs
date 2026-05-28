@@ -14,6 +14,9 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # Send requests for favicon.ico to the front controller, even if the file exists.
+    RewriteRule ^favicon\.ico$ index.php [L]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f

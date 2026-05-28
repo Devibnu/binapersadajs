@@ -97,15 +97,19 @@
             })(window,document,'script','dataLayer',@json($globalSeo->google_tag_manager));
         </script>
     @endif
+    @php
+        $faviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
+        $faviconVersion = $websiteSetting?->updated_at?->timestamp ?? time();
+    @endphp
     <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/favicon-16x16.png') }}">
-    <link rel="shortcut icon" href="{{ asset('icons/favicon-32x32.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
+    <link rel="shortcut icon" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
     <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}" color="#0d1b2f">
     <meta name="msapplication-TileColor" content="#0d1b2f">
     <meta name="msapplication-config" content="{{ asset('browserconfig.xml') }}">
-    @stack('preload')
+    @stack('preload' )
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap">

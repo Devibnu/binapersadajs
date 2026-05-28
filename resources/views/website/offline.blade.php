@@ -6,9 +6,13 @@
     <meta name="theme-color" content="#0d1b2f">
     <title>PT. Bina Persada Jaya Sejahtera - Offline</title>
     <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-    <link rel="shortcut icon" href="/icons/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    @php
+        $faviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
+        $faviconVersion = $websiteSetting?->updated_at?->timestamp ?? time();
+    @endphp
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
+    <link rel="shortcut icon" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
     <style>
         body {
             align-items: center;

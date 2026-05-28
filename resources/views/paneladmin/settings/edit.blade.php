@@ -43,7 +43,7 @@
                 <label>Logo</label>
                 <input type="file" name="logo" class="form-control" accept="image/*">
                 @if($setting->logo)
-                  <img src="{{ Storage::url($setting->logo) }}" alt="Logo" class="mt-3" style="max-height: 60px;">
+                  <img src="{{ Storage::url($setting->logo) }}?v={{ optional($setting->updated_at)->timestamp ?? time() }}" alt="Logo" class="mt-3" style="max-height: 60px;">
                 @endif
               </div>
             </div>
@@ -52,7 +52,7 @@
                 <label>Favicon</label>
                 <input type="file" name="favicon" class="form-control" accept="image/*">
                 @if($setting->favicon)
-                  <img src="{{ Storage::url($setting->favicon) }}" alt="Favicon" class="mt-3" style="max-height: 40px;">
+                  <img src="{{ Storage::url($setting->favicon) }}?v={{ optional($setting->updated_at)->timestamp ?? time() }}" alt="Favicon" class="mt-3" style="max-height: 40px;">
                 @endif
               </div>
             </div>
