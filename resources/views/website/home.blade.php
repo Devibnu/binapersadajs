@@ -628,59 +628,29 @@
     </div>
 
     <div class="row">
-      <div class="col-lg-4 col-md-6 mb-4">
-        <div class="latest-post">
-          <div class="latest-post-media">
-            <a href="{{ route('website.blog.show', 'project-maintenance-pt-sankyu') }}" class="latest-post-img">
-              <img loading="lazy" decoding="async" class="img-fluid" src="{{ asset('web/images/news/news1.jpg') }}" alt="Project maintenance activity" width="750" height="450">
-            </a>
-          </div>
-          <div class="post-body">
-            <h4 class="post-title">
-              <a href="{{ route('website.blog.show', 'project-maintenance-pt-sankyu') }}" class="d-inline-block">Project Maintenance PT Sankyu</a>
-            </h4>
-            <div class="latest-post-meta">
-              <span class="post-item-date"><i class="fa fa-clock-o"></i> May 22, 2026</span>
+      @forelse($latestBlogs as $blog)
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="latest-post">
+            <div class="latest-post-media">
+              <a href="{{ route('website.blog.show', $blog->slug) }}" class="latest-post-img">
+                <img loading="lazy" decoding="async" class="img-fluid" src="{{ $blog->featuredImageUrl('web/images/news/news1.jpg') }}" alt="{{ $blog->title }}" width="750" height="450">
+              </a>
+            </div>
+            <div class="post-body">
+              <h4 class="post-title">
+                <a href="{{ route('website.blog.show', $blog->slug) }}" class="d-inline-block">{{ $blog->title }}</a>
+              </h4>
+              <div class="latest-post-meta">
+                <span class="post-item-date"><i class="fa fa-clock-o"></i> {{ $blog->displayDate() }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 mb-4">
-        <div class="latest-post">
-          <div class="latest-post-media">
-            <a href="{{ route('website.blog.show', 'safety-work-procedure-in-industrial-area') }}" class="latest-post-img">
-              <img loading="lazy" decoding="async" class="img-fluid" src="{{ asset('web/images/news/news2.jpg') }}" alt="Safety procedure" width="750" height="450">
-            </a>
-          </div>
-          <div class="post-body">
-            <h4 class="post-title">
-              <a href="{{ route('website.blog.show', 'safety-work-procedure-in-industrial-area') }}" class="d-inline-block">Safety Work Procedure in Industrial Area</a>
-            </h4>
-            <div class="latest-post-meta">
-              <span class="post-item-date"><i class="fa fa-clock-o"></i> May 22, 2026</span>
-            </div>
-          </div>
+      @empty
+        <div class="col-12">
+          <p class="text-center">Belum ada artikel terbaru.</p>
         </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 mb-4">
-        <div class="latest-post">
-          <div class="latest-post-media">
-            <a href="{{ route('website.blog.show', 'fabrication-pipe-installation-project') }}" class="latest-post-img">
-              <img loading="lazy" decoding="async" class="img-fluid" src="{{ asset('web/images/news/news3.jpg') }}" alt="Pipe fabrication project" width="750" height="450">
-            </a>
-          </div>
-          <div class="post-body">
-            <h4 class="post-title">
-              <a href="{{ route('website.blog.show', 'fabrication-pipe-installation-project') }}" class="d-inline-block">Fabrication & Pipe Installation Project</a>
-            </h4>
-            <div class="latest-post-meta">
-              <span class="post-item-date"><i class="fa fa-clock-o"></i> May 22, 2026</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      @endforelse
     </div>
 
     <div class="general-btn text-center mt-4">

@@ -11,6 +11,7 @@ use App\Models\HomepageVideo;
 use App\Models\PageHero;
 use App\Models\Project;
 use App\Models\ProjectCategory;
+use App\Models\Blog;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,6 +19,15 @@ class WebsiteController extends Controller
 {
     public function home()
     {
+        $latestBlogs = collect();
+
+        if (Schema::hasTable('blogs')) {
+            $latestBlogs = Blog::published()
+                ->orderByDesc('published_at')
+                ->orderByDesc('created_at')
+                ->take(3)
+                ->get();
+        }
         $heroBanners = collect();
 
         if (Schema::hasTable('hero_banners')) {
@@ -42,6 +52,7 @@ class WebsiteController extends Controller
             'projectCategories' => $projectCategories,
             'projects' => $projects,
             'showProjectFallback' => $showProjectFallback,
+            'latestBlogs' => $latestBlogs,
         ]);
     }
 

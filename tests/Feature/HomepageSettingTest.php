@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Blog;
 use App\Models\HomepageSetting;
 use App\Models\Project;
 use App\Models\ProjectCategory;
@@ -110,6 +111,85 @@ class HomepageSettingTest extends TestCase
             ->assertSee('KIRIM PENAWARAN')
             ->assertSee('action="' . route('website.leads.inquiry') . '"', false)
             ->assertSee('https://wa.me/6287774824737?text=', false);
+    }
+
+    public function test_homepage_displays_latest_published_blog_articles(): void
+    {
+        Blog::create([
+            'title' => 'Published Article One',
+            'slug' => 'published-article-one',
+            'excerpt' => 'Excerpt one',
+            'content' => 'Content one',
+            'featured_image' => 'web/images/news/news1.jpg',
+            'category' => 'General',
+            'published_at' => now()->subDays(1),
+            'is_published' => true,
+        ]);
+
+        Blog::create([
+            'title' => 'Published Article Two',
+            'slug' => 'published-article-two',
+            'excerpt' => 'Excerpt two',
+            'content' => 'Content two',
+            'featured_image' => 'web/images/news/news2.jpg',
+            'category' => 'General',
+            'published_at' => now()->subDays(2),
+            'is_published' => true,
+        ]);
+
+        $response = $this->get(route('website.home'))
+            ->assertOk()
+            ->assertSee('Published Article One')
+            ->assertSee('Published Article Two')
+            ->assertSee(route('website.blog.index'))
+            ->assertSee('See All Posts');
+
+        $response->assertSeeInOrder(['Published Article One', 'Published Article Two']);
+    }
+
+    public function test_homepage_does_not_show_unpublished_blog_articles(): void
+    {
+        Blog::create([
+            'title' => 'Draft Article',
+            'slug' => 'draft-article',
+            'excerpt' => 'Draft excerpt',
+            'content' => 'Draft content',
+            'category' => 'General',
+            'published_at' => now()->subDays(3),
+            'is_published' => false,
+        ]);
+
+        $this->get(route('website.home'))
+            ->assertOk()
+            ->assertDontSee('Draft Article');
+    }
+
+    public function test_homepage_blog_articles_are_ordered_by_latest_published_date(): void
+    {
+        Blog::create([
+            'title' => 'Older Published Article',
+            'slug' => 'older-published-article',
+            'excerpt' => 'Older article excerpt',
+            'content' => 'Older article content',
+            'category' => 'General',
+            'published_at' => now()->subDays(10),
+            'is_published' => true,
+        ]);
+
+        Blog::create([
+            'title' => 'Newer Published Article',
+            'slug' => 'newer-published-article',
+            'excerpt' => 'Newer article excerpt',
+            'content' => 'Newer article content',
+            'category' => 'General',
+            'published_at' => now()->subHour(),
+            'is_published' => true,
+        ]);
+
+        $response = $this->get(route('website.home'))
+            ->assertOk();
+
+        $response->assertSeeInOrder(['Newer Published Article', 'Older Published Article']);
     }
 
     public function test_homepage_project_section_uses_active_database_categories_and_published_projects(): void
