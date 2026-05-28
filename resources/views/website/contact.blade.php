@@ -93,6 +93,9 @@
       ? $googleMapsMatch[0]
       : preg_replace('/<iframe\b/i', '<iframe loading="lazy"', $googleMapsMatch[0], 1))
     : null;
+  if ($googleMapsEmbed && ! preg_match('/\btitle\s*=/i', $googleMapsEmbed)) {
+    $googleMapsEmbed = preg_replace('/<iframe\b/i', '<iframe title="Lokasi PT. Bina Persada Jaya Sejahtera"', $googleMapsEmbed, 1);
+  }
 @endphp
 <div id="banner-area" class="banner-area page-hero-managed" style="background-image:url({{ $pageHeroBackground }}); --page-hero-overlay: {{ $pageHeroOpacity }};">
   <div class="banner-text">
@@ -192,7 +195,7 @@
         <form id="contact-form" action="{{ route('website.contact.store') }}" method="post" role="form">
           @csrf
           <div class="error-container"></div>
-          <div class="d-none" aria-hidden="true">
+          <div class="d-none">
             <label for="website_url">Website</label>
             <input type="text" name="website_url" id="website_url" tabindex="-1" autocomplete="off">
           </div>

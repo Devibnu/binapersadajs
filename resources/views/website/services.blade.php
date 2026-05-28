@@ -47,13 +47,13 @@
         <div class="ts-service-box industrial-service-tile">
           <div class="ts-service-image-wrapper">
             <a href="{{ route('services.show', $service->slug) }}">
-              <img loading="lazy" class="w-100" src="{{ $service->imageUrl() }}" alt="{{ $service->title }}">
+              <img loading="lazy" decoding="async" class="w-100" src="{{ $service->imageUrl() }}" alt="{{ $service->title }}" width="360" height="250">
             </a>
           </div>
           <div class="d-flex">
             <div class="industrial-service-icon small">
               @if($service->iconUrl())
-                <img src="{{ $service->iconUrl() }}" alt="" style="max-width: 32px; max-height: 32px; object-fit: contain;">
+                <img src="{{ $service->iconUrl() }}" alt="" width="32" height="32" loading="lazy" decoding="async" style="max-width: 32px; max-height: 32px; object-fit: contain;">
               @else
                 <i class="fas {{ $service->iconClass() }}"></i>
               @endif
@@ -87,7 +87,7 @@
       <div class="col-lg-4 col-md-6 mb-5">
         <div class="ts-service-box industrial-service-tile">
           <div class="ts-service-image-wrapper">
-            <img loading="lazy" class="w-100" src="{{ asset('web/images/services/' . $service[2]) }}" alt="{{ $service[0] }}">
+            <img loading="lazy" decoding="async" class="w-100" src="{{ asset('web/images/services/' . $service[2]) }}" alt="{{ $service[0] }}" width="360" height="250">
           </div>
           <div class="d-flex">
             <div class="industrial-service-icon small">

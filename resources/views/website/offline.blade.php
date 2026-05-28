@@ -47,7 +47,7 @@
 </head>
 <body>
     <main class="offline-card">
-        <img src="/icons/android-chrome-192x192.png" alt="PT. Bina Persada Jaya Sejahtera">
+        <img src="/icons/android-chrome-192x192.png" alt="PT. Bina Persada Jaya Sejahtera" width="192" height="192" decoding="async">
         <h1>Anda sedang offline</h1>
         <p>Koneksi internet tidak tersedia. Beberapa halaman yang pernah dibuka masih dapat diakses dari cache aplikasi.</p>
     </main>

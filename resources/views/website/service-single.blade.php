@@ -105,7 +105,7 @@
 
           <div class="row">
             <div class="col-md-12">
-              <img loading="lazy" class="img-fluid mb-4" src="{{ $service->imageUrl() }}" alt="{{ $service->title }}">
+              <img loading="lazy" decoding="async" class="img-fluid mb-4" src="{{ $service->imageUrl() }}" alt="{{ $service->title }}" width="750" height="450">
               @if($summary)
                 <p class="lead">{{ $summary }}</p>
               @endif
@@ -125,7 +125,7 @@
             <div id="page-slider" class="page-slider">
               @foreach($galleryImages as $galleryImage)
                 <div class="item">
-                  <img loading="lazy" class="img-fluid" src="{{ $galleryImage }}" alt="Galeri {{ $service->title }}">
+                  <img loading="lazy" decoding="async" class="img-fluid" src="{{ $galleryImage }}" alt="Galeri {{ $service->title }}" width="750" height="450">
                 </div>
               @endforeach
             </div>

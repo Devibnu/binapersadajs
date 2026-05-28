@@ -105,6 +105,10 @@
     <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}" color="#0d1b2f">
     <meta name="msapplication-TileColor" content="#0d1b2f">
     <meta name="msapplication-config" content="{{ asset('browserconfig.xml') }}">
+    @stack('preload')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="{{ asset('web/plugins/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('web/plugins/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('web/plugins/animate-css/animate.css') }}">
@@ -342,15 +346,10 @@
                 <div class="col-lg-4 col-md-4 top-social text-center text-md-right">
                     <ul class="list-unstyled">
                         <li>
-                            @if($websiteSetting?->facebook)<a title="Facebook" href="{{ $websiteSetting->facebook }}"><span class="social-icon"><i class="fab fa-facebook-f"></i></span></a>@endif
-                            @if($websiteSetting?->instagram)<a title="Instagram" href="{{ $websiteSetting->instagram }}"><span class="social-icon"><i class="fab fa-instagram"></i></span></a>@endif
-                            @if($websiteSetting?->linkedin)<a title="LinkedIn" href="{{ $websiteSetting->linkedin }}"><span class="social-icon"><i class="fab fa-linkedin-in"></i></span></a>@endif
-                            @if($websiteSetting?->youtube)<a title="YouTube" href="{{ $websiteSetting->youtube }}"><span class="social-icon"><i class="fab fa-youtube"></i></span></a>@endif
-                            @unless($websiteSetting?->facebook || $websiteSetting?->instagram || $websiteSetting?->linkedin || $websiteSetting?->youtube)
-                                <a title="Facebook" href="#"><span class="social-icon"><i class="fab fa-facebook-f"></i></span></a>
-                                <a title="Instagram" href="#"><span class="social-icon"><i class="fab fa-instagram"></i></span></a>
-                                <a title="LinkedIn" href="#"><span class="social-icon"><i class="fab fa-linkedin-in"></i></span></a>
-                            @endunless
+                            @if($websiteSetting?->facebook)<a title="Facebook" aria-label="Buka Facebook PT. Bina Persada JS" href="{{ $websiteSetting->facebook }}" target="_blank" rel="noopener"><span class="social-icon"><i class="fab fa-facebook-f" aria-hidden="true"></i></span></a>@endif
+                            @if($websiteSetting?->instagram)<a title="Instagram" aria-label="Buka Instagram PT. Bina Persada JS" href="{{ $websiteSetting->instagram }}" target="_blank" rel="noopener"><span class="social-icon"><i class="fab fa-instagram" aria-hidden="true"></i></span></a>@endif
+                            @if($websiteSetting?->linkedin)<a title="LinkedIn" aria-label="Buka LinkedIn PT. Bina Persada JS" href="{{ $websiteSetting->linkedin }}" target="_blank" rel="noopener"><span class="social-icon"><i class="fab fa-linkedin-in" aria-hidden="true"></i></span></a>@endif
+                            @if($websiteSetting?->youtube)<a title="YouTube" aria-label="Buka YouTube PT. Bina Persada JS" href="{{ $websiteSetting->youtube }}" target="_blank" rel="noopener"><span class="social-icon"><i class="fab fa-youtube" aria-hidden="true"></i></span></a>@endif
                         </li>
                     </ul>
                 </div>
@@ -364,7 +363,7 @@
                     <div class="row align-items-center">
                         <div class="logo col-lg-3 text-center text-lg-left mb-3 mb-md-5 mb-lg-0">
                             <a class="d-block" href="{{ route('website.home') }}">
-                                <img class="site-logo-img" loading="lazy" src="{{ $websiteSetting?->logoUrl() ?? asset('web/images/logo.png') }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'Constra' }}">
+                                <img class="site-logo-img" src="{{ $websiteSetting?->logoUrl() ?? asset('web/images/logo.png') }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'Constra' }}" width="207" height="39" decoding="async" fetchpriority="high">
                             </a>
                         </div>
                         <div class="col-lg-9 header-right">
@@ -424,18 +423,20 @@
                     </div>
                 </div>
                 <div class="nav-search">
-                    <span id="search"><i class="fa fa-search"></i></span>
+                    <button id="search" type="button" aria-label="Buka pencarian website"><i class="fa fa-search" aria-hidden="true"></i></button>
                 </div>
                 <div class="search-block" style="display: none;">
                     <label for="search-field" class="w-100 mb-0">
                         <input type="text" class="form-control" id="search-field" placeholder="Type what you want and enter">
                     </label>
-                    <span class="search-close">&times;</span>
+                    <button class="search-close" type="button" aria-label="Tutup pencarian">&times;</button>
                 </div>
             </div>
         </div>
     </header>
-    @yield('content')
+	    <main id="main-content" role="main">
+	        @yield('content')
+	    </main>
     <footer id="footer" class="footer bg-overlay">
         <div class="footer-main">
             <div class="container">
@@ -443,23 +444,18 @@
                     <div class="col-lg-4 col-md-6 footer-widget footer-about">
                         <a class="footer-brand" href="{{ route('website.home') }}">
                             @if(!empty($websiteSetting?->logo))
-                                <img loading="lazy" class="footer-logo-img" src="{{ asset('storage/' . $websiteSetting->logo) }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera' }}">
+                                <img loading="lazy" decoding="async" class="footer-logo-img" src="{{ asset('storage/' . $websiteSetting->logo) }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera' }}" width="207" height="39">
                             @else
-                                <img loading="lazy" class="footer-logo-img" src="{{ asset('web/images/logo.png') }}" alt="PT. Bina Persada Jaya Sejahtera">
+                                <img loading="lazy" decoding="async" class="footer-logo-img" src="{{ asset('web/images/logo.png') }}" alt="PT. Bina Persada Jaya Sejahtera" width="207" height="39">
                             @endif
                         </a>
                         <p>{{ $websiteSetting?->deskripsi_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera is an industrial contractor and fabrication company supporting maintenance, construction, fabrication, supplier, and manpower needs.' }}</p>
                         <div class="footer-social">
                             <ul>
-                                @if($websiteSetting?->facebook)<li><a href="{{ $websiteSetting->facebook }}" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>@endif
-                                @if($websiteSetting?->instagram)<li><a href="{{ $websiteSetting->instagram }}" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>@endif
-                                @if($websiteSetting?->linkedin)<li><a href="{{ $websiteSetting->linkedin }}" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a></li>@endif
-                                @if($websiteSetting?->youtube)<li><a href="{{ $websiteSetting->youtube }}" aria-label="YouTube"><i class="fab fa-youtube"></i></a></li>@endif
-                                @unless($websiteSetting?->facebook || $websiteSetting?->instagram || $websiteSetting?->linkedin || $websiteSetting?->youtube)
-                                    <li><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
-                                    <li><a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
-                                    <li><a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a></li>
-                                @endunless
+                                @if($websiteSetting?->facebook)<li><a href="{{ $websiteSetting->facebook }}" target="_blank" rel="noopener" aria-label="Buka Facebook PT. Bina Persada JS"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></li>@endif
+                                @if($websiteSetting?->instagram)<li><a href="{{ $websiteSetting->instagram }}" target="_blank" rel="noopener" aria-label="Buka Instagram PT. Bina Persada JS"><i class="fab fa-instagram" aria-hidden="true"></i></a></li>@endif
+                                @if($websiteSetting?->linkedin)<li><a href="{{ $websiteSetting->linkedin }}" target="_blank" rel="noopener" aria-label="Buka LinkedIn PT. Bina Persada JS"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a></li>@endif
+                                @if($websiteSetting?->youtube)<li><a href="{{ $websiteSetting->youtube }}" target="_blank" rel="noopener" aria-label="Buka YouTube PT. Bina Persada JS"><i class="fab fa-youtube" aria-hidden="true"></i></a></li>@endif
                             </ul>
                         </div>
                     </div>
@@ -510,7 +506,7 @@
                         <form method="POST" action="{{ route('website.leads.newsletter') }}" class="footer-lead-form">
                             @csrf
                             <input type="hidden" name="source" value="footer">
-                            <div class="d-none" aria-hidden="true">
+                            <div class="d-none">
                                 <input type="text" name="website_url" tabindex="-1" autocomplete="off">
                             </div>
                             <div class="form-group mb-2">
@@ -543,7 +539,7 @@
                     </div>
                 </div>
                 <div id="back-to-top" data-spy="affix" data-offset-top="10" class="back-to-top position-fixed">
-                    <button class="btn btn-primary" title="Back to Top"><i class="fa fa-angle-double-up"></i></button>
+	                    <button class="btn btn-primary" title="Kembali ke atas" aria-label="Kembali ke bagian atas halaman"><i class="fa fa-angle-double-up" aria-hidden="true"></i></button>
                 </div>
             </div>
         </div>
@@ -562,9 +558,9 @@
     @endphp
     @if($whatsappNumber)
         <aside class="whatsapp-widget" id="whatsapp-widget" data-whatsapp-number="{{ $whatsappNumber }}" aria-label="Chat WhatsApp">
-            <div class="whatsapp-widget-panel" id="whatsapp-widget-panel" aria-hidden="true">
+            <div class="whatsapp-widget-panel" id="whatsapp-widget-panel" aria-hidden="true" inert>
                 <div class="whatsapp-widget-header">
-                    <span class="whatsapp-widget-avatar"><i class="fab fa-whatsapp"></i></span>
+                    <span class="whatsapp-widget-avatar"><i class="fab fa-whatsapp" aria-hidden="true"></i></span>
                     <div class="whatsapp-widget-brand">
                         <strong>PT. Bina Persada JS</strong>
                         <span>Online</span>
@@ -579,13 +575,13 @@
                     <button type="button" class="whatsapp-widget-quick" data-message="Saya ingin menghubungi admin.">Saya ingin menghubungi admin</button>
                     <label class="sr-only" for="whatsapp-widget-message">Pesan WhatsApp</label>
                     <textarea class="whatsapp-widget-input" id="whatsapp-widget-message" placeholder="Tulis pesan Anda..."></textarea>
-                    <a class="whatsapp-widget-send" id="whatsapp-widget-send" href="#" target="_blank" rel="noopener">
-                        <i class="fab fa-whatsapp"></i> Kirim ke WhatsApp
+                    <a class="whatsapp-widget-send" id="whatsapp-widget-send" href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener" aria-label="Kirim pesan ke WhatsApp PT. Bina Persada JS">
+                        <i class="fab fa-whatsapp" aria-hidden="true"></i> Kirim ke WhatsApp
                     </a>
                 </div>
             </div>
             <button class="whatsapp-widget-toggle" type="button" id="whatsapp-widget-toggle" aria-controls="whatsapp-widget-panel" aria-expanded="false" aria-label="Buka chat WhatsApp">
-                <i class="fab fa-whatsapp"></i>
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
             </button>
         </aside>
     @endif
@@ -618,11 +614,12 @@
                 var send = document.getElementById('whatsapp-widget-send');
                 var defaultMessage = 'Halo PT. Bina Persada Jaya Sejahtera, saya ingin bertanya tentang layanan.';
 
-                function setOpen(open) {
-                    widget.classList.toggle('is-open', open);
-                    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
-                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-                }
+	                function setOpen(open) {
+	                    widget.classList.toggle('is-open', open);
+	                    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+	                    panel.toggleAttribute('inert', !open);
+	                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+	                }
 
                 toggle.addEventListener('click', function () {
                     setOpen(!widget.classList.contains('is-open'));

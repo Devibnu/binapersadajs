@@ -38,11 +38,11 @@
       <div class="col-lg-8">
         <div id="page-slider" class="page-slider">
           <div class="item">
-            <img loading="lazy" class="img-fluid" src="{{ $project->featuredImageUrl() }}" alt="{{ $project->title }}">
+            <img loading="lazy" decoding="async" class="img-fluid" src="{{ $project->featuredImageUrl() }}" alt="{{ $project->title }}" width="750" height="450">
           </div>
           @foreach($galleryImages as $galleryImage)
             <div class="item">
-              <img loading="lazy" class="img-fluid" src="{{ $galleryImage }}" alt="{{ $project->title }} gallery image">
+              <img loading="lazy" decoding="async" class="img-fluid" src="{{ $galleryImage }}" alt="{{ $project->title }} gallery image" width="750" height="450">
             </div>
           @endforeach
         </div>
@@ -85,7 +85,7 @@
           <div class="col-lg-4 col-md-6 mb-4 shuffle-item">
             <div class="project-img-container">
               <a href="{{ route('projects.show', $relatedProject->slug) }}">
-                <img class="img-fluid" src="{{ $relatedProject->featuredImageUrl() }}" alt="{{ $relatedProject->title }}">
+                <img class="img-fluid" src="{{ $relatedProject->featuredImageUrl() }}" alt="{{ $relatedProject->title }}" width="360" height="250" loading="lazy" decoding="async">
               </a>
               <div class="project-item-info">
                 <div class="project-item-info-content">

@@ -2,6 +2,14 @@
 
 @section('title', ($websiteSetting?->nama_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera') . ' - Industrial Contractor & Fabrication')
 
+@push('preload')
+  @php
+    $firstHeroBanner = $heroBanners->first();
+    $firstHeroImage = $firstHeroBanner ? $firstHeroBanner->backgroundUrl() : asset('web/images/slider-main/bg4.jpg');
+  @endphp
+  <link rel="preload" as="image" href="{{ $firstHeroImage }}" fetchpriority="high">
+@endpush
+
 @section('content')
 <div class="banner-carousel banner-carousel-1 mb-0 industrial-hero">
   @forelse($heroBanners as $banner)
@@ -119,7 +127,7 @@
     <div class="row align-items-center">
       <div class="col-lg-6">
         <button type="button" class="homepage-video-media" data-toggle="modal" data-target="#homepageVideoModal" aria-label="Putar video {{ $homepageVideo->title }}">
-          <img src="{{ $homepageVideo->thumbnailUrl() }}" alt="{{ $homepageVideo->title }}" loading="lazy">
+          <img src="{{ $homepageVideo->thumbnailUrl() }}" alt="{{ $homepageVideo->title }}" width="750" height="422" loading="lazy" decoding="async">
           <span class="homepage-video-overlay"></span>
           <span class="homepage-video-play"><i class="fas fa-play"></i></span>
         </button>
@@ -142,7 +150,7 @@
             </button>
             @if($homepageVideo->button_link)
               <a class="homepage-video-external" href="{{ $homepageVideo->button_link }}" target="_blank" rel="noopener" aria-label="Buka tautan video pada tab baru">
-                <i class="fas fa-external-link-alt"></i>
+                <i class="fas fa-external-link-alt" aria-hidden="true"></i>
               </a>
             @endif
           </div>
@@ -152,7 +160,7 @@
   </div>
 </section>
 
-<div class="modal fade homepage-video-modal" id="homepageVideoModal" tabindex="-1" role="dialog" aria-labelledby="homepageVideoModalTitle" aria-hidden="true" data-video-url="{{ $homepageVideoEmbed }}">
+<div class="modal fade homepage-video-modal" id="homepageVideoModal" tabindex="-1" role="dialog" aria-labelledby="homepageVideoModalTitle" aria-hidden="true" inert data-video-url="{{ $homepageVideoEmbed }}">
   <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -345,7 +353,7 @@
 	        <div class="industrial-service-card">
 	          <span class="industrial-service-icon">
 	            @if($service->iconUrl())
-	              <img src="{{ $service->iconUrl() }}" alt="" style="max-width: 36px; max-height: 36px; object-fit: contain;">
+              <img src="{{ $service->iconUrl() }}" alt="" width="36" height="36" loading="lazy" decoding="async" style="max-width: 36px; max-height: 36px; object-fit: contain;">
 	            @else
 	              <i class="fas {{ $service->iconClass() }}"></i>
 	            @endif
@@ -417,13 +425,13 @@
 
           <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;maintenance&quot;,&quot;civil&quot;]">
             <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project1.jpg') }}" aria-label="project-img">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project1.jpg') }}" alt="Industrial maintenance project">
-                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+              <a class="gallery-popup" href="{{ asset('web/images/projects/project1.jpg') }}" aria-label="Lihat gambar Plant Maintenance Support">
+                <img class="img-fluid" src="{{ asset('web/images/projects/project1.jpg') }}" alt="Industrial maintenance project" width="750" height="600" loading="lazy" decoding="async">
+                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
               </a>
               <div class="project-item-info">
                 <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="#">Plant Maintenance Support</a></h3>
+                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Plant Maintenance Support">Plant Maintenance Support</a></h3>
                   <p class="project-cat">Maintenance</p>
                 </div>
               </div>
@@ -432,13 +440,13 @@
 
           <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;fabrication&quot;]">
             <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project2.jpg') }}" aria-label="project-img">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project2.jpg') }}" alt="Fabrication project">
-                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+              <a class="gallery-popup" href="{{ asset('web/images/projects/project2.jpg') }}" aria-label="Lihat gambar Steel Fabrication Work">
+                <img class="img-fluid" src="{{ asset('web/images/projects/project2.jpg') }}" alt="Fabrication project" width="750" height="600" loading="lazy" decoding="async">
+                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
               </a>
               <div class="project-item-info">
                 <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="#">Steel Fabrication Work</a></h3>
+                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Steel Fabrication Work">Steel Fabrication Work</a></h3>
                   <p class="project-cat">Fabrication</p>
                 </div>
               </div>
@@ -447,13 +455,13 @@
 
           <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;piping&quot;,&quot;fabrication&quot;]">
             <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project3.jpg') }}" aria-label="project-img">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project3.jpg') }}" alt="Pipe installation project">
-                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+              <a class="gallery-popup" href="{{ asset('web/images/projects/project3.jpg') }}" aria-label="Lihat gambar Pipe Installation Project">
+                <img class="img-fluid" src="{{ asset('web/images/projects/project3.jpg') }}" alt="Pipe installation project" width="750" height="600" loading="lazy" decoding="async">
+                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
               </a>
               <div class="project-item-info">
                 <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="#">Pipe Installation Project</a></h3>
+                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Pipe Installation Project">Pipe Installation Project</a></h3>
                   <p class="project-cat">Piping</p>
                 </div>
               </div>
@@ -462,13 +470,13 @@
 
           <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;civil&quot;]">
             <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project4.jpg') }}" aria-label="project-img">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project4.jpg') }}" alt="Civil construction project">
-                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+              <a class="gallery-popup" href="{{ asset('web/images/projects/project4.jpg') }}" aria-label="Lihat gambar Civil Construction Support">
+                <img class="img-fluid" src="{{ asset('web/images/projects/project4.jpg') }}" alt="Civil construction project" width="750" height="600" loading="lazy" decoding="async">
+                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
               </a>
               <div class="project-item-info">
                 <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="#">Civil Construction Support</a></h3>
+                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Civil Construction Support">Civil Construction Support</a></h3>
                   <p class="project-cat">Civil</p>
                 </div>
               </div>
@@ -477,13 +485,13 @@
 
           <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;maintenance&quot;]">
             <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project5.jpg') }}" aria-label="project-img">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project5.jpg') }}" alt="Equipment maintenance">
-                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+              <a class="gallery-popup" href="{{ asset('web/images/projects/project5.jpg') }}" aria-label="Lihat gambar Equipment Maintenance">
+                <img class="img-fluid" src="{{ asset('web/images/projects/project5.jpg') }}" alt="Equipment maintenance" width="750" height="600" loading="lazy" decoding="async">
+                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
               </a>
               <div class="project-item-info">
                 <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="#">Equipment Maintenance</a></h3>
+                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Equipment Maintenance">Equipment Maintenance</a></h3>
                   <p class="project-cat">Maintenance</p>
                 </div>
               </div>
@@ -492,13 +500,13 @@
 
           <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;fabrication&quot;,&quot;civil&quot;]">
             <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project6.jpg') }}" aria-label="project-img">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project6.jpg') }}" alt="Site installation work">
-                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+              <a class="gallery-popup" href="{{ asset('web/images/projects/project6.jpg') }}" aria-label="Lihat gambar Site Installation Work">
+                <img class="img-fluid" src="{{ asset('web/images/projects/project6.jpg') }}" alt="Site installation work" width="750" height="600" loading="lazy" decoding="async">
+                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
               </a>
               <div class="project-item-info">
                 <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="#">Site Installation Work</a></h3>
+                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Site Installation Work">Site Installation Work</a></h3>
                   <p class="project-cat">Installation</p>
                 </div>
               </div>
@@ -589,7 +597,7 @@
 
           <form method="POST" action="{{ route('website.leads.inquiry') }}">
             @csrf
-            <div class="d-none" aria-hidden="true">
+            <div class="d-none">
               <input type="text" name="website_url" tabindex="-1" autocomplete="off">
             </div>
             <div class="row">
@@ -634,7 +642,7 @@
         <div class="latest-post">
           <div class="latest-post-media">
             <a href="{{ route('website.blog.show', 'project-maintenance-pt-sankyu') }}" class="latest-post-img">
-              <img loading="lazy" class="img-fluid" src="{{ asset('web/images/news/news1.jpg') }}" alt="Project maintenance activity">
+              <img loading="lazy" decoding="async" class="img-fluid" src="{{ asset('web/images/news/news1.jpg') }}" alt="Project maintenance activity" width="750" height="450">
             </a>
           </div>
           <div class="post-body">
@@ -652,7 +660,7 @@
         <div class="latest-post">
           <div class="latest-post-media">
             <a href="{{ route('website.blog.show', 'safety-work-procedure-in-industrial-area') }}" class="latest-post-img">
-              <img loading="lazy" class="img-fluid" src="{{ asset('web/images/news/news2.jpg') }}" alt="Safety procedure">
+              <img loading="lazy" decoding="async" class="img-fluid" src="{{ asset('web/images/news/news2.jpg') }}" alt="Safety procedure" width="750" height="450">
             </a>
           </div>
           <div class="post-body">
@@ -670,7 +678,7 @@
         <div class="latest-post">
           <div class="latest-post-media">
             <a href="{{ route('website.blog.show', 'fabrication-pipe-installation-project') }}" class="latest-post-img">
-              <img loading="lazy" class="img-fluid" src="{{ asset('web/images/news/news3.jpg') }}" alt="Pipe fabrication project">
+              <img loading="lazy" decoding="async" class="img-fluid" src="{{ asset('web/images/news/news3.jpg') }}" alt="Pipe fabrication project" width="750" height="450">
             </a>
           </div>
           <div class="post-body">
@@ -698,13 +706,15 @@
     var modal = $('#homepageVideoModal');
     var iframe = $('#homepageVideoFrame');
 
-    modal.on('show.bs.modal', function () {
-      iframe.attr('src', modal.data('video-url'));
-    });
+	    modal.on('show.bs.modal', function () {
+	      modal.removeAttr('inert');
+	      iframe.attr('src', modal.data('video-url'));
+	    });
 
-    modal.on('hidden.bs.modal', function () {
-      iframe.attr('src', '');
-    });
+	    modal.on('hidden.bs.modal', function () {
+	      iframe.attr('src', '');
+	      modal.attr('inert', '');
+	    });
   })(jQuery);
 </script>
 @endpush

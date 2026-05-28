@@ -7,7 +7,6 @@ Description: Constra - Construction Html5 Template
 /*------------------------------------------------------------------
 [TABLE OF CONTENTS]
 -------------------------------------------------------------------*/
-@import url(https://fonts.googleapis.com/css?family=Montserrat:300,400,400i,500,500i,600,600i,700,700i,800|Open+Sans:400,400i,600,600i,700,700i,800&display=swap);
 /* Typography
 ================================================== */
 body {
@@ -4697,3 +4696,130 @@ ul.top-info-box > li.nav-search i {
 }
 
 /*# sourceMappingURL=style.css.map */
+
+/* PageSpeed and accessibility refinements */
+button,
+a,
+.btn,
+.navbar-toggler,
+.carousel-control,
+.whatsapp-widget-toggle,
+.whatsapp-widget-close,
+.whatsapp-widget-quick,
+.whatsapp-widget-send,
+.search-close,
+#search {
+  touch-action: manipulation;
+}
+
+.top-social ul li a,
+.footer-social ul li a,
+.nav-search button,
+.search-close,
+#back-to-top .btn.btn-primary,
+.carousel-control,
+.gallery-icon,
+.homepage-video-external,
+.whatsapp-widget-close {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.nav-search button,
+.search-close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.search-close {
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.search-close:focus,
+.nav-search button:focus,
+.whatsapp-widget-toggle:focus,
+.whatsapp-widget-close:focus,
+.carousel-control:focus,
+.btn:focus,
+a:focus {
+  outline: 2px solid #35b779;
+  outline-offset: 3px;
+}
+
+body,
+p,
+.post-body p,
+.entry-content p,
+.service-menu li a,
+.sidebar .widget ul li a {
+  color: #4a4f55;
+}
+
+.footer,
+.footer p,
+.footer a,
+.footer .list-arrow li a,
+.footer-contact p,
+.copyright-info span,
+.footer-menu li a {
+  color: #d8e3ee;
+}
+
+.footer a:hover,
+.footer a:focus,
+.footer .list-arrow li a:hover,
+.footer-menu li a:hover {
+  color: #ffffff;
+}
+
+.text-success.small,
+.footer .text-success {
+  color: #7ff0aa !important;
+}
+
+img[width][height] {
+  height: auto;
+  max-width: 100%;
+}
+
+.latest-post-img img,
+.post-media img,
+.project-img-container img,
+.service-box img,
+.ts-team-wrapper img,
+.homepage-video-media img {
+  background-color: #eef3f7;
+}
+
+.whatsapp-widget-panel[aria-hidden="true"] {
+  visibility: hidden;
+}
+
+.whatsapp-widget.is-open .whatsapp-widget-panel {
+  visibility: visible;
+}
+
+@media (max-width: 767px) {
+  .top-social ul li a {
+    min-height: 36px;
+    min-width: 36px;
+  }
+
+  .nav-search button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .navbar-toggler {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

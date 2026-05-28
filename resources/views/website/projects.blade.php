@@ -191,7 +191,7 @@
               <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["{{ $project->categoryKey() }}"]'>
                 <div class="project-img-container">
                   <a class="gallery-popup" href="{{ $project->featuredImageUrl() }}">
-                    <img class="img-fluid" src="{{ $project->featuredImageUrl() }}" alt="{{ $project->title }}">
+                    <img class="img-fluid" src="{{ $project->featuredImageUrl() }}" alt="{{ $project->title }}" width="750" height="600" loading="lazy" decoding="async">
                     <span class="gallery-icon"><i class="fa fa-plus"></i></span>
                   </a>
                   <div class="project-item-info">
@@ -221,7 +221,7 @@
               <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["{{ strtolower($project['category']) }}"]'>
                 <div class="project-img-container">
                   <a class="gallery-popup" href="{{ asset('web/images/projects/' . $project['image']) }}">
-                    <img class="img-fluid" src="{{ asset('web/images/projects/' . $project['image']) }}" alt="{{ $project['title'] }}">
+                    <img class="img-fluid" src="{{ asset('web/images/projects/' . $project['image']) }}" alt="{{ $project['title'] }}" width="750" height="600" loading="lazy" decoding="async">
                     <span class="gallery-icon"><i class="fa fa-plus"></i></span>
                   </a>
                   <div class="project-item-info">

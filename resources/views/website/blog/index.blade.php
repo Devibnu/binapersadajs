@@ -43,7 +43,7 @@
           <div class="post">
             <div class="post-media post-image">
               <a href="{{ route('website.blog.show', $post->slug) }}">
-                <img loading="lazy" src="{{ $post->featuredImageUrl() }}" class="img-fluid" alt="{{ $post->title }}">
+                <img loading="lazy" decoding="async" src="{{ $post->featuredImageUrl() }}" class="img-fluid" alt="{{ $post->title }}" width="750" height="450">
               </a>
             </div>
             <div class="post-body">

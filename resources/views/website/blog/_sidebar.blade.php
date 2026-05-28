@@ -9,7 +9,7 @@
           <li class="d-flex align-items-start">
             <div class="posts-thumb">
               <a href="{{ route('website.blog.show', $recentPost->slug) }}">
-                <img loading="lazy" alt="{{ $recentPost->title }}" src="{{ $recentPost->featuredImageUrl() }}">
+                <img loading="lazy" decoding="async" alt="{{ $recentPost->title }}" src="{{ $recentPost->featuredImageUrl() }}" width="90" height="70">
               </a>
             </div>
             <div class="post-info">
@@ -66,7 +66,7 @@
     <form method="POST" action="{{ route('website.leads.newsletter') }}">
       @csrf
       <input type="hidden" name="source" value="blog-sidebar">
-      <div class="d-none" aria-hidden="true">
+      <div class="d-none">
         <input type="text" name="website_url" tabindex="-1" autocomplete="off">
       </div>
       <div class="form-group mb-2">

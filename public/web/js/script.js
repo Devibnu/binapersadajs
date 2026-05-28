@@ -129,8 +129,8 @@ jQuery(function ($) {
 					speed: 800,
 					arrows: true,
 					pauseOnHover: true,
-					prevArrow: '<button type="button" class="carousel-control left" aria-label="carousel-control"><i class="fas fa-chevron-left"></i></button>',
-				nextArrow: '<button type="button" class="carousel-control right" aria-label="carousel-control"><i class="fas fa-chevron-right"></i></button>'
+					prevArrow: '<button type="button" class="carousel-control left" aria-label="Slide sebelumnya"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>',
+				nextArrow: '<button type="button" class="carousel-control right" aria-label="Slide berikutnya"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>'
 			});
 			$('.banner-carousel.banner-carousel-1').slickAnimation();
 		}
@@ -147,8 +147,8 @@ jQuery(function ($) {
 				dots: false,
 				speed: 600,
 				arrows: true,
-				prevArrow: '<button type="button" class="carousel-control left" aria-label="carousel-control"><i class="fas fa-chevron-left"></i></button>',
-				nextArrow: '<button type="button" class="carousel-control right" aria-label="carousel-control"><i class="fas fa-chevron-right"></i></button>'
+				prevArrow: '<button type="button" class="carousel-control left" aria-label="Slide sebelumnya"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>',
+				nextArrow: '<button type="button" class="carousel-control right" aria-label="Slide berikutnya"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>'
 			});
 		}
 		bannerCarouselTwo();
@@ -164,8 +164,8 @@ jQuery(function ($) {
 				dots: false,
 				speed: 600,
 				arrows: true,
-				prevArrow: '<button type="button" class="carousel-control left" aria-label="carousel-control"><i class="fas fa-chevron-left"></i></button>',
-				nextArrow: '<button type="button" class="carousel-control right" aria-label="carousel-control"><i class="fas fa-chevron-right"></i></button>'
+				prevArrow: '<button type="button" class="carousel-control left" aria-label="Slide sebelumnya"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>',
+				nextArrow: '<button type="button" class="carousel-control right" aria-label="Slide berikutnya"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>'
 			});
 		}
 		pageSlider();
@@ -217,8 +217,8 @@ jQuery(function ($) {
 				slidesToShow: 4,
 				slidesToScroll: 2,
 				arrows: true,
-				prevArrow: '<button type="button" class="carousel-control left" aria-label="carousel-control"><i class="fas fa-chevron-left"></i></button>',
-				nextArrow: '<button type="button" class="carousel-control right" aria-label="carousel-control"><i class="fas fa-chevron-right"></i></button>',
+				prevArrow: '<button type="button" class="carousel-control left" aria-label="Slide sebelumnya"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>',
+				nextArrow: '<button type="button" class="carousel-control right" aria-label="Slide berikutnya"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>',
 				responsive: [{
 						breakpoint: 992,
 						settings: {

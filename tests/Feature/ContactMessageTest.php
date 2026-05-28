@@ -151,7 +151,7 @@ class ContactMessageTest extends TestCase
 
         $this->get(route('website.contact'))
             ->assertOk()
-            ->assertSee('<iframe src="https://www.google.com/maps/embed?pb=lokasi-perusahaan" loading="lazy"></iframe>', false)
+            ->assertSee('<iframe title="Lokasi PT. Bina Persada Jaya Sejahtera" src="https://www.google.com/maps/embed?pb=lokasi-perusahaan" loading="lazy"></iframe>', false)
             ->assertDontSee('Lokasi Google Maps belum diatur.');
     }
 
@@ -387,7 +387,7 @@ class ContactMessageTest extends TestCase
             ->assertSee('Kontak Proyek')
             ->assertSee('Diskusikan Kebutuhan Anda')
             ->assertSee('KIRIM PERMINTAAN')
-            ->assertSee('<iframe loading="lazy" src="https://www.google.com/maps/embed?pb=cms-contact"></iframe>', false);
+            ->assertSee('<iframe title="Lokasi PT. Bina Persada Jaya Sejahtera" loading="lazy" src="https://www.google.com/maps/embed?pb=cms-contact"></iframe>', false);
 
         $this->post(route('website.contact.store'), [
             'name' => 'Calon Klien',

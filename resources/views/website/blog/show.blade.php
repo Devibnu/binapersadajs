@@ -135,7 +135,7 @@
       <div class="col-lg-8 order-0 order-lg-1">
         <div class="post post-single">
           <div class="post-media post-image">
-            <img loading="lazy" src="{{ $post->featuredImageUrl() }}" class="img-fluid" alt="{{ $post->title }}">
+            <img loading="lazy" decoding="async" src="{{ $post->featuredImageUrl() }}" class="img-fluid" alt="{{ $post->title }}" width="750" height="450">
           </div>
           <div class="post-body">
             <div class="entry-header">
@@ -203,7 +203,7 @@
             <p class="text-muted">Komentar akan tampil setelah disetujui oleh admin.</p>
             <form action="{{ route('website.blog.comments.store', $post) }}" method="POST">
               @csrf
-              <div class="d-none" aria-hidden="true">
+              <div class="d-none">
                 <label for="website_url">Website</label>
                 <input type="text" name="website_url" id="website_url" tabindex="-1" autocomplete="off">
               </div>

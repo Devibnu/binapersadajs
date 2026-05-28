@@ -33,7 +33,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb {{ $pageHeroBreadcrumbClass }}">
                       <li class="breadcrumb-item"><a href="{{ route('website.home') }}">Home</a></li>
-                      <li class="breadcrumb-item"><a href="#">company</a></li>
+                      <li class="breadcrumb-item"><span>Company</span></li>
                       <li class="breadcrumb-item active" aria-current="page">{{ $pageHeroBreadcrumb }}</li>
                     </ol>
                 </nav>
@@ -134,7 +134,7 @@
                 <div class="item">
                   <div class="ts-team-wrapper">
                     <div class="team-img-wrapper">
-                      <img loading="lazy" class="w-100" src="{{ $aboutTeam->imageUrl() }}" alt="{{ $aboutTeam->name }}">
+                      <img loading="lazy" decoding="async" class="w-100" src="{{ $aboutTeam->imageUrl() }}" alt="{{ $aboutTeam->name }}" width="360" height="360">
                     </div>
                     <div class="ts-team-content">
                       <h3 class="ts-name">{{ $aboutTeam->name }}</h3>
