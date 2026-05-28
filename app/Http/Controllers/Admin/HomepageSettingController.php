@@ -7,6 +7,7 @@ use App\Models\HomepageSetting;
 use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class HomepageSettingController extends Controller
@@ -54,6 +55,8 @@ class HomepageSettingController extends Controller
             'counter_4_icon' => ['nullable', 'string', 'max:100'],
             'service_section_label' => ['nullable', 'string', 'max:255'],
             'service_section_title' => ['nullable', 'string', 'max:255'],
+            'project_section_label' => ['nullable', 'string', 'max:255'],
+            'project_section_title' => ['nullable', 'string', 'max:255'],
             'quality_title' => ['nullable', 'string', 'max:255'],
             'quality_description' => ['nullable', 'string'],
             'quality_sub_description' => ['nullable', 'string'],
@@ -72,7 +75,8 @@ class HomepageSettingController extends Controller
         ]);
 
         $setting = HomepageSetting::query()->firstOrNew();
-        $setting->fill($validated);
+        $fillableColumns = Schema::getColumnListing($setting->getTable());
+        $setting->fill(array_intersect_key($validated, array_flip($fillableColumns)));
         $setting->save();
         app(ActivityLogger::class)->log('update', 'Homepage Sections', 'Section homepage diperbarui.', $setting);
 

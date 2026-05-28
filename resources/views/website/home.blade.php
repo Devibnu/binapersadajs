@@ -395,8 +395,8 @@
   <div class="container">
     <div class="row text-center">
       <div class="col-lg-12">
-        <h2 class="section-title">Project Activity</h2>
-        <h3 class="section-sub-title">Industrial Works</h3>
+        <h2 class="section-title">{{ $homepageSetting->project_section_label }}</h2>
+        <h3 class="section-sub-title">{{ $homepageSetting->project_section_title }}</h3>
       </div>
     </div>
 
@@ -406,112 +406,102 @@
           <label class="active" for="all">
             <input type="radio" name="shuffle-filter" id="all" value="all" checked="checked">Show All
           </label>
-          <label for="maintenance">
-            <input type="radio" name="shuffle-filter" id="maintenance" value="maintenance">Maintenance
-          </label>
-          <label for="fabrication">
-            <input type="radio" name="shuffle-filter" id="fabrication" value="fabrication">Fabrication
-          </label>
-          <label for="piping">
-            <input type="radio" name="shuffle-filter" id="piping" value="piping">Piping
-          </label>
-          <label for="civil">
-            <input type="radio" name="shuffle-filter" id="civil" value="civil">Civil
-          </label>
+          @if($projectCategories->isNotEmpty())
+            @foreach($projectCategories as $category)
+              <label for="project-category-{{ $category->slug }}">
+                <input type="radio" name="shuffle-filter" id="project-category-{{ $category->slug }}" value="{{ $category->slug }}">{{ $category->name }}
+              </label>
+            @endforeach
+          @elseif($showProjectFallback)
+            @foreach(['Fabrication', 'Maintenance', 'Piping', 'Scaffolding', 'Mechanical', 'Electrical'] as $category)
+              <label for="project-category-{{ strtolower($category) }}">
+                <input type="radio" name="shuffle-filter" id="project-category-{{ strtolower($category) }}" value="{{ strtolower($category) }}">{{ $category }}
+              </label>
+            @endforeach
+          @endif
         </div>
 
         <div class="row shuffle-wrapper">
           <div class="col-1 shuffle-sizer"></div>
 
-          <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;maintenance&quot;,&quot;civil&quot;]">
-            <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project1.jpg') }}" aria-label="Lihat gambar Plant Maintenance Support">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project1.jpg') }}" alt="Industrial maintenance project" width="750" height="600" loading="lazy" decoding="async">
-                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
-              </a>
-              <div class="project-item-info">
-                <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Plant Maintenance Support">Plant Maintenance Support</a></h3>
-                  <p class="project-cat">Maintenance</p>
+          @if($projects->isNotEmpty())
+            @foreach($projects as $project)
+              <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["{{ $project->categoryKey() }}"]'>
+                <div class="project-img-container">
+                  <a class="gallery-popup" href="{{ $project->featuredImageUrl() }}" aria-label="Lihat gambar {{ $project->title }}">
+                    <img class="img-fluid" src="{{ $project->featuredImageUrl() }}" alt="{{ $project->title }}" width="750" height="600" loading="lazy" decoding="async">
+                    <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                  </a>
+                  <div class="project-item-info">
+                    <div class="project-item-info-content">
+                      <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project {{ $project->title }}">{{ $project->title }}</a></h3>
+                      <p class="project-cat">{{ $project->categoryName() }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            @endforeach
+          @elseif($showProjectFallback)
+            <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["maintenance"]'>
+              <div class="project-img-container">
+                <a class="gallery-popup" href="{{ asset('web/images/projects/project1.jpg') }}" aria-label="Lihat gambar Plant Maintenance Support">
+                  <img class="img-fluid" src="{{ asset('web/images/projects/project1.jpg') }}" alt="Industrial maintenance project" width="750" height="600" loading="lazy" decoding="async">
+                  <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                </a>
+                <div class="project-item-info">
+                  <div class="project-item-info-content">
+                    <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Plant Maintenance Support">Plant Maintenance Support</a></h3>
+                    <p class="project-cat">Maintenance</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;fabrication&quot;]">
-            <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project2.jpg') }}" aria-label="Lihat gambar Steel Fabrication Work">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project2.jpg') }}" alt="Fabrication project" width="750" height="600" loading="lazy" decoding="async">
-                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
-              </a>
-              <div class="project-item-info">
-                <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Steel Fabrication Work">Steel Fabrication Work</a></h3>
-                  <p class="project-cat">Fabrication</p>
+            <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["fabrication"]'>
+              <div class="project-img-container">
+                <a class="gallery-popup" href="{{ asset('web/images/projects/project2.jpg') }}" aria-label="Lihat gambar Steel Fabrication Work">
+                  <img class="img-fluid" src="{{ asset('web/images/projects/project2.jpg') }}" alt="Fabrication project" width="750" height="600" loading="lazy" decoding="async">
+                  <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                </a>
+                <div class="project-item-info">
+                  <div class="project-item-info-content">
+                    <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Steel Fabrication Work">Steel Fabrication Work</a></h3>
+                    <p class="project-cat">Fabrication</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;piping&quot;,&quot;fabrication&quot;]">
-            <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project3.jpg') }}" aria-label="Lihat gambar Pipe Installation Project">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project3.jpg') }}" alt="Pipe installation project" width="750" height="600" loading="lazy" decoding="async">
-                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
-              </a>
-              <div class="project-item-info">
-                <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Pipe Installation Project">Pipe Installation Project</a></h3>
-                  <p class="project-cat">Piping</p>
+            <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["piping"]'>
+              <div class="project-img-container">
+                <a class="gallery-popup" href="{{ asset('web/images/projects/project3.jpg') }}" aria-label="Lihat gambar Pipe Installation Project">
+                  <img class="img-fluid" src="{{ asset('web/images/projects/project3.jpg') }}" alt="Pipe installation project" width="750" height="600" loading="lazy" decoding="async">
+                  <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                </a>
+                <div class="project-item-info">
+                  <div class="project-item-info-content">
+                    <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Pipe Installation Project">Pipe Installation Project</a></h3>
+                    <p class="project-cat">Piping</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;civil&quot;]">
-            <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project4.jpg') }}" aria-label="Lihat gambar Civil Construction Support">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project4.jpg') }}" alt="Civil construction project" width="750" height="600" loading="lazy" decoding="async">
-                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
-              </a>
-              <div class="project-item-info">
-                <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Civil Construction Support">Civil Construction Support</a></h3>
-                  <p class="project-cat">Civil</p>
+            <div class="col-lg-4 col-md-6 shuffle-item" data-groups='["fabrication"]'>
+              <div class="project-img-container">
+                <a class="gallery-popup" href="{{ asset('web/images/projects/project4.jpg') }}" aria-label="Lihat gambar Site Installation Work">
+                  <img class="img-fluid" src="{{ asset('web/images/projects/project4.jpg') }}" alt="Site installation work" width="750" height="600" loading="lazy" decoding="async">
+                  <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                </a>
+                <div class="project-item-info">
+                  <div class="project-item-info-content">
+                    <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Site Installation Work">Site Installation Work</a></h3>
+                    <p class="project-cat">Fabrication</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;maintenance&quot;]">
-            <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project5.jpg') }}" aria-label="Lihat gambar Equipment Maintenance">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project5.jpg') }}" alt="Equipment maintenance" width="750" height="600" loading="lazy" decoding="async">
-                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
-              </a>
-              <div class="project-item-info">
-                <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Equipment Maintenance">Equipment Maintenance</a></h3>
-                  <p class="project-cat">Maintenance</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;fabrication&quot;,&quot;civil&quot;]">
-            <div class="project-img-container">
-              <a class="gallery-popup" href="{{ asset('web/images/projects/project6.jpg') }}" aria-label="Lihat gambar Site Installation Work">
-                <img class="img-fluid" src="{{ asset('web/images/projects/project6.jpg') }}" alt="Site installation work" width="750" height="600" loading="lazy" decoding="async">
-                <span class="gallery-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
-              </a>
-              <div class="project-item-info">
-                <div class="project-item-info-content">
-                  <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Site Installation Work">Site Installation Work</a></h3>
-                  <p class="project-cat">Installation</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          @endif
         </div>
       </div>
 

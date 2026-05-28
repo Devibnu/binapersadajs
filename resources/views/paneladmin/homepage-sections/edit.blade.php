@@ -140,6 +140,28 @@
           </div>
 
           <div class="card border mb-4">
+            <div class="card-header pb-0"><h6>Heading Section Proyek Homepage</h6></div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Label Project</label>
+                    <input type="text" name="project_section_label" class="form-control @error('project_section_label') is-invalid @enderror" value="{{ old('project_section_label', $setting->project_section_label) }}">
+                    @error('project_section_label')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Judul Project</label>
+                    <input type="text" name="project_section_title" class="form-control @error('project_section_title') is-invalid @enderror" value="{{ old('project_section_title', $setting->project_section_title) }}">
+                    @error('project_section_title')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border mb-4">
             <div class="card-header pb-0"><h6>Quality &amp; HSE Commitment</h6></div>
             <div class="card-body">
               <div class="row">

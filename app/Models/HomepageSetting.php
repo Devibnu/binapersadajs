@@ -54,6 +54,8 @@ class HomepageSetting extends Model
         'cta_description',
         'cta_button_text',
         'cta_button_link',
+        'project_section_label',
+        'project_section_title',
         'blog_label',
         'blog_title',
     ];
@@ -107,6 +109,8 @@ class HomepageSetting extends Model
             'cta_description' => 'Mechanical, fabrication, maintenance, piping, scaffolding, manpower supplier, and civil work.',
             'cta_button_text' => 'Contact Now',
             'cta_button_link' => '/contact',
+            'project_section_label' => 'PROJECT ACTIVITY',
+            'project_section_title' => 'INDUSTRIAL WORKS',
             'blog_label' => 'Company Updates',
             'blog_title' => 'Latest Blog',
         ];

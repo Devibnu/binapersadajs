@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\HomepageSetting;
+use App\Models\Project;
+use App\Models\ProjectCategory;
 use App\Models\User;
 use App\Models\WebsiteSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -108,5 +110,104 @@ class HomepageSettingTest extends TestCase
             ->assertSee('KIRIM PENAWARAN')
             ->assertSee('action="' . route('website.leads.inquiry') . '"', false)
             ->assertSee('https://wa.me/6287774824737?text=', false);
+    }
+
+    public function test_homepage_project_section_uses_active_database_categories_and_published_projects(): void
+    {
+        $activeCategory = ProjectCategory::create([
+            'name' => 'Fabrication',
+            'slug' => 'fabrication',
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        $inactiveCategory = ProjectCategory::create([
+            'name' => 'Civil',
+            'slug' => 'civil',
+            'sort_order' => 2,
+            'is_active' => false,
+        ]);
+
+        Project::create([
+            'title' => 'Active Fabrication Project',
+            'slug' => 'active-fabrication-project',
+            'project_category_id' => $activeCategory->id,
+            'status' => 'active',
+            'sort_order' => 1,
+            'featured_image' => 'web/images/projects/project2.jpg',
+        ]);
+
+        Project::create([
+            'title' => 'Inactive Fabrication Project',
+            'slug' => 'inactive-fabrication-project',
+            'project_category_id' => $activeCategory->id,
+            'status' => 'inactive',
+            'sort_order' => 2,
+            'featured_image' => 'web/images/projects/project5.jpg',
+        ]);
+
+        $this->get(route('website.home'))
+            ->assertOk()
+            ->assertSee('project-category-fabrication')
+            ->assertDontSee('project-category-civil')
+            ->assertSee('Active Fabrication Project')
+            ->assertDontSee('Inactive Fabrication Project')
+            ->assertSeeInOrder(['Fabrication']);
+    }
+
+    public function test_projects_page_continue_to_use_active_database_categories(): void
+    {
+        $activeCategory = ProjectCategory::create([
+            'name' => 'Mechanical',
+            'slug' => 'mechanical',
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        ProjectCategory::create([
+            'name' => 'Civil',
+            'slug' => 'civil',
+            'sort_order' => 2,
+            'is_active' => false,
+        ]);
+
+        Project::create([
+            'title' => 'Active Mechanical Project',
+            'slug' => 'active-mechanical-project',
+            'project_category_id' => $activeCategory->id,
+            'status' => 'active',
+            'sort_order' => 1,
+            'featured_image' => 'web/images/projects/project5.jpg',
+        ]);
+
+        $this->get(route('website.projects'))
+            ->assertOk()
+            ->assertSee('project-category-mechanical')
+            ->assertDontSee('project-category-civil')
+            ->assertSee('Active Mechanical Project');
+    }
+
+    public function test_admin_can_update_homepage_project_headings(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin Project Heading',
+            'email' => 'project-heading-admin@example.com',
+            'password' => bcrypt('secret'),
+        ]);
+
+        $payload = array_merge(HomepageSetting::defaults(), [
+            'project_section_label' => 'PROJECT ACTIVITY',
+            'project_section_title' => 'INDUSTRIAL WORKS',
+        ]);
+
+        $this->actingAs($admin)
+            ->put(route('paneladmin.homepage-sections.update'), $payload)
+            ->assertRedirect(route('paneladmin.homepage-sections.edit'))
+            ->assertSessionHas('success', 'Section homepage berhasil disimpan.');
+
+        $this->get(route('website.home'))
+            ->assertOk()
+            ->assertSee('PROJECT ACTIVITY')
+            ->assertSee('INDUSTRIAL WORKS');
     }
 }

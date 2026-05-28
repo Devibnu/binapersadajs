@@ -9,6 +9,8 @@ use App\Models\HeroBanner;
 use App\Models\HomepageSetting;
 use App\Models\HomepageVideo;
 use App\Models\PageHero;
+use App\Models\Project;
+use App\Models\ProjectCategory;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
 
@@ -29,6 +31,7 @@ class WebsiteController extends Controller
         }
 
         [$services, $showServiceFallback] = $this->servicesForWebsite();
+        [$projectCategories, $projects, $showProjectFallback] = $this->projectsForWebsite();
 
         return view('website.home', [
             'heroBanners' => $heroBanners,
@@ -36,7 +39,33 @@ class WebsiteController extends Controller
             'showServiceFallback' => $showServiceFallback,
             'homepageSetting' => HomepageSetting::current(),
             'homepageVideo' => HomepageVideo::current(),
+            'projectCategories' => $projectCategories,
+            'projects' => $projects,
+            'showProjectFallback' => $showProjectFallback,
         ]);
+    }
+
+    private function projectsForWebsite(): array
+    {
+        if (! Schema::hasTable('projects')) {
+            return [collect(), collect(), true];
+        }
+
+        $hasProjects = Project::exists();
+        $projects = Project::with('projectCategory')
+            ->where('status', 'active')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get();
+
+        $projectCategories = Schema::hasTable('project_categories')
+            ? ProjectCategory::where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get()
+            : collect();
+
+        return [$projectCategories, $projects, ! $hasProjects];
     }
 
     public function about()
