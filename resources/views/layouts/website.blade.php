@@ -112,10 +112,10 @@
     @stack('preload' )
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap" as="style">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="{{ asset('web/plugins/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('web/plugins/fontawesome/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('web/plugins/animate-css/animate.css') }}">
     <link rel="stylesheet" href="{{ asset('web/plugins/slick/slick.css') }}">
     <link rel="stylesheet" href="{{ asset('web/plugins/slick/slick-theme.css') }}">
     <link rel="stylesheet" href="{{ asset('web/plugins/colorbox/colorbox.css') }}">

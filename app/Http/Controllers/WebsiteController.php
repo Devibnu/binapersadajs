@@ -14,6 +14,7 @@ use App\Models\ProjectCategory;
 use App\Models\Blog;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Cache;
 
 class WebsiteController extends Controller
 {
@@ -62,20 +63,27 @@ class WebsiteController extends Controller
             return [collect(), collect(), true];
         }
 
-        $hasProjects = Project::exists();
-        $projects = Project::with('projectCategory')
-            ->where('status', 'active')
-            ->orderBy('sort_order')
-            ->orderBy('title')
-            ->get();
+        // Cache projects data for 1 hour
+        $projects = Cache::remember('website_projects', 3600, function () {
+            return Project::with('projectCategory')
+                ->where('status', 'active')
+                ->orderBy('sort_order')
+                ->orderBy('title')
+                ->get();
+        });
 
-        $projectCategories = Schema::hasTable('project_categories')
-            ? ProjectCategory::where('is_active', true)
+        // Cache project categories for 1 hour
+        $projectCategories = Cache::remember('website_project_categories', 3600, function () {
+            if (!Schema::hasTable('project_categories')) {
+                return collect();
+            }
+            return ProjectCategory::where('is_active', true)
                 ->orderBy('sort_order')
                 ->orderBy('name')
-                ->get()
-            : collect();
+                ->get();
+        });
 
+        $hasProjects = $projects->count() > 0;
         return [$projectCategories, $projects, ! $hasProjects];
     }
 
@@ -127,12 +135,15 @@ class WebsiteController extends Controller
             return [collect(), true];
         }
 
-        $hasServices = Service::exists();
-        $services = Service::where('status', 'active')
-            ->orderBy('sort_order')
-            ->orderBy('title')
-            ->get();
+        // Cache services data for 1 hour
+        $services = Cache::remember('website_services', 3600, function () {
+            return Service::where('status', 'active')
+                ->orderBy('sort_order')
+                ->orderBy('title')
+                ->get();
+        });
 
+        $hasServices = $services->count() > 0;
         return [$services, ! $hasServices];
     }
 
