@@ -57,7 +57,7 @@
     </ul>
   </div>
 
-  <div class="widget">
+  <div class="widget widget-newsletter">
     <h3 class="widget-title">Berlangganan Update</h3>
     <p>Dapatkan kabar proyek dan informasi perusahaan terbaru.</p>
     @if(session('lead_success') && session('lead_source') === 'blog-sidebar')

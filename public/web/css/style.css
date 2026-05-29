@@ -3339,6 +3339,8 @@ label {
 
 /* Widget common */
 .sidebar .widget {
+  clear: both;
+  overflow: hidden;
   margin-bottom: 40px;
 }
 
@@ -3492,17 +3494,35 @@ label {
 }
 
 /* Widget tags */
+.sidebar .widget-tags ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .widget-tags ul > li {
-  float: left;
-  margin: 3px;
+  display: inline-block;
+  margin: 0;
+}
+
+.sidebar .widget-tags ul > li a,
+.sidebar .tags a,
+.sidebar .tagcloud a {
+  display: inline-block;
+  margin: 0 8px 8px 0;
+  padding: 8px 14px;
+  border: 1px solid #e5e5e5;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .sidebar .widget-tags ul > li a {
-  border: 1px solid #dadada;
   color: #303030;
-  display: block;
-  font-size: 14px;
-  padding: 3px 15px;
   transition: all 0.3s ease 0s;
 }
 
