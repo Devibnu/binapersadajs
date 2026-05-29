@@ -1,0 +1,51 @@
+/* WebP Support via CSS */
+
+@supports (background-image: image-set(url('') type('image/webp'))) {
+  /* Hero banner WebP support */
+  .banner-carousel-item[style*="slider-main/bg1.jpg"] {
+    background-image: image-set(
+      url('/web/images/slider-main/bg1.webp') type('image/webp'),
+      url('/web/images/slider-main/bg1.jpg') type('image/jpeg')
+    ) !important;
+  }
+
+  .banner-carousel-item[style*="slider-main/bg2.jpg"] {
+    background-image: image-set(
+      url('/web/images/slider-main/bg2.webp') type('image/webp'),
+      url('/web/images/slider-main/bg2.jpg') type('image/jpeg')
+    ) !important;
+  }
+
+  .banner-carousel-item[style*="slider-main/bg3.jpg"] {
+    background-image: image-set(
+      url('/web/images/slider-main/bg3.webp') type('image/webp'),
+      url('/web/images/slider-main/bg3.jpg') type('image/jpeg')
+    ) !important;
+  }
+
+  .banner-carousel-item[style*="slider-main/bg4.jpg"] {
+    background-image: image-set(
+      url('/web/images/slider-main/bg4.webp') type('image/webp'),
+      url('/web/images/slider-main/bg4.jpg') type('image/jpeg')
+    ) !important;
+  }
+
+  .banner-carousel-item[style*="slider-main/bg5.jpg"] {
+    background-image: image-set(
+      url('/web/images/slider-main/bg5.webp') type('image/webp'),
+      url('/web/images/slider-main/bg5.jpg') type('image/jpeg')
+    ) !important;
+  }
+
+  .banner-carousel-item[style*="projects/parallax1.jpg"] {
+    background-image: image-set(
+      url('/web/images/projects/parallax1.webp') type('image/webp'),
+      url('/web/images/projects/parallax1.jpg') type('image/jpeg')
+    ) !important;
+  }
+
+  /* Page hero banners */
+  .page-hero-managed {
+    background-image-set: url(data:image/webp;base64,UklGRiYAAABXRUJQVlA4IBIAAAAwAQCdASoBAAEAAUAcJZQCdLoAAA==) type('image/webp');
+  }
+}
