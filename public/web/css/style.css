@@ -1122,9 +1122,100 @@ ul.navbar-nav > li > a {
   color: #999;
 }
 
+.header-user-menu {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+  position: absolute;
+  right: 15px;
+  top: 13px;
+}
+
+.header-user-menu .nav-search {
+  color: #fff;
+  position: static;
+  right: auto;
+  top: auto;
+}
+
+.header-search-wrapper {
+  align-items: center;
+  display: inline-flex;
+  position: relative;
+}
+
+.header-login-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 18px;
+  z-index: 10000;
+}
+
+.header-login-toggle {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 8px;
+  transition: .3s;
+}
+
+.header-login-toggle:hover,
+.header-login-toggle:focus {
+  color: #1f8f5f;
+  outline: 0;
+}
+
+.header-login-menu {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+  display: none;
+  min-width: 220px;
+  padding: 8px 0;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 99999;
+}
+
+.header-login-menu.show {
+  display: block;
+}
+
+.header-login-menu a {
+  color: #0c1e35;
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-login-menu a:hover,
+.header-login-menu a:focus {
+  background: #f4f7f9;
+  color: #1f8f5f;
+}
+
+.site-navigation,
+.navbar,
+.navbar-collapse {
+  overflow: visible !important;
+}
+
 @media (max-width: 991px) {
   .nav-search {
     top: 17px;
+  }
+
+  .header-user-menu {
+    right: 15px;
+    top: 6px;
   }
 }
 
@@ -1170,6 +1261,47 @@ ul.navbar-nav > li > a {
 @media (max-width: 991px) {
   .search-block .search-close {
     top: -46px;
+  }
+}
+
+@media (min-width: 992px) {
+  .header-user-menu .header-search-box {
+    background: transparent;
+    box-shadow: none;
+    display: none;
+    margin-top: 0;
+    padding: 0;
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 260px;
+    z-index: 9999;
+  }
+
+  .header-user-menu .header-search-box.show,
+  .header-user-menu .header-search-box[style*="display: block"] {
+    display: block !important;
+  }
+
+  .header-user-menu .header-search-box .form-control {
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .14);
+    color: #000000;
+    font-size: 14px;
+    height: 40px;
+    padding: 0 12px;
+    width: 100%;
+  }
+
+  .header-user-menu .header-search-box .form-control::placeholder {
+    color: #777;
+  }
+
+  .header-user-menu .header-search-box .search-close {
+    display: none;
   }
 }
 

@@ -29,6 +29,17 @@ class WebsiteBlogController extends Controller
             $posts = $posts->filter(fn (Blog $blog) => $blog->published_at?->format('Y-m') === $archive);
         }
 
+        if ($request->filled('search')) {
+            $keyword = str($request->string('search')->toString())->lower()->toString();
+            $posts = $posts->filter(function (Blog $blog) use ($keyword) {
+                return str($blog->title)->lower()->contains($keyword)
+                    || str($blog->excerpt)->lower()->contains($keyword)
+                    || str(strip_tags((string) $blog->content))->lower()->contains($keyword)
+                    || str($blog->category)->lower()->contains($keyword)
+                    || str($blog->tags)->lower()->contains($keyword);
+            });
+        }
+
         return view('website.blog.index', array_merge([
             'posts' => $posts->values(),
             'pageHero' => $this->pageHero(),

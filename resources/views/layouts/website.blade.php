@@ -423,19 +423,39 @@
                                     <li class="nav-item {{ request()->routeIs('website.blog.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.blog.index') }}">Blog</a></li>
                                     <li class="nav-item {{ request()->routeIs('iqm.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('iqm.landing') }}">IQM</a></li>
                                     <li class="nav-item {{ request()->routeIs('website.contact') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.contact') }}">Contact</a></li>
+                                    <li class="nav-item d-lg-none"><a class="nav-link" href="{{ route('iqm.login') }}"><i class="fas fa-user-lock mr-1" aria-hidden="true"></i> Portal Client (IQM)</a></li>
+                                    <li class="nav-item d-lg-none"><a class="nav-link" href="{{ route('paneladmin.login') }}"><i class="fas fa-user-shield mr-1" aria-hidden="true"></i> Admin Panel</a></li>
                                 </ul>
                             </div>
                         </nav>
                     </div>
                 </div>
-                <div class="nav-search">
-                    <button id="search" type="button" aria-label="Buka pencarian website"><i class="fa fa-search" aria-hidden="true"></i></button>
-                </div>
-                <div class="search-block" style="display: none;">
-                    <label for="search-field" class="w-100 mb-0">
-                        <input type="text" class="form-control" id="search-field" placeholder="Type what you want and enter">
-                    </label>
-                    <button class="search-close" type="button" aria-label="Tutup pencarian">&times;</button>
+                <div class="header-user-menu">
+                    <div class="header-search-wrapper">
+                        <form class="search-block header-search-box header-search-form" action="{{ route('website.blog.index') }}" method="GET" style="display: none;">
+                            <label for="search-field" class="w-100 mb-0">
+                                <input type="text" class="form-control" id="search-field" name="search" value="{{ request('search') }}" placeholder="Search keyword..." required>
+                            </label>
+                            <button class="search-close" type="button" aria-label="Tutup pencarian">&times;</button>
+                        </form>
+                        <div class="nav-search">
+                            <button id="search" type="button" aria-label="Buka pencarian website"><i class="fa fa-search" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                    <div class="header-login-icon js-header-login d-none d-lg-inline-flex">
+                        <button type="button" class="header-login-toggle" aria-label="Login menu" aria-expanded="false">
+                            <i class="fas fa-user-circle" aria-hidden="true"></i>
+                        </button>
+
+                        <div class="header-login-menu">
+                            <a href="{{ route('iqm.login') }}">
+                                <i class="fas fa-user-lock mr-2" aria-hidden="true"></i> Portal Client (IQM)
+                            </a>
+                            <a href="{{ route('paneladmin.login') }}">
+                                <i class="fas fa-user-shield mr-2" aria-hidden="true"></i> Admin Panel
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -602,6 +622,74 @@
     @endif
     <script src="{{ asset('web/plugins/google-map/map.js') }}" defer></script>
     <script src="{{ asset('web/js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var searchWrap = document.querySelector('.header-search-wrapper');
+            var searchToggle = searchWrap ? searchWrap.querySelector('#search') : null;
+            var searchForm = searchWrap ? searchWrap.querySelector('.header-search-form') : null;
+            var searchInput = searchForm ? searchForm.querySelector('input[name="search"]') : null;
+            var loginIcon = document.querySelector('.js-header-login');
+            var toggle = loginIcon ? loginIcon.querySelector('.header-login-toggle') : null;
+            var menu = loginIcon ? loginIcon.querySelector('.header-login-menu') : null;
+
+            if (searchWrap && searchToggle && searchForm) {
+                searchToggle.addEventListener('click', function (event) {
+                    if (!window.matchMedia('(min-width: 992px)').matches) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+
+                    if (!searchForm.classList.contains('show')) {
+                        searchForm.classList.add('show');
+                        if (searchInput) {
+                            searchInput.focus();
+                        }
+                        return;
+                    }
+
+                    if (searchInput && searchInput.value.trim() !== '') {
+                        searchForm.submit();
+                        return;
+                    }
+
+                    if (searchInput) {
+                        searchInput.focus();
+                    }
+                }, true);
+
+                document.addEventListener('click', function (event) {
+                    if (!window.matchMedia('(min-width: 992px)').matches || searchWrap.contains(event.target)) {
+                        return;
+                    }
+
+                    searchForm.classList.remove('show');
+                });
+            }
+
+            if (!loginIcon || !toggle || !menu) {
+                return;
+            }
+
+            toggle.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                menu.classList.toggle('show');
+                toggle.setAttribute('aria-expanded', menu.classList.contains('show') ? 'true' : 'false');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (loginIcon.contains(event.target)) {
+                    return;
+                }
+
+                menu.classList.remove('show');
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+    </script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
