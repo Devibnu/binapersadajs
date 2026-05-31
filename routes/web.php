@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\LeadController as AdminLeadController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\InquiryQuotationController;
 use App\Http\Controllers\Admin\IqmUserController;
+use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\BlogCommentController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\IqmPortalController;
@@ -157,6 +158,13 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->middleware('permission:projects.update')->name('paneladmin.projects.edit');
         Route::put('/projects/{project}', [ProjectController::class, 'update'])->middleware('permission:projects.update')->name('paneladmin.projects.update');
         Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->middleware('permission:projects.delete')->name('paneladmin.projects.destroy');
+        Route::get('/clients', [ClientController::class, 'index'])->middleware('permission:clients.view')->name('paneladmin.clients.index');
+        Route::get('/clients/create', [ClientController::class, 'create'])->middleware('permission:clients.create')->name('paneladmin.clients.create');
+        Route::post('/clients', [ClientController::class, 'store'])->middleware('permission:clients.create')->name('paneladmin.clients.store');
+        Route::get('/clients/{client}', [ClientController::class, 'show'])->middleware('permission:clients.view')->name('paneladmin.clients.show');
+        Route::get('/clients/{client}/edit', [ClientController::class, 'edit'])->middleware('permission:clients.update')->name('paneladmin.clients.edit');
+        Route::put('/clients/{client}', [ClientController::class, 'update'])->middleware('permission:clients.update')->name('paneladmin.clients.update');
+        Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->middleware('permission:clients.delete')->name('paneladmin.clients.destroy');
         Route::post('/editor/upload-image', [EditorImageController::class, 'store'])
             ->middleware('permission:services.update')
             ->name('paneladmin.editor.upload-image');

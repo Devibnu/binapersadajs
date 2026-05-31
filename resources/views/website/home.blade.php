@@ -538,6 +538,42 @@
   </div>
 </section>
 
+@if($clients->isNotEmpty())
+<section class="bpjs-clients-section" aria-label="Klien Kami">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-lg-12">
+        <h2 class="section-title">KLIEN KAMI</h2>
+        <h3 class="section-sub-title">Dipercaya oleh berbagai perusahaan nasional dan internasional.</h3>
+      </div>
+    </div>
+
+    <div class="bpjs-client-grid">
+      @foreach($clients as $client)
+        @php
+          $clientLogo = $client->logoUrl();
+        @endphp
+        <div class="bpjs-client-item">
+          @if($client->website_url)
+            <a href="{{ $client->website_url }}" target="_blank" rel="noopener" aria-label="Kunjungi website {{ $client->name }}">
+              @if($clientLogo)
+                <img src="{{ $clientLogo }}" alt="{{ $client->name }}" loading="lazy" decoding="async">
+              @endif
+              <span>{{ $client->name }}</span>
+            </a>
+          @else
+            @if($clientLogo)
+              <img src="{{ $clientLogo }}" alt="{{ $client->name }}" loading="lazy" decoding="async">
+            @endif
+            <span>{{ $client->name }}</span>
+          @endif
+        </div>
+      @endforeach
+    </div>
+  </div>
+</section>
+@endif
+
 <section class="content industrial-quality">
   <div class="container">
     <div class="row align-items-center">

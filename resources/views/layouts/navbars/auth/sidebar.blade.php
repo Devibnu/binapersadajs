@@ -17,7 +17,7 @@
       $adminUser = auth()->user();
       $can = fn (string $permission): bool => (bool) $adminUser?->canAccess($permission);
       $hasWebsiteMenus = $can('website-settings.view') || $can('homepage-sections.view') || $can('hero-banners.view') || $can('page-heroes.view') || $can('contact-page.view') || $can('seo-settings.view') || $can('media-library.view');
-      $hasContentMenus = $can('homepage-video.view') || $can('services.view') || $can('project-categories.view') || $can('projects.view') || $can('blogs.view') || $can('blog-comments.view') || $can('about-page.view') || $can('about-teams.view');
+      $hasContentMenus = $can('homepage-video.view') || $can('services.view') || $can('project-categories.view') || $can('projects.view') || $can('clients.view') || $can('blogs.view') || $can('blog-comments.view') || $can('about-page.view') || $can('about-teams.view');
       $hasCommunicationMenus = $can('contact-messages.view') || $can('leads.view') || $can('inquiry-quotation.view') || $can('iqm-user.view');
       $hasAnalyticsMenus = $can('analytics.view') || $can('activity-logs.view');
       $hasSystemMenus = $can('email-settings.view') || $can('roles.view') || $can('users.view') || $adminUser;
@@ -78,6 +78,9 @@
         @endif
         @if($can('projects.view'))
           <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/projects*') ? 'active' : '' }}" href="{{ route('paneladmin.projects.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-hard-hat text-sm opacity-10 {{ Request::is('paneladmin/projects*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Projects</span></a></li>
+        @endif
+        @if($can('clients.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/clients*') ? 'active' : '' }}" href="{{ route('paneladmin.clients.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-handshake text-sm opacity-10 {{ Request::is('paneladmin/clients*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Klien / Our Clients</span></a></li>
         @endif
         @if($can('blogs.view'))
           <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/blogs*') ? 'active' : '' }}" href="{{ route('paneladmin.blogs.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-newspaper text-sm opacity-10 {{ Request::is('paneladmin/blogs*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Blogs</span></a></li>

@@ -12,6 +12,7 @@ use App\Models\PageHero;
 use App\Models\Project;
 use App\Models\ProjectCategory;
 use App\Models\Blog;
+use App\Models\Client;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
@@ -43,6 +44,7 @@ class WebsiteController extends Controller
 
         [$services, $showServiceFallback] = $this->servicesForWebsite();
         [$projectCategories, $projects, $showProjectFallback] = $this->projectsForWebsite();
+        $clients = $this->clientsForWebsite();
 
         return view('website.home', [
             'heroBanners' => $heroBanners,
@@ -53,8 +55,23 @@ class WebsiteController extends Controller
             'projectCategories' => $projectCategories,
             'projects' => $projects,
             'showProjectFallback' => $showProjectFallback,
+            'clients' => $clients,
             'latestBlogs' => $latestBlogs,
         ]);
+    }
+
+    private function clientsForWebsite()
+    {
+        if (! Schema::hasTable('clients')) {
+            return collect();
+        }
+
+        return Cache::remember('website_clients', 3600, function () {
+            return Client::where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+        });
     }
 
     private function projectsForWebsite(): array
