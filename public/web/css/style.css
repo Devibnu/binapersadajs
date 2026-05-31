@@ -4962,6 +4962,85 @@ img[width][height] {
   visibility: visible;
 }
 
+.project-area .shuffle-item,
+.projects-gallery .shuffle-item {
+  margin-bottom: 30px;
+}
+
+.project-area .project-img-container,
+.projects-gallery .project-img-container {
+  margin-bottom: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.project-area .project-img-container img,
+.projects-gallery .project-img-container img {
+  display: block;
+  height: 280px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.project-area .project-img-container .project-item-info,
+.projects-gallery .project-img-container .project-item-info {
+  bottom: 30px;
+  left: 30px;
+  margin-top: 0;
+  padding: 0;
+  right: 30px;
+  top: auto;
+  z-index: 2;
+}
+
+.project-area .project-img-container .project-item-info-content .project-item-title,
+.projects-gallery .project-img-container .project-item-info-content .project-item-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.project-area .project-img-container .project-item-info-content .project-item-title a,
+.projects-gallery .project-img-container .project-item-info-content .project-item-title a,
+.project-area .project-img-container .project-item-info-content .project-item-title span,
+.projects-gallery .project-img-container .project-item-info-content .project-item-title span {
+  color: #ffffff;
+}
+
+.project-area .project-meta,
+.projects-gallery .project-meta {
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.55;
+  margin-top: 10px;
+}
+
+.project-area .project-meta span,
+.projects-gallery .project-meta span {
+  color: rgba(255, 255, 255, .9);
+  display: block;
+}
+
+.project-area .project-meta strong,
+.projects-gallery .project-meta strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.project-area .project-img-container .gallery-popup .gallery-icon,
+.projects-gallery .project-img-container .gallery-popup .gallery-icon {
+  align-items: center;
+  display: flex;
+  height: 42px;
+  justify-content: center;
+  padding: 0;
+  width: 42px;
+  z-index: 3;
+}
+
 @media (max-width: 767px) {
   .top-social ul li a {
     min-height: 36px;

@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\ProjectCategory;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -39,6 +40,7 @@ class ProjectController extends Controller
 
         $this->storeUploads($request, $validated);
         $project = Project::create($validated);
+        $this->clearWebsiteProjectCache();
         app(ActivityLogger::class)->log('create', 'Projects', 'Project ditambahkan: ' . $project->title, $project);
 
         return redirect()
@@ -69,6 +71,7 @@ class ProjectController extends Controller
 
         $this->storeUploads($request, $validated, $project);
         $project->update($validated);
+        $this->clearWebsiteProjectCache();
         app(ActivityLogger::class)->log('update', 'Projects', 'Project diperbarui: ' . $project->title, $project);
 
         return redirect()
@@ -83,7 +86,13 @@ class ProjectController extends Controller
             ImageUploadHelper::deleteStoredImage($project->{$field});
         }
 
+        $project->load('projectImages');
+        foreach ($project->projectImages as $projectImage) {
+            ImageUploadHelper::deleteStoredImage($projectImage->image_path);
+        }
+
         $project->delete();
+        $this->clearWebsiteProjectCache();
 
         return redirect()
             ->route('paneladmin.projects.index')
@@ -155,6 +164,12 @@ class ProjectController extends Controller
     private function storedImageFields(): array
     {
         return ['featured_image', 'gallery_image_1', 'gallery_image_2', 'gallery_image_3'];
+    }
+
+    private function clearWebsiteProjectCache(): void
+    {
+        Cache::forget('website_projects');
+        Cache::forget('website_project_categories');
     }
 
     private function activeCategories()

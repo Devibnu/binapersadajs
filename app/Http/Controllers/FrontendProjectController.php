@@ -42,7 +42,7 @@ class FrontendProjectController extends Controller
 
     public function show(string $slug)
     {
-        $project = Project::with('projectCategory')
+        $project = Project::with(['projectCategory', 'projectImages'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();

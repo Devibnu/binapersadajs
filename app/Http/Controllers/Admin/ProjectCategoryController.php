@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProjectCategory;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -38,6 +39,7 @@ class ProjectCategoryController extends Controller
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
         $projectCategory = ProjectCategory::create($validated);
+        $this->clearWebsiteProjectCache();
         app(ActivityLogger::class)->log('create', 'Project Categories', 'Kategori project ditambahkan: ' . $projectCategory->name, $projectCategory);
 
         return redirect()
@@ -57,6 +59,7 @@ class ProjectCategoryController extends Controller
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
         $projectCategory->update($validated);
+        $this->clearWebsiteProjectCache();
         app(ActivityLogger::class)->log('update', 'Project Categories', 'Kategori project diperbarui: ' . $projectCategory->name, $projectCategory);
 
         return redirect()
@@ -68,6 +71,7 @@ class ProjectCategoryController extends Controller
     {
         app(ActivityLogger::class)->log('delete', 'Project Categories', 'Kategori project dihapus: ' . $projectCategory->name, $projectCategory);
         $projectCategory->delete();
+        $this->clearWebsiteProjectCache();
 
         return redirect()
             ->route('paneladmin.project-categories.index')
@@ -105,5 +109,11 @@ class ProjectCategoryController extends Controller
         }
 
         return $candidate;
+    }
+
+    private function clearWebsiteProjectCache(): void
+    {
+        Cache::forget('website_projects');
+        Cache::forget('website_project_categories');
     }
 }

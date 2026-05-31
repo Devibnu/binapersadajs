@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -14,11 +15,15 @@ class Project extends Model
         'slug',
         'short_description',
         'description',
+        'scope_of_work',
         'client_name',
         'project_location',
         'project_year',
         'category',
         'project_category_id',
+        'project_status',
+        'progress',
+        'project_value',
         'featured_image',
         'gallery_image_1',
         'gallery_image_2',
@@ -29,6 +34,8 @@ class Project extends Model
 
     protected $casts = [
         'sort_order' => 'integer',
+        'progress' => 'integer',
+        'project_value' => 'decimal:2',
     ];
 
     public function isActive(): bool
@@ -39,6 +46,11 @@ class Project extends Model
     public function projectCategory(): BelongsTo
     {
         return $this->belongsTo(ProjectCategory::class);
+    }
+
+    public function projectImages(): HasMany
+    {
+        return $this->hasMany(ProjectImage::class)->orderBy('sort_order')->orderBy('id');
     }
 
     public function categoryName(): string
@@ -53,10 +65,16 @@ class Project extends Model
 
     public function galleryImages(): array
     {
-        return array_values(array_filter(array_map(
+        $legacyImages = array_values(array_filter(array_map(
             fn (string $field) => $this->mediaUrl($this->{$field}),
             ['gallery_image_1', 'gallery_image_2', 'gallery_image_3']
         )));
+
+        $uploadedImages = $this->projectImages
+            ->map(fn (ProjectImage $image) => $image->imageUrl())
+            ->all();
+
+        return array_values(array_filter(array_merge($legacyImages, $uploadedImages)));
     }
 
     public function categoryKey(): string

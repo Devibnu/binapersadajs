@@ -4,38 +4,8 @@
 
 @push('styles')
 <style>
-  .project-card-meta {
-    margin: 10px 0 14px;
-  }
-
-  .project-card-meta p {
-    color: rgba(255, 255, 255, .88);
-    font-size: 12px;
-    line-height: 1.45;
-    margin: 0 0 3px;
-  }
-
-  .project-card-meta-label {
-    color: rgba(255, 255, 255, .68);
-    display: inline-block;
-    font-weight: 600;
-    margin-right: 5px;
-  }
-
   .project-item-title span {
     color: #fff;
-  }
-
-  .projects-gallery .project-img-container .project-item-info {
-    align-items: center;
-    bottom: 0;
-    display: flex;
-    margin-top: 0;
-    top: 0;
-  }
-
-  .projects-gallery .project-item-info-content {
-    width: 100%;
   }
 
   @media (max-width: 767px) {
@@ -100,25 +70,12 @@
       transform: perspective(1px) scale3d(1, 1, 1);
     }
 
-    .projects-gallery .project-img-container .project-item-info {
-      align-items: flex-end;
-      padding: 22px 20px;
-    }
-
     .projects-gallery .project-item-title {
       font-size: 17px !important;
       line-height: 1.3;
       margin-bottom: 10px;
     }
 
-    .project-card-meta {
-      margin: 7px 0 10px;
-    }
-
-    .project-card-meta p {
-      font-size: 12px;
-      line-height: 1.5;
-    }
   }
 </style>
 @endpush
@@ -196,21 +153,20 @@
                   </a>
                   <div class="project-item-info">
                     <div class="project-item-info-content">
-                      <h3 class="project-item-title"><span>{{ $project->title }}</span></h3>
+                      <h3 class="project-item-title"><a href="{{ route('projects.show', $project->slug) }}">{{ $project->title }}</a></h3>
                       <p class="project-cat">{{ $project->categoryName() }}</p>
-                      @if($project->client_name || $project->project_location || $project->project_year)
-                        <div class="project-card-meta">
-                          @if($project->client_name)
-                            <p><span class="project-card-meta-label">Client:</span>{{ $project->client_name }}</p>
-                          @endif
-                          @if($project->project_location)
-                            <p><span class="project-card-meta-label">Lokasi:</span>{{ $project->project_location }}</p>
-                          @endif
-                          @if($project->project_year)
-                            <p><span class="project-card-meta-label">Tahun:</span>{{ $project->project_year }}</p>
-                          @endif
-                        </div>
-                      @endif
+                      <div class="project-meta">
+                        @if($project->client_name)
+                          <span><strong>Client:</strong> {{ $project->client_name }}</span>
+                        @endif
+                        @if($project->project_location)
+                          <span><strong>Lokasi:</strong> {{ $project->project_location }}</span>
+                        @endif
+                        @if($project->project_year)
+                          <span><strong>Tahun:</strong> {{ $project->project_year }}</span>
+                        @endif
+                        <span><strong>Kategori:</strong> {{ $project->categoryName() }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -228,19 +184,18 @@
                     <div class="project-item-info-content">
                       <h3 class="project-item-title"><span>{{ $project['title'] }}</span></h3>
                       <p class="project-cat">{{ $project['category'] }}</p>
-                      @if($project['client'] || $project['location'] || $project['year'])
-                        <div class="project-card-meta">
-                          @if($project['client'])
-                            <p><span class="project-card-meta-label">Client:</span>{{ $project['client'] }}</p>
-                          @endif
-                          @if($project['location'])
-                            <p><span class="project-card-meta-label">Lokasi:</span>{{ $project['location'] }}</p>
-                          @endif
-                          @if($project['year'])
-                            <p><span class="project-card-meta-label">Tahun:</span>{{ $project['year'] }}</p>
-                          @endif
-                        </div>
-                      @endif
+                      <div class="project-meta">
+                        @if($project['client'])
+                          <span><strong>Client:</strong> {{ $project['client'] }}</span>
+                        @endif
+                        @if($project['location'])
+                          <span><strong>Lokasi:</strong> {{ $project['location'] }}</span>
+                        @endif
+                        @if($project['year'])
+                          <span><strong>Tahun:</strong> {{ $project['year'] }}</span>
+                        @endif
+                        <span><strong>Kategori:</strong> {{ $project['category'] }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

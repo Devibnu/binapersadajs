@@ -436,6 +436,18 @@
                     <div class="project-item-info-content">
                       <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project {{ $project->title }}">{{ $project->title }}</a></h3>
                       <p class="project-cat">{{ $project->categoryName() }}</p>
+                      <div class="project-meta">
+                        @if($project->client_name)
+                          <span><strong>Client:</strong> {{ $project->client_name }}</span>
+                        @endif
+                        @if($project->project_location)
+                          <span><strong>Lokasi:</strong> {{ $project->project_location }}</span>
+                        @endif
+                        @if($project->project_year)
+                          <span><strong>Tahun:</strong> {{ $project->project_year }}</span>
+                        @endif
+                        <span><strong>Kategori:</strong> {{ $project->categoryName() }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -452,6 +464,9 @@
                   <div class="project-item-info-content">
                     <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Plant Maintenance Support">Plant Maintenance Support</a></h3>
                     <p class="project-cat">Maintenance</p>
+                    <div class="project-meta">
+                      <span><strong>Kategori:</strong> Maintenance</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -467,6 +482,9 @@
                   <div class="project-item-info-content">
                     <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Steel Fabrication Work">Steel Fabrication Work</a></h3>
                     <p class="project-cat">Fabrication</p>
+                    <div class="project-meta">
+                      <span><strong>Kategori:</strong> Fabrication</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -482,6 +500,9 @@
                   <div class="project-item-info-content">
                     <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Pipe Installation Project">Pipe Installation Project</a></h3>
                     <p class="project-cat">Piping</p>
+                    <div class="project-meta">
+                      <span><strong>Kategori:</strong> Piping</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -497,6 +518,9 @@
                   <div class="project-item-info-content">
                     <h3 class="project-item-title"><a href="{{ route('website.projects') }}" aria-label="Lihat daftar project Site Installation Work">Site Installation Work</a></h3>
                     <p class="project-cat">Fabrication</p>
+                    <div class="project-meta">
+                      <span><strong>Kategori:</strong> Fabrication</span>
+                    </div>
                   </div>
                 </div>
               </div>
