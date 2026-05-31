@@ -23,6 +23,10 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                if ($guard === 'iqm') {
+                    return redirect()->route('iqm.dashboard');
+                }
+
                 return redirect(RouteServiceProvider::HOME);
             }
         }

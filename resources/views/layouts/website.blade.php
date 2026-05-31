@@ -98,16 +98,17 @@
         </script>
     @endif
     @php
-        $faviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
-        $faviconVersion = $websiteSetting?->updated_at?->timestamp ?? time();
+        $pwaIconVersion = file_exists(public_path('icons/icon-512x512.png'))
+            ? filemtime(public_path('icons/icon-512x512.png'))
+            : time();
     @endphp
-    <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
-    <link rel="shortcut icon" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
-    <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}" color="#0d1b2f">
-    <meta name="msapplication-TileColor" content="#0d1b2f">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ $pwaIconVersion }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}?v={{ $pwaIconVersion }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/favicon-16x16.png') }}?v={{ $pwaIconVersion }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ $pwaIconVersion }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}?v={{ $pwaIconVersion }}">
+    <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}" color="#0c1e35">
+    <meta name="msapplication-TileColor" content="#0c1e35">
     <meta name="msapplication-config" content="{{ asset('browserconfig.xml') }}">
     @stack('preload' )
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -367,7 +368,7 @@
                     <div class="row align-items-center">
                         <div class="logo col-lg-3 text-center text-lg-left mb-3 mb-md-5 mb-lg-0">
                             <a class="d-block" href="{{ route('website.home') }}">
-                                <img class="site-logo-img" src="{{ $websiteSetting?->logoUrl() ?? asset('web/images/logo.png') }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'Constra' }}" width="207" height="39" decoding="async" fetchpriority="high">
+                                <img class="site-logo-img" src="{{ ($websiteSetting?->logoUrl() ?? asset('web/images/logo.png')) }}?v={{ $websiteSetting?->assetVersion() ?? time() }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera' }}" width="207" height="39" decoding="async" fetchpriority="high">
                             </a>
                         </div>
                         <div class="col-lg-9 header-right">
@@ -420,6 +421,7 @@
                                     <li class="nav-item {{ request()->routeIs('services.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('services.index') }}">Services</a></li>
                                     <li class="nav-item {{ request()->routeIs('website.projects') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.projects') }}">Projects</a></li>
                                     <li class="nav-item {{ request()->routeIs('website.blog.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.blog.index') }}">Blog</a></li>
+                                    <li class="nav-item {{ request()->routeIs('iqm.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('iqm.landing') }}">IQM</a></li>
                                     <li class="nav-item {{ request()->routeIs('website.contact') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.contact') }}">Contact</a></li>
                                 </ul>
                             </div>
@@ -448,7 +450,7 @@
                     <div class="col-lg-4 col-md-6 footer-widget footer-about">
                         <a class="footer-brand" href="{{ route('website.home') }}">
                             @if(!empty($websiteSetting?->logo))
-                                <img loading="lazy" decoding="async" class="footer-logo-img" src="{{ asset('storage/' . $websiteSetting->logo) }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera' }}" width="207" height="39">
+                                <img loading="lazy" decoding="async" class="footer-logo-img" src="{{ $websiteSetting->logoUrl() }}?v={{ $websiteSetting->assetVersion() }}" alt="{{ $websiteSetting?->nama_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera' }}" width="207" height="39">
                             @else
                                 <img loading="lazy" decoding="async" class="footer-logo-img" src="{{ asset('web/images/logo.png') }}" alt="PT. Bina Persada Jaya Sejahtera" width="207" height="39">
                             @endif

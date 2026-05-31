@@ -31,8 +31,13 @@ class WebsiteSetting extends Model
         return $this->logo ? Storage::url($this->logo) : asset('web/images/logo.png');
     }
 
+    public function assetVersion(): int
+    {
+        return $this->updated_at?->timestamp ?? time();
+    }
+
     public function faviconUrl(): string
     {
-        return $this->favicon ? Storage::url($this->favicon) : asset('icons/favicon-32x32.png');
+        return asset('icons/favicon-32x32.png');
     }
 }

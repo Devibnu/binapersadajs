@@ -5,23 +5,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="theme-color" content="#0d1b2f">
+  <meta name="theme-color" content="#0c1e35">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Bina Persada">
 
-  <link rel="manifest" href="{{ asset('manifest.json') }}">
   @php
-    $adminFaviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
-    $adminFaviconVersion = optional($websiteSetting)->updated_at?->timestamp ?? time();
+    $adminPwaIconVersion = file_exists(public_path('icons/icon-512x512.png'))
+      ? filemtime(public_path('icons/icon-512x512.png'))
+      : time();
   @endphp
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ $adminFaviconUrl }}?v={{ $adminFaviconVersion }}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{{ $adminFaviconUrl }}?v={{ $adminFaviconVersion }}">
-  <link rel="shortcut icon" href="{{ $adminFaviconUrl }}?v={{ $adminFaviconVersion }}">
-  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}?v={{ filemtime(public_path('icons/apple-touch-icon.png')) }}">
-  <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}" color="#0d1b2f">
-  <meta name="msapplication-TileColor" content="#0d1b2f">
+  <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ $adminPwaIconVersion }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}?v={{ $adminPwaIconVersion }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/favicon-16x16.png') }}?v={{ $adminPwaIconVersion }}">
+  <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ $adminPwaIconVersion }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}?v={{ $adminPwaIconVersion }}">
+  <link rel="mask-icon" href="{{ asset('icons/safari-pinned-tab.svg') }}" color="#0c1e35">
+  <meta name="msapplication-TileColor" content="#0c1e35">
   <meta name="msapplication-config" content="{{ asset('browserconfig.xml') }}">
   <title>{{ $websiteSetting?->nama_perusahaan ?? 'Bina Persada JS' }} - Panel Admin</title>
   <!--     Fonts and icons     -->

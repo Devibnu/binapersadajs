@@ -1,10 +1,11 @@
-const CACHE_NAME = 'bpjs-pwa-v11';
+const CACHE_NAME = 'bpjs-pwa-v1780197555';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [
   '/',
   OFFLINE_URL,
   '/manifest.json',
+  '/site.webmanifest',
   '/web/css/style.css',
   '/web/plugins/bootstrap/bootstrap.min.css',
   '/web/plugins/fontawesome/css/all.min.css',
@@ -15,9 +16,11 @@ const PRECACHE_URLS = [
   '/assets/js/soft-ui-dashboard.min.js',
   '/assets/js/core/bootstrap.min.js',
   '/assets/js/core/popper.min.js',
-  '/icons/android-chrome-192x192.png',
-  '/icons/android-chrome-512x512.png',
-  '/icons/maskable-icon-512x512.png'
+  '/favicon.ico',
+  '/icons/favicon-32x32.png',
+  '/icons/apple-touch-icon.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {

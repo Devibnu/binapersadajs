@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\WebsiteSetting;
 use App\Services\ActivityLogger;
+use App\Services\PwaIconGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -22,8 +23,8 @@ class WebsiteSettingController extends Controller
         $validated = $request->validate([
             'nama_perusahaan' => ['nullable', 'string', 'max:255'],
             'deskripsi_perusahaan' => ['nullable', 'string'],
-            'logo' => ['nullable', 'image', 'max:2048'],
-            'favicon' => ['nullable', 'image', 'max:1024'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'favicon' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
             'email' => ['nullable', 'email', 'max:255'],
             'telepon' => ['nullable', 'string', 'max:50'],
             'whatsapp' => ['nullable', 'string', 'max:50'],
@@ -40,6 +41,8 @@ class WebsiteSettingController extends Controller
 
         $setting = WebsiteSetting::firstOrNew();
 
+        $logoWasUploaded = $request->hasFile('logo');
+
         foreach (['logo', 'favicon'] as $field) {
             if ($request->hasFile($field)) {
                 if ($setting->{$field}) {
@@ -52,6 +55,11 @@ class WebsiteSettingController extends Controller
 
         $setting->fill($validated);
         $setting->save();
+
+        if ($logoWasUploaded) {
+            app(PwaIconGenerator::class)->generateFromWebsiteSetting($setting);
+        }
+
         app(ActivityLogger::class)->log('update', 'Website Settings', 'Pengaturan website diperbarui.', $setting);
 
         return redirect()

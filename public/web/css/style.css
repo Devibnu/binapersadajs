@@ -4372,12 +4372,15 @@ ul.top-info-box > li.nav-search i {
 }
 
 .footer-logo-img {
-  background: #fff;
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   height: auto;
   margin-bottom: 25px;
   max-width: 220px;
-  padding: 10px 14px;
+  outline: none;
+  padding: 0;
   width: 100%;
 }
 

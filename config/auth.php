@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'iqm' => [
+            'driver' => 'session',
+            'provider' => 'iqm_users',
+        ],
     ],
 
     /*
@@ -63,6 +67,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+        'iqm_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\IqmUser::class,
         ],
 
         // 'users' => [

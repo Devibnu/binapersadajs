@@ -28,22 +28,25 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\LeadController as AdminLeadController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\InquiryQuotationController;
+use App\Http\Controllers\Admin\IqmUserController;
 use App\Http\Controllers\BlogCommentController;
 use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\IqmPortalController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ResetController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\WebsiteBlogController;
 use App\Http\Controllers\WebsiteController;
-use App\Models\WebsiteSetting;
 use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/favicon.ico', function () {
-    $websiteSetting = WebsiteSetting::first();
-    $faviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
-    $faviconVersion = $websiteSetting?->updated_at?->timestamp ?? filemtime(public_path('icons/favicon-32x32.png'));
-    return redirect()->to($faviconUrl . '?v=' . $faviconVersion);
+    $faviconVersion = file_exists(public_path('icons/pwa-version.txt'))
+        ? trim(file_get_contents(public_path('icons/pwa-version.txt')))
+        : filemtime(public_path('icons/favicon-32x32.png'));
+
+    return redirect()->to(asset('icons/favicon-32x32.png') . '?v=' . $faviconVersion);
 });
 
 Route::get('/', [WebsiteController::class, 'home'])->middleware('analytics.track')->name('website.home');
@@ -71,6 +74,23 @@ Route::post('/leads/inquiry', [LeadController::class, 'storeInquiry'])
 Route::view('/offline', 'website.offline')->name('website.offline');
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('website.sitemap');
 Route::get('/robots.txt', [SeoController::class, 'robots'])->name('website.robots');
+
+Route::prefix('iqm')->name('iqm.')->group(function () {
+    Route::get('/', [IqmPortalController::class, 'dashboard'])->middleware('auth:iqm')->name('landing');
+    Route::middleware('guest:iqm')->group(function () {
+        Route::get('/login', [IqmPortalController::class, 'login'])->name('login');
+        Route::post('/login', [IqmPortalController::class, 'authenticate'])->name('authenticate');
+    });
+    Route::middleware('auth:iqm')->group(function () {
+        Route::post('/logout', [IqmPortalController::class, 'logout'])->name('logout');
+        Route::get('/dashboard', [IqmPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/inquiries', [IqmPortalController::class, 'inquiries'])->name('inquiries.index');
+        Route::get('/quotations', [IqmPortalController::class, 'quotations'])->name('quotations.index');
+        Route::get('/attachments', [IqmPortalController::class, 'attachments'])->name('attachments.index');
+        Route::get('/profile', [IqmPortalController::class, 'profile'])->name('profile');
+        Route::get('/inquiries/{inquiryQuotation}', [IqmPortalController::class, 'show'])->name('inquiries.show');
+    });
+});
 
 Route::prefix('paneladmin')->group(function () {
     Route::middleware('guest')->group(function () {
@@ -221,6 +241,31 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->middleware('permission:users.update')->name('paneladmin.users.edit');
         Route::put('/users/{user}', [UserController::class, 'update'])->middleware('permission:users.update')->name('paneladmin.users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:users.delete')->name('paneladmin.users.destroy');
+        Route::get('/iqm-users', [IqmUserController::class, 'index'])->middleware('permission:iqm-user.view')->name('paneladmin.iqm-users.index');
+        Route::get('/iqm-users/create', [IqmUserController::class, 'create'])->middleware('permission:iqm-user.create')->name('paneladmin.iqm-users.create');
+        Route::post('/iqm-users', [IqmUserController::class, 'store'])->middleware('permission:iqm-user.create')->name('paneladmin.iqm-users.store');
+        Route::get('/iqm-users/{iqmUser}/edit', [IqmUserController::class, 'edit'])->middleware('permission:iqm-user.edit')->name('paneladmin.iqm-users.edit');
+        Route::put('/iqm-users/{iqmUser}', [IqmUserController::class, 'update'])->middleware('permission:iqm-user.edit')->name('paneladmin.iqm-users.update');
+        Route::get('/iqm-users/{iqmUser}', [IqmUserController::class, 'show'])->middleware('permission:iqm-user.view')->name('paneladmin.iqm-users.show');
+        Route::delete('/iqm-users/{iqmUser}', [IqmUserController::class, 'destroy'])->middleware('permission:iqm-user.delete')->name('paneladmin.iqm-users.destroy');
+
+        // Inquiry & Quotation Management
+        Route::get('/inquiries', [InquiryQuotationController::class, 'index'])->middleware('permission:inquiry-quotation.view')->name('admin.inquiries.index');
+        Route::get('/inquiries/create', [InquiryQuotationController::class, 'create'])->middleware('permission:inquiry-quotation.create')->name('admin.inquiries.create');
+        Route::post('/inquiries', [InquiryQuotationController::class, 'store'])->middleware('permission:inquiry-quotation.create')->name('admin.inquiries.store');
+        Route::get('/inquiries/{inquiryQuotation}', [InquiryQuotationController::class, 'show'])->middleware('permission:inquiry-quotation.view')->name('admin.inquiries.show');
+        Route::get('/inquiries/{inquiryQuotation}/edit', [InquiryQuotationController::class, 'edit'])->middleware('permission:inquiry-quotation.edit')->name('admin.inquiries.edit');
+        Route::put('/inquiries/{inquiryQuotation}', [InquiryQuotationController::class, 'update'])->middleware('permission:inquiry-quotation.edit')->name('admin.inquiries.update');
+        Route::delete('/inquiries/{inquiryQuotation}', [InquiryQuotationController::class, 'destroy'])->middleware('permission:inquiry-quotation.delete')->name('admin.inquiries.destroy');
+        Route::delete('/inquiry-attachments/{attachment}', [InquiryQuotationController::class, 'deleteAttachment'])->middleware('permission:inquiry-quotation.edit')->name('admin.inquiry-attachments.delete');
+        Route::get('/inquiry-attachments/{attachment}/download', [InquiryQuotationController::class, 'downloadAttachment'])->middleware('permission:inquiry-quotation.view')->name('admin.inquiry-attachments.download');
+
+        // New resource routes for Inquiry & Quotation (inquiry-quotations)
+        Route::resource('inquiry-quotations', InquiryQuotationController::class, [
+            'names' => 'paneladmin.inquiry-quotations',
+            'parameters' => ['inquiry-quotations' => 'inquiryQuotation']
+        ]);
+
         Route::get('/profile', [ProfileController::class, 'show'])->name('paneladmin.profile');
         Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('paneladmin.profile.edit');
         Route::put('/profile', [ProfileController::class, 'update'])->name('paneladmin.profile.update');

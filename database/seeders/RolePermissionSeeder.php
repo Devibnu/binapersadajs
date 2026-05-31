@@ -23,6 +23,8 @@ class RolePermissionSeeder extends Seeder
             'Activity Logs' => ['activity-logs.view' => 'Lihat activity logs'],
             'Analytics Visitor' => ['analytics.view' => 'Lihat statistik visitor'],
             'Leads' => ['leads.view' => 'Lihat leads', 'leads.update' => 'Ubah status leads', 'leads.delete' => 'Hapus leads'],
+            'Inquiry & Quotation' => ['inquiry-quotation.view' => 'Lihat inquiry quotation', 'inquiry-quotation.create' => 'Tambah inquiry quotation', 'inquiry-quotation.edit' => 'Ubah inquiry quotation', 'inquiry-quotation.delete' => 'Hapus inquiry quotation'],
+            'IQM' => ['iqm-user.view' => 'Lihat user portal IQM', 'iqm-user.create' => 'Tambah user portal IQM', 'iqm-user.edit' => 'Ubah user portal IQM', 'iqm-user.delete' => 'Hapus user portal IQM'],
             'About Page' => ['about-page.view' => 'Lihat about page', 'about-page.update' => 'Ubah about page'],
             'About Teams' => ['about-teams.view' => 'Lihat tim', 'about-teams.create' => 'Tambah tim', 'about-teams.update' => 'Ubah tim', 'about-teams.delete' => 'Hapus tim'],
             'Page Heroes' => ['page-heroes.view' => 'Lihat page hero', 'page-heroes.create' => 'Tambah page hero', 'page-heroes.update' => 'Ubah page hero', 'page-heroes.delete' => 'Hapus page hero'],
@@ -81,13 +83,19 @@ class RolePermissionSeeder extends Seeder
             'media-library.view', 'media-library.upload', 'media-library.delete',
             'analytics.view',
             'leads.view',
+            'inquiry-quotation.view', 'inquiry-quotation.create', 'inquiry-quotation.edit', 'inquiry-quotation.delete',
+            'iqm-user.view', 'iqm-user.create', 'iqm-user.edit', 'iqm-user.delete',
         ])->pluck('id'));
         $supportAdmin->permissions()->sync(Permission::whereIn('slug', [
             'dashboard.view',
             'contact-messages.view', 'contact-messages.read', 'contact-messages.reply', 'contact-messages.delete',
             'blog-comments.view', 'blog-comments.approve', 'blog-comments.reject', 'blog-comments.reply', 'blog-comments.delete',
             'leads.view', 'leads.update',
+            'inquiry-quotation.view', 'inquiry-quotation.create', 'inquiry-quotation.edit',
+            'iqm-user.view',
         ])->pluck('id'));
+
+        Permission::whereIn('slug', ['iqm-users.view', 'iqm-users.create', 'iqm-users.edit', 'iqm-users.delete'])->delete();
 
         $firstUser = User::query()->oldest('id')->first();
         if ($firstUser) {

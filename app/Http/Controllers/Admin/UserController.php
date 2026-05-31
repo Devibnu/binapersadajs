@@ -133,8 +133,10 @@ class UserController extends Controller
     private function availableRoles(?User $user = null)
     {
         return Role::query()
-            ->where('is_active', true)
-            ->when($user?->role_id, fn ($query) => $query->orWhereKey($user->role_id))
+            ->where(function ($query) use ($user) {
+                $query->where('is_active', true)
+                    ->when($user?->role_id, fn ($query) => $query->orWhere('id', $user->role_id));
+            })
             ->orderByDesc('is_super_admin')
             ->orderBy('name')
             ->get();

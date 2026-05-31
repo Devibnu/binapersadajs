@@ -3,16 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0d1b2f">
+    <meta name="theme-color" content="#0c1e35">
     <title>PT. Bina Persada Jaya Sejahtera - Offline</title>
-    <link rel="manifest" href="/manifest.json">
     @php
-        $faviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
-        $faviconVersion = $websiteSetting?->updated_at?->timestamp ?? time();
+        $pwaIconVersion = file_exists(public_path('icons/icon-512x512.png'))
+            ? filemtime(public_path('icons/icon-512x512.png'))
+            : time();
     @endphp
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
-    <link rel="shortcut icon" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ $faviconUrl }}?v={{ $faviconVersion }}">
+    <link rel="manifest" href="/manifest.json?v={{ $pwaIconVersion }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}?v={{ $pwaIconVersion }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ $pwaIconVersion }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}?v={{ $pwaIconVersion }}">
     <style>
         body {
             align-items: center;
@@ -51,7 +52,7 @@
 </head>
 <body>
     <main class="offline-card">
-        <img src="/icons/android-chrome-192x192.png" alt="PT. Bina Persada Jaya Sejahtera" width="192" height="192" decoding="async">
+        <img src="/icons/icon-192x192.png" alt="PT. Bina Persada Jaya Sejahtera" width="192" height="192" decoding="async">
         <h1>Anda sedang offline</h1>
         <p>Koneksi internet tidak tersedia. Beberapa halaman yang pernah dibuka masih dapat diakses dari cache aplikasi.</p>
     </main>

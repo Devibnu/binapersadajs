@@ -86,6 +86,32 @@ class RolePermissionTest extends TestCase
         $this->assertDatabaseHas('activity_logs', ['module' => 'Users', 'action' => 'create']);
     }
 
+    public function test_user_edit_page_loads_roles_and_keeps_current_inactive_role_visible(): void
+    {
+        $this->seed(RolePermissionSeeder::class);
+        $admin = $this->userWithRole('super-admin');
+        $inactiveRole = Role::create([
+            'name' => 'Inactive Legacy Role',
+            'slug' => 'inactive-legacy-role',
+            'description' => 'Role lama yang sudah dinonaktifkan.',
+            'is_super_admin' => false,
+            'is_active' => false,
+        ]);
+        $user = User::create([
+            'name' => 'Legacy User',
+            'email' => 'legacy-user@example.test',
+            'password' => bcrypt('secret'),
+            'role_id' => $inactiveRole->id,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('paneladmin.users.edit', $user))
+            ->assertOk()
+            ->assertSee('Super Admin', false)
+            ->assertSee('Inactive Legacy Role', false);
+    }
+
     public function test_last_super_admin_cannot_be_reassigned_disabled_or_deleted(): void
     {
         $this->seed(RolePermissionSeeder::class);
