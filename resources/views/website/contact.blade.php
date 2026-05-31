@@ -22,6 +22,18 @@
     margin-bottom: 20px;
   }
 
+  .contact-card h3,
+  .contact-card h4 {
+    color: #ffffff !important;
+  }
+
+  .contact-card p,
+  .contact-card span,
+  .contact-card a {
+    color: rgba(255, 255, 255, .85) !important;
+    line-height: 1.8;
+  }
+
   .contact-map-frame {
     margin-bottom: 48px;
   }
@@ -130,7 +142,7 @@
 
     <div class="row contact-info-row">
       <div class="col-md-4">
-        <div class="ts-service-box-bg text-center h-100">
+        <div class="ts-service-box-bg contact-card text-center h-100">
           <span class="ts-service-icon icon-round">
             <i class="fas fa-map-marker-alt mr-0"></i>
           </span>
@@ -142,7 +154,7 @@
       </div>
 
       <div class="col-md-4">
-        <div class="ts-service-box-bg text-center h-100">
+        <div class="ts-service-box-bg contact-card text-center h-100">
           <span class="ts-service-icon icon-round">
             <i class="fa fa-envelope mr-0"></i>
           </span>
@@ -154,7 +166,7 @@
       </div>
 
       <div class="col-md-4">
-        <div class="ts-service-box-bg text-center h-100">
+        <div class="ts-service-box-bg contact-card text-center h-100">
           <span class="ts-service-icon icon-round">
             <i class="fa fa-phone-square mr-0"></i>
           </span>
