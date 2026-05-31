@@ -4,7 +4,10 @@
     <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3" href="{{ route('paneladmin.login') }}">
       Bina Persada JS Panel Admin
     </a>
-    <div class="ms-auto">
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <a class="nav-link text-dark font-weight-bold px-2" href="{{ url('/') }}">
+        <i class="fas fa-arrow-left opacity-6 me-1"></i> Website
+      </a>
       <a class="nav-link text-dark font-weight-bold" href="{{ route('paneladmin.login') }}">
         <i class="fas fa-key opacity-6 me-1"></i> Masuk
       </a>
