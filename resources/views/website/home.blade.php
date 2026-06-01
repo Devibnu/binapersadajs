@@ -402,7 +402,7 @@
 
     <div class="row">
       <div class="col-12">
-        <div class="shuffle-btn-group">
+        <div class="shuffle-btn-group mobile-project-filter">
           <label class="active" for="all">
             <input type="radio" name="shuffle-filter" id="all" value="all" checked="checked">Show All
           </label>
