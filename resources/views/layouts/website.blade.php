@@ -101,6 +101,11 @@
         $pwaIconVersion = file_exists(public_path('icons/icon-512x512.png'))
             ? filemtime(public_path('icons/icon-512x512.png'))
             : time();
+        $versionedAsset = function (string $path): string {
+            $fullPath = public_path($path);
+
+            return asset($path) . '?v=' . (file_exists($fullPath) ? filemtime($fullPath) : time());
+        };
     @endphp
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ $pwaIconVersion }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}?v={{ $pwaIconVersion }}">
@@ -115,12 +120,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap" as="style">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap">
-    <link rel="stylesheet" href="{{ asset('web/plugins/bootstrap/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('web/plugins/fontawesome/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('web/plugins/slick/slick.css') }}">
-    <link rel="stylesheet" href="{{ asset('web/plugins/slick/slick-theme.css') }}">
-    <link rel="stylesheet" href="{{ asset('web/plugins/colorbox/colorbox.css') }}">
-    <link rel="stylesheet" href="{{ asset('web/css/style.css') }}?v={{ filemtime(public_path('web/css/style.css')) }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('web/plugins/bootstrap/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('web/plugins/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('web/plugins/slick/slick.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('web/plugins/slick/slick-theme.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('web/plugins/colorbox/colorbox.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('web/css/style.css') }}">
     <style>
         .header-one .logo img.site-logo-img {
             height: auto !important;
@@ -611,17 +616,17 @@
             </button>
         </aside>
     @endif
-    <script src="{{ asset('web/plugins/jQuery/jquery.min.js') }}"></script>
-    <script src="{{ asset('web/plugins/bootstrap/bootstrap.min.js') }}" defer></script>
-    <script src="{{ asset('web/plugins/slick/slick.min.js') }}"></script>
-    <script src="{{ asset('web/plugins/slick/slick-animation.min.js') }}"></script>
-    <script src="{{ asset('web/plugins/colorbox/jquery.colorbox.js') }}"></script>
-    <script src="{{ asset('web/plugins/shuffle/shuffle.min.js') }}" defer></script>
+    <script src="{{ $versionedAsset('web/plugins/jQuery/jquery.min.js') }}"></script>
+    <script src="{{ $versionedAsset('web/plugins/bootstrap/bootstrap.min.js') }}" defer></script>
+    <script src="{{ $versionedAsset('web/plugins/slick/slick.min.js') }}"></script>
+    <script src="{{ $versionedAsset('web/plugins/slick/slick-animation.min.js') }}"></script>
+    <script src="{{ $versionedAsset('web/plugins/colorbox/jquery.colorbox.js') }}"></script>
+    <script src="{{ $versionedAsset('web/plugins/shuffle/shuffle.min.js') }}" defer></script>
     @if(config('services.google_maps.key'))
         <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&loading=async" async defer></script>
     @endif
-    <script src="{{ asset('web/plugins/google-map/map.js') }}" defer></script>
-    <script src="{{ asset('web/js/script.js') }}"></script>
+    <script src="{{ $versionedAsset('web/plugins/google-map/map.js') }}" defer></script>
+    <script src="{{ $versionedAsset('web/js/script.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var searchWrap = document.querySelector('.header-search-wrapper');

@@ -1,8 +1,7 @@
-const CACHE_NAME = 'bpjs-pwa-v1780197555';
+const CACHE_NAME = 'bpjs-cache-v202606011';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [
-  '/',
   OFFLINE_URL,
   '/manifest.json',
   '/site.webmanifest',
