@@ -152,6 +152,177 @@
             z-index: 1050;
         }
 
+        .music-widget {
+            bottom: 144px;
+            position: fixed;
+            right: 28px;
+            z-index: 1051;
+        }
+
+        .music-widget-toggle {
+            align-items: center;
+            background: #0c1e35;
+            border: 0;
+            border-radius: 50%;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, .24);
+            color: #fff;
+            display: flex;
+            font-size: 22px;
+            height: 58px;
+            justify-content: center;
+            margin-left: auto;
+            transition: transform .2s ease, background-color .2s ease;
+            width: 58px;
+        }
+
+        .music-widget-toggle:hover,
+        .music-widget-toggle:focus {
+            background: #1f8f5f;
+            color: #fff;
+            outline: 0;
+            transform: translateY(-2px);
+        }
+
+        .music-widget-panel {
+            background: #fff;
+            border-radius: 8px;
+            bottom: 72px;
+            box-shadow: 0 16px 42px rgba(12, 30, 53, .24);
+            max-width: 350px;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+            transform: translateY(10px);
+            transition: opacity .2s ease, transform .2s ease;
+            width: 350px;
+        }
+
+        .music-widget.is-open .music-widget-panel {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .music-widget-header {
+            align-items: center;
+            background: #0c1e35;
+            color: #fff;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            padding: 15px 16px;
+        }
+
+        .music-widget-header strong {
+            color: #fff;
+            display: block;
+            font-size: 15px;
+        }
+
+        .music-widget-header span {
+            color: rgba(255, 255, 255, .72);
+            display: block;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .music-widget-close {
+            background: transparent;
+            border: 0;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            padding: 4px;
+        }
+
+        .music-widget-body {
+            padding: 16px;
+        }
+
+        .music-widget-current {
+            color: #0c1e35;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .music-widget-controls {
+            align-items: center;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .music-widget-control {
+            align-items: center;
+            background: #eef3f6;
+            border: 0;
+            border-radius: 50%;
+            color: #0c1e35;
+            display: flex;
+            height: 38px;
+            justify-content: center;
+            transition: background-color .2s ease, color .2s ease;
+            width: 38px;
+        }
+
+        .music-widget-control.is-main {
+            background: #1f8f5f;
+            color: #fff;
+            height: 44px;
+            width: 44px;
+        }
+
+        .music-widget-control:hover,
+        .music-widget-control:focus {
+            background: #1f8f5f;
+            color: #fff;
+            outline: 0;
+        }
+
+        .music-widget-volume {
+            align-items: center;
+            display: flex;
+            gap: 9px;
+            margin-bottom: 14px;
+        }
+
+        .music-widget-volume input {
+            accent-color: #1f8f5f;
+            flex: 1;
+        }
+
+        .music-widget-list {
+            display: grid;
+            gap: 7px;
+            max-height: 190px;
+            overflow-y: auto;
+        }
+
+        .music-widget-track {
+            background: #f5f8fa;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: #263544;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 9px 10px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .music-widget-track.is-active,
+        .music-widget-track:hover,
+        .music-widget-track:focus {
+            background: #edf8f2;
+            border-color: #1f8f5f;
+            color: #0f5f3c;
+            outline: 0;
+        }
+
         .whatsapp-widget-toggle {
             align-items: center;
             background: #25d366;
@@ -319,6 +490,22 @@
         }
 
         @media (max-width: 767px) {
+            .music-widget {
+                bottom: 146px;
+                right: 18px;
+            }
+
+            .music-widget-panel {
+                max-width: 90vw;
+                width: 336px;
+            }
+
+            .music-widget-toggle {
+                font-size: 20px;
+                height: 52px;
+                width: 52px;
+            }
+
             .whatsapp-widget {
                 bottom: 85px;
                 right: 18px;
@@ -576,6 +763,49 @@
         </div>
     </footer>
     @php
+        $musicPlaylists = \Illuminate\Support\Facades\Schema::hasTable('music_playlists')
+            ? \App\Models\MusicPlaylist::active()->ordered()->get()
+            : collect();
+    @endphp
+    @if($musicPlaylists->isNotEmpty())
+        <aside class="music-widget" id="music-widget" aria-label="Music playlist">
+            <div class="music-widget-panel" id="music-widget-panel" aria-hidden="true" inert>
+                <div class="music-widget-header">
+                    <div>
+                        <strong>Music Playlist</strong>
+                        <span>PT. Bina Persada JS</span>
+                    </div>
+                    <button class="music-widget-close" type="button" id="music-widget-close" aria-label="Tutup music playlist">&times;</button>
+                </div>
+                <div class="music-widget-body">
+                    <div class="music-widget-current" id="music-widget-current">{{ $musicPlaylists->first()->title }}</div>
+                    <div class="music-widget-controls">
+                        <button type="button" class="music-widget-control" id="music-widget-prev" aria-label="Lagu sebelumnya"><i class="fas fa-step-backward" aria-hidden="true"></i></button>
+                        <button type="button" class="music-widget-control is-main" id="music-widget-play" aria-label="Putar musik"><i class="fas fa-play" aria-hidden="true"></i></button>
+                        <button type="button" class="music-widget-control" id="music-widget-next" aria-label="Lagu berikutnya"><i class="fas fa-step-forward" aria-hidden="true"></i></button>
+                    </div>
+                    <div class="music-widget-volume">
+                        <i class="fas fa-volume-down" aria-hidden="true"></i>
+                        <input type="range" id="music-widget-volume" min="0" max="1" step="0.05" value="0.7" aria-label="Volume musik">
+                    </div>
+                    <div class="music-widget-list" id="music-widget-list">
+                        @foreach($musicPlaylists as $musicPlaylist)
+                            @if($musicPlaylist->audioSource())
+                                <button type="button" class="music-widget-track {{ $loop->first ? 'is-active' : '' }}" data-src="{{ $musicPlaylist->audioSource() }}" data-title="{{ $musicPlaylist->title }}">
+                                    {{ $musicPlaylist->title }}
+                                </button>
+                            @endif
+                        @endforeach
+                    </div>
+                    <audio id="music-widget-audio" preload="none"></audio>
+                </div>
+            </div>
+            <button class="music-widget-toggle" type="button" id="music-widget-toggle" aria-controls="music-widget-panel" aria-expanded="false" aria-label="Buka music playlist">
+                <i class="fas fa-music" aria-hidden="true"></i>
+            </button>
+        </aside>
+    @endif
+    @php
         $whatsappValue = trim((string) ($websiteSetting?->whatsapp ?? ''));
         $whatsappIsFormattedNumber = $whatsappValue !== '' && ! preg_match('/[^\d\s+().-]/', $whatsappValue);
         $whatsappRaw = $whatsappIsFormattedNumber ? $whatsappValue : (string) ($websiteSetting?->telepon ?? '');
@@ -702,6 +932,105 @@
             });
         }
     </script>
+    @if($musicPlaylists->isNotEmpty())
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var widget = document.getElementById('music-widget');
+                var panel = document.getElementById('music-widget-panel');
+                var toggle = document.getElementById('music-widget-toggle');
+                var close = document.getElementById('music-widget-close');
+                var audio = document.getElementById('music-widget-audio');
+                var play = document.getElementById('music-widget-play');
+                var previous = document.getElementById('music-widget-prev');
+                var next = document.getElementById('music-widget-next');
+                var volume = document.getElementById('music-widget-volume');
+                var current = document.getElementById('music-widget-current');
+                var tracks = Array.prototype.slice.call(document.querySelectorAll('.music-widget-track'));
+                var currentIndex = 0;
+
+                if (!widget || !panel || !toggle || !audio || tracks.length === 0) {
+                    return;
+                }
+
+                function setOpen(open) {
+                    widget.classList.toggle('is-open', open);
+                    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+                    panel.toggleAttribute('inert', !open);
+                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                }
+
+                function setTrack(index, shouldPlay) {
+                    currentIndex = (index + tracks.length) % tracks.length;
+                    var track = tracks[currentIndex];
+                    tracks.forEach(function (item) {
+                        item.classList.toggle('is-active', item === track);
+                    });
+                    current.textContent = track.dataset.title || 'Music Playlist';
+                    audio.src = track.dataset.src;
+
+                    if (shouldPlay) {
+                        audio.play();
+                    }
+                }
+
+                function syncPlayIcon() {
+                    var icon = play.querySelector('i');
+                    icon.className = audio.paused ? 'fas fa-play' : 'fas fa-pause';
+                    play.setAttribute('aria-label', audio.paused ? 'Putar musik' : 'Jeda musik');
+                }
+
+                setTrack(0, false);
+                audio.volume = parseFloat(volume.value || '0.7');
+
+                toggle.addEventListener('click', function () {
+                    setOpen(!widget.classList.contains('is-open'));
+                });
+
+                close.addEventListener('click', function () {
+                    setOpen(false);
+                });
+
+                play.addEventListener('click', function () {
+                    if (audio.paused) {
+                        audio.play();
+                        return;
+                    }
+
+                    audio.pause();
+                });
+
+                previous.addEventListener('click', function () {
+                    setTrack(currentIndex - 1, !audio.paused);
+                });
+
+                next.addEventListener('click', function () {
+                    setTrack(currentIndex + 1, !audio.paused);
+                });
+
+                volume.addEventListener('input', function () {
+                    audio.volume = parseFloat(volume.value || '0.7');
+                });
+
+                tracks.forEach(function (track, index) {
+                    track.addEventListener('click', function () {
+                        setTrack(index, true);
+                    });
+                });
+
+                audio.addEventListener('play', syncPlayIcon);
+                audio.addEventListener('pause', syncPlayIcon);
+                audio.addEventListener('ended', function () {
+                    setTrack(currentIndex + 1, true);
+                });
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        setOpen(false);
+                    }
+                });
+            });
+        </script>
+    @endif
     @if($whatsappNumber)
         <script>
             document.addEventListener('DOMContentLoaded', function () {
