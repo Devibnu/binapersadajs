@@ -27,9 +27,9 @@
   </div>
   <div class="col-md-6">
     <div class="form-group">
-      <label>Upload MP3</label>
-      <input type="file" name="audio_file" class="form-control @error('audio_file') is-invalid @enderror" accept="audio/mpeg,.mp3">
-      <small class="text-secondary">Opsional jika URL Audio diisi. Maksimal 10MB.</small>
+      <label>Upload Audio</label>
+      <input type="file" name="audio_file" class="form-control @error('audio_file') is-invalid @enderror" accept="audio/mpeg,audio/wav,audio/ogg,.mp3,.mpeg,.mpga,.wav,.ogg">
+      <small class="text-secondary">Format didukung: MP3, MPEG, WAV, OGG. Maksimal 10MB.</small>
       @error('audio_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
       @if($musicPlaylist->audio_file)
         <div class="mt-3">

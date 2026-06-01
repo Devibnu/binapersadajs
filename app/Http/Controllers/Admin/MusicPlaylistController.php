@@ -87,7 +87,7 @@ class MusicPlaylistController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => ['required', 'string', 'max:255'],
-            'audio_file' => ['nullable', 'file', 'mimes:mp3', 'mimetypes:audio/mpeg,audio/mp3', 'max:10240'],
+            'audio_file' => ['nullable', 'file', 'mimes:mp3,mpeg,mpga,wav,ogg', 'max:10240'],
             'audio_url' => ['nullable', 'url', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['required', Rule::in(['0', '1'])],
