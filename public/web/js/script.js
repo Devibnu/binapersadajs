@@ -119,45 +119,8 @@ jQuery(function ($) {
 
 
 		// banner-carousel
-		function syncBannerCarouselFocus($carousel, currentSlide) {
-			var slick = $carousel.slick('getSlick');
-			var focusable = 'a, button, input, textarea, select, [tabindex]';
-			var activeIndex = typeof currentSlide === 'number' ? currentSlide : slick.currentSlide;
-			var $activeSlide = $(slick.$slides.get(activeIndex));
-
-			$(slick.$slides)
-				.attr('tabindex', '-1')
-				.blur()
-				.find(focusable)
-				.attr('tabindex', '-1')
-				.blur();
-
-			$activeSlide
-				.attr('tabindex', '-1')
-				.blur()
-				.find('a, button, input, textarea, select')
-				.attr('tabindex', '0');
-		}
-
 		function bannerCarouselOne() {
 			var $bannerCarousel = $('.banner-carousel.banner-carousel-1');
-
-			$bannerCarousel.on('init', function (event, slick) {
-				syncBannerCarouselFocus($(this), slick.currentSlide);
-			});
-
-			$bannerCarousel.on('beforeChange', function (event, slick) {
-				$(slick.$slides)
-					.attr('tabindex', '-1')
-					.blur()
-					.find('a, button, input, textarea, select, [tabindex]')
-					.attr('tabindex', '-1')
-					.blur();
-			});
-
-			$bannerCarousel.on('afterChange', function (event, slick, currentSlide) {
-				syncBannerCarouselFocus($(this), currentSlide);
-			});
 
 			$bannerCarousel.slick({
 					slidesToShow: 1,
