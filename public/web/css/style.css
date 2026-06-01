@@ -2597,28 +2597,41 @@ img.testimonial-thumb {
   padding: 20px 0 5px;
 }
 
-.industrial-news .latest-post-media,
-.industrial-news .latest-post-img {
+.home-blog-section .latest-post-media,
+.home-blog-section .latest-post-img {
   display: block;
+  height: 230px;
   overflow: hidden;
-}
-
-.industrial-news .latest-post-img img {
-  display: block;
-  height: 220px;
-  object-fit: cover;
   width: 100%;
 }
 
+.home-blog-section .latest-post-img img,
+.home-blog-section .latest-post-media img,
+.home-blog-section .latest-post img {
+  display: block;
+  height: 230px !important;
+  object-fit: cover !important;
+  object-position: center center;
+  width: 100% !important;
+}
+
 @media (max-width: 991px) {
-  .industrial-news .latest-post-img img {
-    height: 200px;
+  .home-blog-section .latest-post-media,
+  .home-blog-section .latest-post-img,
+  .home-blog-section .latest-post-img img,
+  .home-blog-section .latest-post-media img,
+  .home-blog-section .latest-post img {
+    height: 200px !important;
   }
 }
 
-@media (max-width: 767px) {
-  .industrial-news .latest-post-img img {
-    height: 190px;
+@media (max-width: 575px) {
+  .home-blog-section .latest-post-media,
+  .home-blog-section .latest-post-img,
+  .home-blog-section .latest-post-img img,
+  .home-blog-section .latest-post-media img,
+  .home-blog-section .latest-post img {
+    height: 190px !important;
   }
 }
 

@@ -678,7 +678,7 @@
   </div>
 </section>
 
-<section id="news" class="news industrial-news">
+<section id="news" class="news industrial-news home-blog-section">
   <div class="container">
     <div class="row text-center">
       <div class="col-12">
