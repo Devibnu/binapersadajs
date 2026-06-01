@@ -6,6 +6,56 @@
 
 @section('title', 'About - ' . ($websiteSetting?->nama_perusahaan ?? 'PT. Bina Persada Jaya Sejahtera'))
 @section('meta_description', $aboutPageSetting->section_description)
+@push('styles')
+<style>
+  .about-video-grid {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-video-section {
+    padding-top: 0;
+  }
+
+  .about-video-grid.is-single {
+    grid-template-columns: minmax(0, 700px);
+    justify-content: center;
+  }
+
+  .about-video-card {
+    background: #fff;
+  }
+
+  .about-video-frame {
+    aspect-ratio: 16 / 9;
+    background: #0c1e35;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .about-video-frame iframe {
+    border: 0;
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+
+  .about-video-title {
+    color: #0c1e35;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 12px 0 0;
+  }
+
+  @media (max-width: 767px) {
+    .about-video-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+@endpush
 @push('schema')
   @include('website.partials.breadcrumb-schema', ['items' => [
     ['name' => 'Beranda', 'url' => $aboutSeoSetting->canonicalUrl(route('website.home'))],
@@ -59,7 +109,6 @@
         </div><!-- Col end -->
 
         <div class="col-lg-6 mt-5 mt-lg-0">
-          
           @php
             $aboutSlides = [
               [$aboutPageSetting->slider_1_title, $aboutPageSetting->imageUrl('slider_1_image')],
@@ -74,20 +123,48 @@
                     <div class="box-slider-content">
                       <div class="box-slider-text">
                           <h2 class="box-slide-title">{{ $aboutSlide[0] }}</h2>
-                      </div>    
+                      </div>
                     </div>
                 </div>
               </div>
             @endforeach
-          </div><!-- Page slider end-->          
-        
-
+          </div><!-- Page slider end-->
         </div><!-- Col end -->
     </div><!-- Content row end -->
 
   </div><!-- Container end -->
 </section><!-- Main container end -->
 
+@if($aboutVideos->isNotEmpty())
+  <section class="about-video-section">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-lg-12">
+          <h2 class="section-title">Video Perusahaan</h2>
+          <h3 class="section-sub-title">Aktivitas &amp; Dokumentasi</h3>
+        </div>
+      </div>
+
+      <div class="about-video-grid {{ $aboutVideos->count() === 1 ? 'is-single' : '' }}">
+        @foreach($aboutVideos as $aboutVideo)
+          @if($aboutVideo->embedUrl())
+            <article class="about-video-card">
+              <div class="about-video-frame">
+                <iframe
+                  src="{{ $aboutVideo->embedUrl() }}"
+                  title="{{ $aboutVideo->displayTitle() }}"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+              </div>
+              <h4 class="about-video-title text-center">{{ $aboutVideo->displayTitle() }}</h4>
+            </article>
+          @endif
+        @endforeach
+      </div>
+    </div>
+  </section>
+@endif
 
 <section id="facts" class="facts-area dark-bg">
   <div class="container">

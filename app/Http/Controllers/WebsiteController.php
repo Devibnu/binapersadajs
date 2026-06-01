@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ContactPageSetting;
 use App\Models\AboutPageSetting;
 use App\Models\AboutTeam;
+use App\Models\AboutVideo;
 use App\Models\HeroBanner;
 use App\Models\HomepageSetting;
 use App\Models\HomepageVideo;
@@ -109,6 +110,9 @@ class WebsiteController extends Controller
         return view('website.about', [
             'pageHero' => $this->pageHero('about'),
             'aboutPageSetting' => AboutPageSetting::current(),
+            'aboutVideos' => Schema::hasTable('about_videos')
+                ? AboutVideo::where('is_active', true)->orderBy('sort_order')->orderBy('title')->get()
+                : collect(),
             'aboutTeams' => Schema::hasTable('about_teams')
                 ? AboutTeam::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get()
                 : collect(),
