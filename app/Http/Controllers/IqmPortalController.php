@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\InquiryQuotation;
 use App\Models\InquiryQuotationAttachment;
+use App\Models\InvoiceReport;
 use App\Models\IqmUser;
+use App\Models\ProjectReport;
 use App\Models\WebsiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -134,6 +136,50 @@ class IqmPortalController extends Controller
         return view('iqm.show', ['entry' => $inquiryQuotation, 'user' => $user]);
     }
 
+    public function projectReports()
+    {
+        $user = Auth::guard('iqm')->user();
+
+        return view('iqm.project-reports.index', [
+            'user' => $user,
+            'projectReports' => $this->visibleProjectReports($user->id)->paginate(10),
+        ]);
+    }
+
+    public function showProjectReport(ProjectReport $projectReport)
+    {
+        $user = Auth::guard('iqm')->user();
+
+        abort_unless($this->projectReportVisibleToUser($projectReport, $user->id), 403);
+
+        return view('iqm.project-reports.show', [
+            'user' => $user,
+            'projectReport' => $projectReport,
+        ]);
+    }
+
+    public function invoiceReports()
+    {
+        $user = Auth::guard('iqm')->user();
+
+        return view('iqm.invoice-reports.index', [
+            'user' => $user,
+            'invoiceReports' => $this->visibleInvoiceReports($user->id)->paginate(10),
+        ]);
+    }
+
+    public function showInvoiceReport(InvoiceReport $invoiceReport)
+    {
+        $user = Auth::guard('iqm')->user();
+
+        abort_unless($this->invoiceReportVisibleToUser($invoiceReport, $user->id), 403);
+
+        return view('iqm.invoice-reports.show', [
+            'user' => $user,
+            'invoiceReport' => $invoiceReport,
+        ]);
+    }
+
     private function ownedInquiries(int $iqmUserId)
     {
         return $this->applyVisibleToIqmUser(InquiryQuotation::query(), $iqmUserId)->latest();
@@ -147,5 +193,49 @@ class IqmPortalController extends Controller
                     $query->where('iqm_users.id', $iqmUserId);
                 });
         });
+    }
+
+    private function visibleProjectReports(int $iqmUserId)
+    {
+        return ProjectReport::active()
+            ->where(function ($query) use ($iqmUserId) {
+                $query->where('visibility', 'public')
+                    ->orWhereHas('iqmUsers', function ($query) use ($iqmUserId) {
+                        $query->where('iqm_users.id', $iqmUserId);
+                    });
+            })
+            ->ordered();
+    }
+
+    private function projectReportVisibleToUser(ProjectReport $projectReport, int $iqmUserId): bool
+    {
+        if (! $projectReport->is_active) {
+            return false;
+        }
+
+        return $projectReport->isPublic()
+            || $projectReport->iqmUsers()->where('iqm_users.id', $iqmUserId)->exists();
+    }
+
+    private function visibleInvoiceReports(int $iqmUserId)
+    {
+        return InvoiceReport::active()
+            ->where(function ($query) use ($iqmUserId) {
+                $query->where('visibility', 'public')
+                    ->orWhereHas('iqmUsers', function ($query) use ($iqmUserId) {
+                        $query->where('iqm_users.id', $iqmUserId);
+                    });
+            })
+            ->ordered();
+    }
+
+    private function invoiceReportVisibleToUser(InvoiceReport $invoiceReport, int $iqmUserId): bool
+    {
+        if (! $invoiceReport->is_active) {
+            return false;
+        }
+
+        return $invoiceReport->isPublic()
+            || $invoiceReport->iqmUsers()->where('iqm_users.id', $iqmUserId)->exists();
     }
 }

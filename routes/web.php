@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\PageHeroController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
+use App\Http\Controllers\Admin\ProjectReportController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\WebsiteSettingController;
 use App\Http\Controllers\Admin\BlogController;
@@ -21,7 +22,9 @@ use App\Http\Controllers\Admin\HomepageVideoController;
 use App\Http\Controllers\Admin\AboutPageSettingController;
 use App\Http\Controllers\Admin\AboutVideoController;
 use App\Http\Controllers\Admin\AboutTeamController;
+use App\Http\Controllers\Admin\InvoiceReportController;
 use App\Http\Controllers\Admin\MusicPlaylistController;
+use App\Http\Controllers\Admin\TradingProductController;
 use App\Http\Controllers\Admin\SeoSettingController;
 use App\Http\Controllers\Admin\MediaLibraryController;
 use App\Http\Controllers\Admin\ActivityLogController;
@@ -41,6 +44,7 @@ use App\Http\Controllers\ResetController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\WebsiteBlogController;
 use App\Http\Controllers\WebsiteController;
+use App\Http\Controllers\WebsiteTradingController;
 use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
@@ -59,6 +63,8 @@ Route::get('/services/{slug}', [FrontendServiceController::class, 'show'])->midd
 Route::redirect('/service-single', '/services')->name('website.service-single');
 Route::get('/projects', [FrontendProjectController::class, 'index'])->middleware('analytics.track')->name('website.projects');
 Route::get('/projects/{slug}', [FrontendProjectController::class, 'show'])->name('projects.show');
+Route::get('/trading', [WebsiteTradingController::class, 'index'])->middleware('analytics.track')->name('website.trading.index');
+Route::get('/trading/{slug}', [WebsiteTradingController::class, 'show'])->middleware('analytics.track')->name('website.trading.show');
 Route::get('/contact', [WebsiteController::class, 'contact'])->middleware('analytics.track')->name('website.contact');
 Route::post('/contact', [ContactMessageController::class, 'store'])
     ->middleware('throttle:5,10')
@@ -91,6 +97,10 @@ Route::prefix('iqm')->name('iqm.')->group(function () {
         Route::get('/quotations', [IqmPortalController::class, 'quotations'])->name('quotations.index');
         Route::get('/attachments', [IqmPortalController::class, 'attachments'])->name('attachments.index');
         Route::get('/profile', [IqmPortalController::class, 'profile'])->name('profile');
+        Route::get('/project-reports', [IqmPortalController::class, 'projectReports'])->name('project-reports.index');
+        Route::get('/project-reports/{projectReport}', [IqmPortalController::class, 'showProjectReport'])->name('project-reports.show');
+        Route::get('/invoice-reports', [IqmPortalController::class, 'invoiceReports'])->name('invoice-reports.index');
+        Route::get('/invoice-reports/{invoiceReport}', [IqmPortalController::class, 'showInvoiceReport'])->name('invoice-reports.show');
         Route::get('/inquiries/{inquiryQuotation}', [IqmPortalController::class, 'show'])->name('inquiries.show');
     });
 });
@@ -181,6 +191,13 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/clients/{client}/edit', [ClientController::class, 'edit'])->middleware('permission:clients.update')->name('paneladmin.clients.edit');
         Route::put('/clients/{client}', [ClientController::class, 'update'])->middleware('permission:clients.update')->name('paneladmin.clients.update');
         Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->middleware('permission:clients.delete')->name('paneladmin.clients.destroy');
+        Route::get('/trading-products', [TradingProductController::class, 'index'])->middleware('permission:trading-products.view')->name('paneladmin.trading-products.index');
+        Route::get('/trading-products/create', [TradingProductController::class, 'create'])->middleware('permission:trading-products.create')->name('paneladmin.trading-products.create');
+        Route::post('/trading-products', [TradingProductController::class, 'store'])->middleware('permission:trading-products.create')->name('paneladmin.trading-products.store');
+        Route::get('/trading-products/{tradingProduct}', [TradingProductController::class, 'show'])->middleware('permission:trading-products.view')->name('paneladmin.trading-products.show');
+        Route::get('/trading-products/{tradingProduct}/edit', [TradingProductController::class, 'edit'])->middleware('permission:trading-products.update')->name('paneladmin.trading-products.edit');
+        Route::put('/trading-products/{tradingProduct}', [TradingProductController::class, 'update'])->middleware('permission:trading-products.update')->name('paneladmin.trading-products.update');
+        Route::delete('/trading-products/{tradingProduct}', [TradingProductController::class, 'destroy'])->middleware('permission:trading-products.delete')->name('paneladmin.trading-products.destroy');
         Route::post('/editor/upload-image', [EditorImageController::class, 'store'])
             ->middleware('permission:services.update')
             ->name('paneladmin.editor.upload-image');
@@ -272,6 +289,21 @@ Route::prefix('paneladmin')->group(function () {
         Route::put('/iqm-users/{iqmUser}', [IqmUserController::class, 'update'])->middleware('permission:iqm-user.edit')->name('paneladmin.iqm-users.update');
         Route::get('/iqm-users/{iqmUser}', [IqmUserController::class, 'show'])->middleware('permission:iqm-user.view')->name('paneladmin.iqm-users.show');
         Route::delete('/iqm-users/{iqmUser}', [IqmUserController::class, 'destroy'])->middleware('permission:iqm-user.delete')->name('paneladmin.iqm-users.destroy');
+
+        Route::get('/project-reports', [ProjectReportController::class, 'index'])->middleware('permission:project-reports.view')->name('paneladmin.project-reports.index');
+        Route::get('/project-reports/create', [ProjectReportController::class, 'create'])->middleware('permission:project-reports.create')->name('paneladmin.project-reports.create');
+        Route::post('/project-reports', [ProjectReportController::class, 'store'])->middleware('permission:project-reports.create')->name('paneladmin.project-reports.store');
+        Route::get('/project-reports/{projectReport}', [ProjectReportController::class, 'show'])->middleware('permission:project-reports.view')->name('paneladmin.project-reports.show');
+        Route::get('/project-reports/{projectReport}/edit', [ProjectReportController::class, 'edit'])->middleware('permission:project-reports.update')->name('paneladmin.project-reports.edit');
+        Route::put('/project-reports/{projectReport}', [ProjectReportController::class, 'update'])->middleware('permission:project-reports.update')->name('paneladmin.project-reports.update');
+        Route::delete('/project-reports/{projectReport}', [ProjectReportController::class, 'destroy'])->middleware('permission:project-reports.delete')->name('paneladmin.project-reports.destroy');
+        Route::get('/invoice-reports', [InvoiceReportController::class, 'index'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-reports.index');
+        Route::get('/invoice-reports/create', [InvoiceReportController::class, 'create'])->middleware('permission:invoice-reports.create')->name('paneladmin.invoice-reports.create');
+        Route::post('/invoice-reports', [InvoiceReportController::class, 'store'])->middleware('permission:invoice-reports.create')->name('paneladmin.invoice-reports.store');
+        Route::get('/invoice-reports/{invoiceReport}', [InvoiceReportController::class, 'show'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-reports.show');
+        Route::get('/invoice-reports/{invoiceReport}/edit', [InvoiceReportController::class, 'edit'])->middleware('permission:invoice-reports.update')->name('paneladmin.invoice-reports.edit');
+        Route::put('/invoice-reports/{invoiceReport}', [InvoiceReportController::class, 'update'])->middleware('permission:invoice-reports.update')->name('paneladmin.invoice-reports.update');
+        Route::delete('/invoice-reports/{invoiceReport}', [InvoiceReportController::class, 'destroy'])->middleware('permission:invoice-reports.delete')->name('paneladmin.invoice-reports.destroy');
 
         // Inquiry & Quotation Management
         Route::get('/inquiries', [InquiryQuotationController::class, 'index'])->middleware('permission:inquiry-quotation.view')->name('admin.inquiries.index');

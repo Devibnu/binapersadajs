@@ -44,6 +44,18 @@ class IqmUser extends Authenticatable
             ->withTimestamps();
     }
 
+    public function projectReports(): BelongsToMany
+    {
+        return $this->belongsToMany(ProjectReport::class, 'project_report_iqm_user')
+            ->withTimestamps();
+    }
+
+    public function invoiceReports(): BelongsToMany
+    {
+        return $this->belongsToMany(InvoiceReport::class, 'invoice_report_iqm_user')
+            ->withTimestamps();
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

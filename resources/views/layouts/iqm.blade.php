@@ -44,6 +44,9 @@
     $iqmLogoAlt = $websiteSetting?->nama_perusahaan ?? $websiteSetting?->company_name ?? 'PT Bina Persada Jaya Sejahtera';
     $iqmNav = [
       ['label' => 'Dashboard', 'url' => route('iqm.dashboard'), 'pattern' => 'iqm/dashboard', 'icon' => 'fa-chart-line'],
+      ['label' => 'Inquiry & Quotation', 'url' => route('iqm.inquiries.index'), 'pattern' => 'iqm/inquiries*', 'icon' => 'fa-file-lines'],
+      ['label' => 'Project Report', 'url' => route('iqm.project-reports.index'), 'pattern' => 'iqm/project-reports*', 'icon' => 'fa-clipboard-list'],
+      ['label' => 'Invoice Report', 'url' => route('iqm.invoice-reports.index'), 'pattern' => 'iqm/invoice-reports*', 'icon' => 'fa-file-invoice-dollar'],
       ['label' => 'Website Perusahaan', 'url' => url('/'), 'pattern' => null, 'icon' => 'fa-globe', 'target' => '_blank'],
       ['label' => 'Profile', 'url' => route('iqm.profile'), 'pattern' => 'iqm/profile', 'icon' => 'fa-user'],
     ];

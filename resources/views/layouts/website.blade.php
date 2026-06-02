@@ -612,6 +612,7 @@
                                     <li class="nav-item {{ request()->routeIs('website.about') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.about') }}">About</a></li>
                                     <li class="nav-item {{ request()->routeIs('services.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('services.index') }}">Services</a></li>
                                     <li class="nav-item {{ request()->routeIs('website.projects') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.projects') }}">Projects</a></li>
+                                    <li class="nav-item {{ request()->routeIs('website.trading.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.trading.index') }}">Trading</a></li>
                                     <li class="nav-item {{ request()->routeIs('website.blog.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.blog.index') }}">Blog</a></li>
                                     <li class="nav-item {{ request()->routeIs('iqm.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('iqm.landing') }}">IQM</a></li>
                                     <li class="nav-item {{ request()->routeIs('website.contact') ? 'active' : '' }}"><a class="nav-link" href="{{ route('website.contact') }}">Contact</a></li>
