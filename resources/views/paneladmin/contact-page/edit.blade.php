@@ -6,7 +6,7 @@
     <div class="card mb-4">
       <div class="card-header pb-0">
         <h6>Halaman Kontak</h6>
-        <p class="text-sm mb-0">Kelola teks halaman kontak dan embed Google Maps. Alamat, email, dan telepon tetap dikelola dari Pengaturan Website.</p>
+        <p class="text-sm mb-0">Kelola teks halaman kontak. Alamat, email, telepon, dan Google Maps tetap dikelola dari Pengaturan Website.</p>
       </div>
       <div class="card-body">
         <form method="POST" action="{{ route('paneladmin.contact-page.update') }}" class="js-confirm-submit">
@@ -61,14 +61,6 @@
                 <label>Teks Tombol Kirim</label>
                 <input type="text" name="submit_button_text" class="form-control @error('submit_button_text') is-invalid @enderror" value="{{ old('submit_button_text', $setting->submit_button_text) }}">
                 @error('submit_button_text')<div class="invalid-feedback">{{ $message }}</div>@enderror
-              </div>
-            </div>
-            <div class="col-md-12">
-              <div class="form-group">
-                <label>Sematkan Google Maps</label>
-                <textarea name="map_embed" class="form-control @error('map_embed') is-invalid @enderror" rows="5" placeholder="<iframe ...></iframe>">{{ old('map_embed', $setting->map_embed) }}</textarea>
-                @error('map_embed')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                <small class="form-text text-muted">Tempel kode iframe embed Google Maps, bukan URL biasa.</small>
               </div>
             </div>
             <div class="col-md-12">

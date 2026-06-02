@@ -98,7 +98,7 @@
   $pageHeroBreadcrumbClass = $pageHero?->breadcrumbClass() ?? 'justify-content-center';
   $pageHeroOpacity = $pageHero?->overlay_opacity ?? 1;
   $contactSetting = $contactPageSetting ?? \App\Models\ContactPageSetting::current();
-  $googleMapsValue = trim((string) ($contactSetting->map_embed ?: ($websiteSetting?->google_maps ?? '')));
+  $googleMapsValue = trim((string) ($websiteSetting?->google_maps ?? ''));
   $hasGoogleMapsEmbed = preg_match('/<iframe\b[^>]*>.*?<\/iframe>/is', $googleMapsValue, $googleMapsMatch) === 1;
   $googleMapsEmbed = $hasGoogleMapsEmbed
     ? (preg_match('/\bloading\s*=/i', $googleMapsMatch[0])

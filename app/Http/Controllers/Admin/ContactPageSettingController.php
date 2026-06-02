@@ -26,7 +26,6 @@ class ContactPageSettingController extends Controller
             'address_title' => ['nullable', 'string', 'max:255'],
             'email_title' => ['nullable', 'string', 'max:255'],
             'phone_title' => ['nullable', 'string', 'max:255'],
-            'map_embed' => ['nullable', 'string'],
             'form_heading' => ['nullable', 'string', 'max:255'],
             'success_message' => ['nullable', 'string', 'max:500'],
             'submit_button_text' => ['nullable', 'string', 'max:100'],
