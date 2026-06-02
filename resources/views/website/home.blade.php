@@ -317,8 +317,13 @@
         @foreach($counters as $counter)
           @php
             preg_match('/^(\d+)(.*)$/', trim((string) $counter[0]), $counterParts);
+            $counterText = strtolower(trim((string) $counter[0] . ' ' . (string) $counter[1]));
+            $isIsoCounter = str_contains($counterText, 'iso')
+              || str_contains($counterText, 'ohsas')
+              || str_contains($counterText, '9001')
+              || str_contains($counterText, '18001');
           @endphp
-          <div class="col-md-3 col-sm-6 ts-facts {{ $loop->first ? '' : ($loop->iteration === 2 ? 'mt-5 mt-sm-0' : 'mt-5 mt-md-0') }}">
+          <div class="col-md-3 col-sm-6 ts-facts {{ $isIsoCounter ? 'iso-counter' : '' }} {{ $loop->first ? '' : ($loop->iteration === 2 ? 'mt-5 mt-sm-0' : 'mt-5 mt-md-0') }}">
             <div class="ts-facts-icon"><i class="fas {{ $counter[2] }}"></i></div>
             <div class="ts-facts-content">
               <h2 class="ts-facts-num">

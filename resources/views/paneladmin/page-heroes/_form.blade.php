@@ -11,6 +11,7 @@
         <option value="about" {{ old('page_key', $pageHero->page_key) === 'about' ? 'selected' : '' }}>About</option>
         <option value="contact" {{ old('page_key', $pageHero->page_key) === 'contact' ? 'selected' : '' }}>Contact</option>
         <option value="blog" {{ old('page_key', $pageHero->page_key) === 'blog' ? 'selected' : '' }}>Blog</option>
+        <option value="trading" {{ old('page_key', $pageHero->page_key) === 'trading' ? 'selected' : '' }}>Trading</option>
       </select>
     </div>
   </div>

@@ -1835,6 +1835,29 @@ ul.navbar-nav > li.header-get-a-quote:hover > a:after {
   margin: 0;
 }
 
+.ts-facts.iso-counter .ts-facts-content .ts-facts-num {
+  font-size: 36px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.ts-facts.iso-counter .ts-facts-content .ts-facts-title {
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+@media (max-width: 991px) {
+  .ts-facts.iso-counter .ts-facts-content .ts-facts-num {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 575px) {
+  .ts-facts.iso-counter .ts-facts-content .ts-facts-num {
+    font-size: 32px;
+  }
+}
+
 /* Services
 ================================================== */
 /* Service box */

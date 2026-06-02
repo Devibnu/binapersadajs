@@ -79,7 +79,7 @@ class PageHeroController extends Controller
         return $request->validate([
             'page_key' => [
                 'required',
-                Rule::in(['services', 'projects', 'about', 'contact', 'blog']),
+                Rule::in(['services', 'projects', 'about', 'contact', 'blog', 'trading']),
                 Rule::unique('page_heroes', 'page_key')->ignore($pageHero),
             ],
             'title' => ['required', 'string', 'max:255'],
