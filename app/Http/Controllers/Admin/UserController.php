@@ -12,6 +12,8 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    private const DEFAULT_PASSWORD = 'BinaPersada@2026';
+
     public function index(Request $request)
     {
         $query = User::with('role')->latest();
@@ -38,6 +40,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validatedData($request);
+        $validated['password'] = filled($validated['password'] ?? null)
+            ? $validated['password']
+            : self::DEFAULT_PASSWORD;
         $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
@@ -106,7 +111,7 @@ class UserController extends Controller
         return $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150', Rule::unique('users', 'email')->ignore($user)],
-            'password' => [$user ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'role_id' => ['required', 'integer', Rule::exists('roles', 'id')->where(fn ($query) => $query->where('is_active', true))],
             'is_active' => ['required', 'boolean'],
         ]);

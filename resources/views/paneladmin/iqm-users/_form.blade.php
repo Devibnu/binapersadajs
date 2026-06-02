@@ -1,5 +1,34 @@
 @csrf
 
+@once
+  <style>
+    .iqm-admin-password-field {
+      position: relative;
+    }
+
+    .iqm-admin-password-field .form-control {
+      padding-right: 44px;
+    }
+
+    .iqm-admin-password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: #6c757d;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .iqm-admin-password-toggle:hover {
+      color: #1f8f5f;
+    }
+  </style>
+@endonce
+
 <div class="row">
   <div class="col-md-6">
     <div class="form-group">
@@ -49,14 +78,29 @@
   <div class="col-md-6">
     <div class="form-group">
       <label>Password {{ $user->exists ? '(kosongkan jika tidak diubah)' : '' }}</label>
-      <input type="password" name="password" class="form-control" {{ $user->exists ? '' : 'required' }}>
+      <div class="iqm-admin-password-field">
+        <input type="password" name="password" id="iqm-user-password" class="form-control">
+        <button type="button" class="iqm-admin-password-toggle js-iqm-password-toggle" data-target="iqm-user-password" aria-label="Tampilkan password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      @unless($user->exists)
+        <small class="form-text text-muted">
+          Jika password dikosongkan, sistem akan menggunakan default password: BinaPersada@2026. User dapat mengubah password setelah login.
+        </small>
+      @endunless
       @error('password') <p class="text-danger text-xs mt-1">{{ $message }}</p> @enderror
     </div>
   </div>
   <div class="col-md-6">
     <div class="form-group">
       <label>Konfirmasi Password</label>
-      <input type="password" name="password_confirmation" class="form-control" {{ $user->exists ? '' : 'required' }}>
+      <div class="iqm-admin-password-field">
+        <input type="password" name="password_confirmation" id="iqm-user-password-confirmation" class="form-control">
+        <button type="button" class="iqm-admin-password-toggle js-iqm-password-toggle" data-target="iqm-user-password-confirmation" aria-label="Tampilkan konfirmasi password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -65,3 +109,28 @@
   <a href="{{ route('paneladmin.iqm-users.index') }}" class="btn bg-gradient-secondary mb-0">Kembali</a>
   <button type="submit" class="btn bg-gradient-primary mb-0">Simpan</button>
 </div>
+
+@push('dashboard')
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.js-iqm-password-toggle').forEach(function (button) {
+        button.addEventListener('click', function () {
+          const input = document.getElementById(button.dataset.target);
+          const icon = button.querySelector('i');
+
+          if (!input || !icon) return;
+
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+          }
+        });
+      });
+    });
+  </script>
+@endpush

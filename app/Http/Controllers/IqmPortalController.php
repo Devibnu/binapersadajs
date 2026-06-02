@@ -121,6 +121,39 @@ class IqmPortalController extends Controller
         return view('iqm.profile', ['user' => Auth::guard('iqm')->user()]);
     }
 
+    public function updateProfilePassword(Request $request)
+    {
+        $user = Auth::guard('iqm')->user();
+
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password baru tidak sesuai.',
+        ]);
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            return back()->withErrors([
+                'current_password' => 'Password saat ini tidak sesuai.',
+            ])->withInput();
+        }
+
+        if (Hash::check($validated['password'], $user->password)) {
+            return back()->withErrors([
+                'password' => 'Password baru harus berbeda dari password saat ini.',
+            ])->withInput();
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+        ])->save();
+
+        return back()->with('success', 'Password berhasil diperbarui.');
+    }
+
     public function show(InquiryQuotation $inquiryQuotation)
     {
         $user = Auth::guard('iqm')->user();

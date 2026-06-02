@@ -97,6 +97,7 @@ Route::prefix('iqm')->name('iqm.')->group(function () {
         Route::get('/quotations', [IqmPortalController::class, 'quotations'])->name('quotations.index');
         Route::get('/attachments', [IqmPortalController::class, 'attachments'])->name('attachments.index');
         Route::get('/profile', [IqmPortalController::class, 'profile'])->name('profile');
+        Route::put('/profile/password', [IqmPortalController::class, 'updateProfilePassword'])->name('profile.password.update');
         Route::get('/project-reports', [IqmPortalController::class, 'projectReports'])->name('project-reports.index');
         Route::get('/project-reports/{projectReport}', [IqmPortalController::class, 'showProjectReport'])->name('project-reports.show');
         Route::get('/invoice-reports', [IqmPortalController::class, 'invoiceReports'])->name('invoice-reports.index');

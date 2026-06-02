@@ -1,6 +1,37 @@
 @extends('layouts.user_type.guest')
 
 @section('content')
+  <style>
+    .admin-password-field {
+      position: relative;
+    }
+
+    .admin-password-field .form-control {
+      padding-right: 46px;
+    }
+
+    .admin-password-toggle {
+      align-items: center;
+      background: transparent;
+      border: 0;
+      color: #8392ab;
+      cursor: pointer;
+      display: inline-flex;
+      height: 38px;
+      justify-content: center;
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 38px;
+    }
+
+    .admin-password-toggle:hover,
+    .admin-password-toggle:focus {
+      color: #2152ff;
+      outline: 0;
+    }
+  </style>
 
   <main class="main-content  mt-0">
     <section>
@@ -26,7 +57,12 @@
                     </div>
                     <label>Password</label>
                     <div class="mb-3">
-                      <input type="password" class="form-control" name="password" id="password" placeholder="Password" aria-label="Password" aria-describedby="password-addon">
+                      <div class="admin-password-field">
+                        <input type="password" class="form-control" name="password" id="adminPassword" placeholder="Password" aria-label="Password" aria-describedby="password-addon">
+                        <button type="button" id="toggleAdminPassword" class="admin-password-toggle" aria-label="Lihat password" aria-pressed="false">
+                          <i class="fas fa-eye" aria-hidden="true"></i>
+                        </button>
+                      </div>
                       @error('password')
                         <p class="text-danger text-xs mt-2">{{ $message }}</p>
                       @enderror
@@ -59,3 +95,27 @@
   </main>
 
 @endsection
+
+@push('dashboard')
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggle = document.getElementById('toggleAdminPassword');
+      const input = document.getElementById('adminPassword');
+
+      if (!toggle || !input) {
+        return;
+      }
+
+      toggle.addEventListener('click', function () {
+        const icon = toggle.querySelector('i');
+        const isHidden = input.type === 'password';
+
+        input.type = isHidden ? 'text' : 'password';
+        toggle.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Lihat password');
+        toggle.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+        icon.classList.toggle('fa-eye', !isHidden);
+        icon.classList.toggle('fa-eye-slash', isHidden);
+      });
+    });
+  </script>
+@endpush

@@ -11,6 +11,8 @@ use Illuminate\Validation\Rule;
 
 class IqmUserController extends Controller
 {
+    private const DEFAULT_PASSWORD = 'BinaPersada@2026';
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -47,6 +49,9 @@ class IqmUserController extends Controller
     {
         $this->normalizePhoneInput($request);
         $validated = $this->validatedData($request);
+        $validated['password'] = filled($validated['password'] ?? null)
+            ? $validated['password']
+            : self::DEFAULT_PASSWORD;
         $validated['password'] = Hash::make($validated['password']);
 
         $user = IqmUser::create($validated);
@@ -125,7 +130,7 @@ class IqmUserController extends Controller
             'username' => ['required', 'string', 'max:80', Rule::unique('iqm_users', 'username')->ignore($user)],
             'email' => ['nullable', 'email', 'max:150', Rule::unique('iqm_users', 'email')->ignore($user)],
             'phone' => ['nullable', 'string', 'max:30'],
-            'password' => [$user ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
     }
