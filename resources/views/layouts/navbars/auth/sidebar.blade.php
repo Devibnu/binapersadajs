@@ -20,7 +20,7 @@
       $hasContentMenus = $can('homepage-video.view') || $can('services.view') || $can('project-categories.view') || $can('projects.view') || $can('clients.view') || $can('trading-products.view') || $can('blogs.view') || $can('blog-comments.view') || $can('about-page.view') || $can('about-videos.view') || $can('music-playlists.view') || $can('about-teams.view');
       $hasCommunicationMenus = $can('contact-messages.view') || $can('leads.view') || $can('inquiry-quotation.view') || $can('project-reports.view') || $can('invoice-reports.view') || $can('iqm-user.view');
       $hasAnalyticsMenus = $can('analytics.view') || $can('activity-logs.view');
-      $hasSystemMenus = $can('email-settings.view') || $can('roles.view') || $can('users.view') || $adminUser;
+      $hasSystemMenus = $can('email-settings.view') || $can('email-templates.view') || $can('roles.view') || $can('users.view') || $adminUser;
     @endphp
     <ul class="navbar-nav">
       @if($can('dashboard.view'))
@@ -147,6 +147,9 @@
         </li>
         @if($can('email-settings.view'))
           <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/email-settings') ? 'active' : '' }}" href="{{ route('paneladmin.email-settings.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-at text-sm opacity-10 {{ Request::is('paneladmin/email-settings') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Email Settings</span></a></li>
+        @endif
+        @if($can('email-templates.view'))
+          <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/email-templates*') ? 'active' : '' }}" href="{{ route('paneladmin.email-templates.edit') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-envelope-open-text text-sm opacity-10 {{ Request::is('paneladmin/email-templates*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Email Templates</span></a></li>
         @endif
         @if($can('roles.view'))
           <li class="nav-item"><a class="nav-link {{ Request::is('paneladmin/roles*') ? 'active' : '' }}" href="{{ route('paneladmin.roles.index') }}"><div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center"><i class="fas fa-user-shield text-sm opacity-10 {{ Request::is('paneladmin/roles*') ? 'text-white' : 'text-dark' }}"></i></div><span class="nav-link-text ms-1">Roles &amp; Permissions</span></a></li>

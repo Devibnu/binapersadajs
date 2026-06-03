@@ -79,6 +79,9 @@
                   <td><p class="text-xs text-secondary mb-0">{{ $lead->created_at->format('d/m/Y H:i') }}</p></td>
                   <td class="align-middle text-nowrap">
                     <a href="{{ route('paneladmin.leads.show', $lead) }}" class="text-secondary font-weight-bold text-xs me-3">Lihat</a>
+                    @if(auth()->user()->canAccess('leads.email'))
+                      <a href="{{ route('paneladmin.leads.show', $lead) }}" class="text-info font-weight-bold text-xs me-3">Kirim Email</a>
+                    @endif
                     @if(auth()->user()->canAccess('leads.delete'))
                       <form method="POST" action="{{ route('paneladmin.leads.destroy', $lead) }}" class="d-inline js-confirm-delete">
                         @csrf

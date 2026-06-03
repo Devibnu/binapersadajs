@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Mail\ContactMessageReplyMail;
+use App\Mail\BrandedTemplateMail;
 use App\Models\ContactMessage;
 use App\Models\EmailSetting;
-use App\Models\WebsiteSetting;
+use App\Models\EmailTemplate;
 use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -76,11 +76,10 @@ class ContactMessageController extends Controller
 
         try {
             EmailSetting::applyActiveConfiguration();
-            Mail::to($validated['to_email'])->send(new ContactMessageReplyMail(
-                $contactMessage,
+            Mail::to($validated['to_email'])->send(new BrandedTemplateMail(
                 $validated['subject'],
-                $validated['body'],
-                WebsiteSetting::query()->first()
+                '<p style="margin:0 0 20px;">Yth. ' . e($contactMessage->name) . ',</p><div>' . nl2br(e($validated['body'])) . '</div>',
+                EmailTemplate::current()
             ));
         } catch (\Throwable $exception) {
             Log::warning('Failed to send contact reply email', [

@@ -9,6 +9,12 @@
         <span class="badge badge-sm {{ $lead->statusBadgeClass() }}">{{ $lead->statusLabel() }}</span>
       </div>
       <div class="card-body">
+        @if(session('success'))
+          <div class="alert alert-success text-white">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+          <div class="alert alert-danger text-white">{{ session('error') }}</div>
+        @endif
         <div class="row">
           @foreach([
             'Nama' => $lead->name ?: '-',
@@ -32,7 +38,6 @@
       </div>
       <div class="card-footer pt-0 d-flex flex-wrap gap-2">
         <a href="{{ route('paneladmin.leads.index') }}" class="btn btn-outline-secondary mb-0">Kembali</a>
-        <a href="mailto:{{ $lead->email }}" class="btn bg-gradient-info mb-0">Kirim Email</a>
         @if($lead->whatsappUrl())
           <a href="{{ $lead->whatsappUrl() }}" target="_blank" rel="noopener" class="btn bg-gradient-success mb-0">Chat WhatsApp</a>
         @endif
@@ -47,8 +52,39 @@
     </div>
   </div>
 
-  @if(auth()->user()->canAccess('leads.update'))
+  @if(auth()->user()->canAccess('leads.update') || auth()->user()->canAccess('leads.email'))
   <div class="col-lg-4">
+    @if(auth()->user()->canAccess('leads.email'))
+    @if(auth()->user()->canAccess('leads.update'))
+    <div class="card mb-4">
+      <div class="card-header pb-0">
+        <h6>Kirim Email</h6>
+        <p class="text-sm mb-0">Email memakai Email Template global.</p>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ route('paneladmin.leads.email', $lead) }}" class="js-confirm-submit">
+          @csrf
+          <div class="form-group">
+            <label>Email Tujuan</label>
+            <input type="email" name="to_email" value="{{ old('to_email', $lead->email) }}" class="form-control @error('to_email') is-invalid @enderror" required>
+            @error('to_email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" name="subject" value="{{ old('subject', 'Follow Up dari PT. Bina Persada Jaya Sejahtera') }}" class="form-control @error('subject') is-invalid @enderror" maxlength="150" required>
+            @error('subject')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          </div>
+          <div class="form-group">
+            <label>Isi Pesan</label>
+            <textarea name="body" rows="7" class="form-control @error('body') is-invalid @enderror" required>{{ old('body') }}</textarea>
+            @error('body')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          </div>
+          <button type="submit" class="btn bg-gradient-info mb-0 w-100">Kirim Email</button>
+        </form>
+      </div>
+    </div>
+    @endif
+
     <div class="card mb-4">
       <div class="card-header pb-0">
         <h6>Update Status</h6>
@@ -70,7 +106,33 @@
         </form>
       </div>
     </div>
+    @endif
   </div>
   @endif
+
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header pb-0">
+        <h6>Riwayat Email</h6>
+        <p class="text-sm mb-0">Email follow up yang dikirim dari panel admin.</p>
+      </div>
+      <div class="card-body">
+        @forelse($lead->emailHistories as $history)
+          <div class="border rounded-3 p-3 mb-3">
+            <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+              <div>
+                <p class="text-sm font-weight-bold mb-1">{{ $history->subject }}</p>
+                <p class="text-xs text-secondary mb-0">Ke: {{ $history->to_email }} | Oleh: {{ $history->sender?->name ?: 'System' }}</p>
+              </div>
+              <span class="text-xs text-secondary">{{ $history->sent_at?->format('d/m/Y H:i') ?: '-' }}</span>
+            </div>
+            <p class="text-sm mb-0" style="white-space: pre-wrap;">{{ $history->body }}</p>
+          </div>
+        @empty
+          <p class="text-sm text-secondary mb-0">Belum ada email follow up.</p>
+        @endforelse
+      </div>
+    </div>
+  </div>
 </div>
 @endsection

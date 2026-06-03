@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lead extends Model
 {
@@ -53,6 +54,11 @@ class Lead extends Model
             'service-inquiry' => 'Service Inquiry',
             default => $this->source ? ucfirst($this->source) : '-',
         };
+    }
+
+    public function emailHistories(): HasMany
+    {
+        return $this->hasMany(LeadEmailHistory::class)->latest('sent_at');
     }
 
     public function whatsappUrl(): ?string

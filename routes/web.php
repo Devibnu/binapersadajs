@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageCo
 use App\Http\Controllers\Admin\ContactPageSettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailSettingController;
+use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\EditorImageController;
 use App\Http\Controllers\Admin\HomepageSettingController;
 use App\Http\Controllers\Admin\HomepageVideoController;
@@ -127,6 +128,10 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/email-settings', [EmailSettingController::class, 'edit'])->middleware('permission:email-settings.view')->name('paneladmin.email-settings.edit');
         Route::put('/email-settings', [EmailSettingController::class, 'update'])->middleware('permission:email-settings.update')->name('paneladmin.email-settings.update');
         Route::post('/email-settings/test', [EmailSettingController::class, 'sendTest'])->middleware('permission:email-settings.test')->name('paneladmin.email-settings.test');
+        Route::get('/email-templates', [EmailTemplateController::class, 'index'])->middleware('permission:email-templates.view')->name('paneladmin.email-templates.index');
+        Route::get('/email-templates/edit', [EmailTemplateController::class, 'edit'])->middleware('permission:email-templates.view')->name('paneladmin.email-templates.edit');
+        Route::put('/email-templates', [EmailTemplateController::class, 'update'])->middleware('permission:email-templates.update')->name('paneladmin.email-templates.update');
+        Route::post('/email-templates/test', [EmailTemplateController::class, 'sendTest'])->middleware('permission:email-templates.test')->name('paneladmin.email-templates.test');
         Route::get('/homepage-sections', [HomepageSettingController::class, 'edit'])->middleware('permission:homepage-sections.view')->name('paneladmin.homepage-sections.edit');
         Route::put('/homepage-sections', [HomepageSettingController::class, 'update'])->middleware('permission:homepage-sections.update')->name('paneladmin.homepage-sections.update');
         Route::get('/homepage-video', [HomepageVideoController::class, 'index'])->middleware('permission:homepage-video.view')->name('paneladmin.homepage-video.index');
@@ -256,6 +261,9 @@ Route::prefix('paneladmin')->group(function () {
         Route::patch('/leads/{lead}/status', [AdminLeadController::class, 'updateStatus'])
             ->middleware('permission:leads.update')
             ->name('paneladmin.leads.status');
+        Route::post('/leads/{lead}/email', [AdminLeadController::class, 'sendEmail'])
+            ->middleware('permission:leads.email')
+            ->name('paneladmin.leads.email');
         Route::delete('/leads/{lead}', [AdminLeadController::class, 'destroy'])
             ->middleware('permission:leads.delete')
             ->name('paneladmin.leads.destroy');
