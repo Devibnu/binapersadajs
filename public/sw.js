@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bpjs-cache-v202606011';
+const CACHE_NAME = 'binapersadajs-v3';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [
@@ -40,6 +40,16 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+function isAdminRequest(url) {
+  return url.pathname === '/paneladmin' || url.pathname.startsWith('/paneladmin/');
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -52,8 +62,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.pathname.startsWith('/paneladmin')) {
-    event.respondWith(fetch(request));
+  if (isAdminRequest(url)) {
+    event.respondWith(
+      fetch(request, { cache: 'no-store' })
+        .catch(() => caches.match(request))
+    );
     return;
   }
 
