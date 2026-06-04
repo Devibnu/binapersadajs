@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-  $selectedAccountId = old('email_account_id', $draft?->email_account_id ?: request('account_id'));
+  $selectedAccountId = old('email_account_id', $draft?->email_account_id ?: ($prefill['email_account_id'] ?? request('account_id')));
   $bodyValue = old('body', $draft?->body ?: ($prefill['body'] ?? ''));
 @endphp
 
@@ -33,6 +33,8 @@
           @csrf
           @if($draft)<input type="hidden" name="draft_id" value="{{ $draft->id }}">@endif
           <input type="hidden" name="action_type" value="{{ old('action_type', $draft ? 'send' : ($prefill['action_type'] ?? 'send')) }}">
+          <input type="hidden" name="source" value="{{ old('source', $prefill['source'] ?? '') }}">
+          <input type="hidden" name="source_id" value="{{ old('source_id', $prefill['source_id'] ?? '') }}">
           <textarea name="body" id="emailBody" class="d-none">{{ $bodyValue }}</textarea>
 
           <div class="row">
@@ -78,6 +80,12 @@
               <label>Message</label>
               <div class="email-editor mb-2" id="emailEditor" contenteditable="true">{!! $bodyValue !!}</div>
               @error('body')<div class="text-danger text-xs">{{ $message }}</div>@enderror
+              @if(!empty($prefill['quoted_context']))
+                <div class="bg-gray-100 border-radius-lg p-3 mt-3">
+                  <p class="text-xs text-uppercase text-secondary font-weight-bolder mb-2">Pesan Sebelumnya</p>
+                  <pre class="text-xs text-secondary mb-0" style="white-space: pre-wrap; font-family: inherit;">{{ $prefill['quoted_context'] }}</pre>
+                </div>
+              @endif
             </div>
             <div class="col-md-6">
               <div class="form-group mt-3">

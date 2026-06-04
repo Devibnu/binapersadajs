@@ -1,8 +1,16 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
+<style>
+  .contact-reply-history-item { border: 1px solid #eef0f4; border-radius: 8px; padding: 14px 16px; }
+  .contact-reply-subject { color: #344767; font-size: .9rem; font-weight: 700; line-height: 1.3; }
+  .contact-reply-meta { color: #8392ab; font-size: .72rem; line-height: 1.45; }
+  .contact-reply-body { color: #475569; display: -webkit-box; font-size: .82rem; line-height: 1.5; margin-bottom: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; white-space: pre-line; }
+  .contact-line-clamp-1 { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+</style>
+
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col-12">
     <div class="card mb-4">
       <div class="card-header pb-0 d-flex justify-content-between align-items-center">
         <h6>Detail Pesan Kontak</h6>
@@ -35,7 +43,7 @@
       </div>
       <div class="card-footer pt-0 d-flex flex-wrap gap-2">
         <a href="{{ route('paneladmin.contact-messages.index') }}" class="btn btn-outline-secondary mb-0">Kembali</a>
-        <a href="{{ route('paneladmin.email-center.compose', ['to' => $contactMessage->email, 'subject' => 'Re: ' . ($contactMessage->subject ?: 'Pesan website Bina Persada JS'), 'body' => 'Yth. ' . $contactMessage->name . ',']) }}" class="btn bg-gradient-info mb-0">Balas via Email Center</a>
+        <a href="{{ route('paneladmin.email-center.compose', ['source' => 'contact_message', 'id' => $contactMessage->id]) }}" class="btn bg-gradient-info mb-0">Balas via Email Center</a>
         @if($contactMessage->whatsappUrl())
           <a href="{{ $contactMessage->whatsappUrl() }}" target="_blank" rel="noopener" class="btn bg-gradient-success mb-0">Chat WhatsApp</a>
         @endif
@@ -68,52 +76,24 @@
       </div>
       <div class="card-body">
         @forelse($contactMessage->replies->sortByDesc('sent_at') as $reply)
-          <div class="border border-radius-lg p-3 mb-3">
-            <div class="d-flex flex-wrap justify-content-between mb-2">
-              <p class="text-sm font-weight-bold mb-0">{{ $reply->subject }}</p>
+          <div class="contact-reply-history-item mb-3">
+            <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+              <p class="contact-reply-subject contact-line-clamp-1 mb-0">{{ $reply->subject ?: '(tanpa subject)' }}</p>
               <span class="text-xs text-secondary">{{ ($reply->sent_at ?? $reply->created_at)->format('d/m/Y H:i') }}</span>
             </div>
-            <p class="text-xs text-secondary mb-2">
-              Kepada: {{ $reply->to_email }}
+            <div class="d-flex flex-wrap gap-3 mb-2">
+              <span class="contact-reply-meta">Kepada: {{ $reply->to_email ?: '-' }}</span>
               @if($reply->sender)
-                | Dikirim oleh: {{ $reply->sender->name }}
+                <span class="contact-reply-meta">Dikirim oleh: {{ $reply->sender->name }}</span>
+              @else
+                <span class="contact-reply-meta">Dikirim oleh: -</span>
               @endif
-            </p>
-            <p class="text-sm text-dark mb-0" style="white-space: pre-line;">{{ $reply->body }}</p>
+            </div>
+            <p class="contact-reply-body">{{ strip_tags($reply->body ?: '-') }}</p>
           </div>
         @empty
           <p class="text-sm text-secondary mb-0">Belum ada balasan email untuk pesan ini.</p>
         @endforelse
-      </div>
-    </div>
-  </div>
-
-  <div class="col-lg-4">
-    <div class="card mb-4" id="form-balasan-email">
-      <div class="card-header pb-0">
-        <h6>Balas Email</h6>
-        <p class="text-sm mb-0">Kirim balasan langsung melalui SMTP yang dikonfigurasi pada aplikasi.</p>
-      </div>
-      <div class="card-body">
-        <form method="POST" action="{{ route('paneladmin.contact-messages.reply', $contactMessage) }}" class="js-confirm-submit">
-          @csrf
-          <div class="form-group">
-            <label>Kepada</label>
-            <input type="email" name="to_email" value="{{ old('to_email', $contactMessage->email) }}" class="form-control @error('to_email') is-invalid @enderror" required>
-            @error('to_email')<div class="invalid-feedback">{{ $message }}</div>@enderror
-          </div>
-          <div class="form-group">
-            <label>Subjek</label>
-            <input type="text" name="subject" value="{{ old('subject', 'Re: ' . ($contactMessage->subject ?: 'Pesan website Bina Persada JS')) }}" class="form-control @error('subject') is-invalid @enderror" maxlength="150" required>
-            @error('subject')<div class="invalid-feedback">{{ $message }}</div>@enderror
-          </div>
-          <div class="form-group">
-            <label>Isi Balasan</label>
-            <textarea name="body" class="form-control @error('body') is-invalid @enderror" rows="9" required minlength="10" placeholder="Tulis balasan email untuk pengirim...">{{ old('body') }}</textarea>
-            @error('body')<div class="invalid-feedback">{{ $message }}</div>@enderror
-          </div>
-          <button type="submit" class="btn bg-gradient-success mb-0 w-100">Kirim Balasan</button>
-        </form>
       </div>
     </div>
   </div>

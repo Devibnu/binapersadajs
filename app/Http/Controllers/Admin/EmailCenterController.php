@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\BrandedTemplateMail;
+use App\Models\ContactMessage;
 use App\Models\EmailAccount;
 use App\Models\EmailCenterMessage;
 use App\Models\EmailTemplate;
+use App\Models\Lead;
 use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -63,15 +65,66 @@ class EmailCenterController extends Controller
 
     public function compose(Request $request): View
     {
+        $accounts = EmailAccount::query()->where('is_active', true)->orderBy('name')->get();
+        $defaultAccount = $accounts->first();
+        $prefill = [
+            'email_account_id' => $request->query('account_id', $defaultAccount?->id),
+            'to_email' => $request->query('to'),
+            'subject' => $request->query('subject'),
+            'body' => $request->query('body'),
+            'action_type' => $request->query('action_type', 'send'),
+            'source' => $request->query('source'),
+            'source_id' => $request->query('id'),
+            'quoted_context' => null,
+        ];
+
+        if ($request->query('source') === 'contact_message' && $request->filled('id')) {
+            $contactMessage = ContactMessage::find($request->query('id'));
+            if ($contactMessage) {
+                $prefill['to_email'] = $contactMessage->email;
+                $prefill['subject'] = 'Re: ' . ($contactMessage->subject ?: 'Pesan website Bina Persada JS');
+                $prefill['body'] = '';
+                $prefill['action_type'] = 'reply';
+                $prefill['source'] = 'contact_message';
+                $prefill['source_id'] = $contactMessage->id;
+                $prefill['quoted_context'] = implode("\n", [
+                    '---- Pesan sebelumnya ----',
+                    'Nama: ' . ($contactMessage->name ?: '-'),
+                    'Email: ' . ($contactMessage->email ?: '-'),
+                    'Telepon: ' . ($contactMessage->phone ?: '-'),
+                    'Pesan: ' . ($contactMessage->message ?: '-'),
+                ]);
+            }
+        }
+
+        if ($request->query('source') === 'lead' && $request->filled('id')) {
+            $lead = Lead::find($request->query('id'));
+            if ($lead) {
+                $subjectSource = filled($lead->interest)
+                    ? $lead->interest
+                    : (filled($lead->source) ? $lead->sourceLabel() : 'Permintaan Penawaran');
+                $prefill['to_email'] = $lead->email;
+                $prefill['subject'] = 'Re: ' . $subjectSource;
+                $prefill['body'] = '';
+                $prefill['action_type'] = 'send';
+                $prefill['source'] = 'lead';
+                $prefill['source_id'] = $lead->id;
+                $prefill['quoted_context'] = implode("\n", [
+                    '---- Data Lead ----',
+                    'Nama: ' . ($lead->name ?: '-'),
+                    'Email: ' . ($lead->email ?: '-'),
+                    'Telepon: ' . ($lead->phone ?: '-'),
+                    'Perusahaan: ' . ($lead->company ?: '-'),
+                    'Minat: ' . ($lead->interest ?: $lead->sourceLabel()),
+                    'Kebutuhan: ' . ($lead->message ?: '-'),
+                ]);
+            }
+        }
+
         return view('paneladmin.email-center.compose', [
-            'accounts' => EmailAccount::query()->where('is_active', true)->orderBy('name')->get(),
+            'accounts' => $accounts,
             'draft' => null,
-            'prefill' => [
-                'to_email' => $request->query('to'),
-                'subject' => $request->query('subject'),
-                'body' => $request->query('body'),
-                'action_type' => $request->query('action_type', 'send'),
-            ],
+            'prefill' => $prefill,
         ]);
     }
 
@@ -124,6 +177,56 @@ class EmailCenterController extends Controller
             'to_email' => $message->to_email,
             'subject' => $message->subject,
         ]);
+
+        if ($request->input('source') === 'contact_message' && $request->filled('source_id')) {
+            $contactMessage = ContactMessage::find($request->input('source_id'));
+            if ($contactMessage) {
+                $contactMessage->replies()->create([
+                    'to_email' => $message->to_email,
+                    'subject' => $message->subject,
+                    'body' => strip_tags($message->body ?: ''),
+                    'sent_by' => $request->user()?->id,
+                    'sent_at' => now(),
+                ]);
+                $contactMessage->update(['status' => 'replied']);
+                app(ActivityLogger::class)->log('EMAIL', 'Contact Messages', 'Admin mengirim balasan email ke ' . $message->to_email . ' melalui Email Center.', $contactMessage, [
+                    'to_email' => $message->to_email,
+                    'subject' => $message->subject,
+                    'email_center_message_id' => $message->id,
+                ]);
+
+                return redirect()
+                    ->route('paneladmin.contact-messages.show', $contactMessage)
+                    ->with('success', 'Balasan email berhasil dikirim melalui Email Center.');
+            }
+        }
+
+        if ($request->input('source') === 'lead' && $request->filled('source_id')) {
+            $lead = Lead::find($request->input('source_id'));
+            if ($lead) {
+                $lead->emailHistories()->create([
+                    'user_id' => $request->user()?->id,
+                    'to_email' => $message->to_email,
+                    'subject' => $message->subject,
+                    'body' => strip_tags($message->body ?: ''),
+                    'sent_at' => now(),
+                ]);
+
+                if ($lead->status === 'new') {
+                    $lead->update(['status' => 'contacted']);
+                }
+
+                app(ActivityLogger::class)->log('EMAIL', 'Leads', 'Admin mengirim email follow up kepada Lead: ' . ($lead->name ?: $lead->email) . '.', $lead, [
+                    'to_email' => $message->to_email,
+                    'subject' => $message->subject,
+                    'email_center_message_id' => $message->id,
+                ]);
+
+                return redirect()
+                    ->route('paneladmin.leads.show', $lead)
+                    ->with('success', 'Email follow up berhasil dikirim melalui Email Center.');
+            }
+        }
 
         return redirect()->route('paneladmin.email-center.index', ['folder' => 'sent', 'account_id' => $account->id])
             ->with('success', 'Email berhasil dikirim.');

@@ -1,6 +1,14 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
+<style>
+  .lead-email-history-item { border: 1px solid #eef0f4; border-radius: 8px; padding: 14px 16px; }
+  .lead-email-subject { color: #344767; font-size: .9rem; font-weight: 700; line-height: 1.3; }
+  .lead-email-meta { color: #8392ab; font-size: .72rem; line-height: 1.45; }
+  .lead-email-body { color: #475569; display: -webkit-box; font-size: .82rem; line-height: 1.5; margin-bottom: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; white-space: pre-line; }
+  .lead-line-clamp-1 { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+</style>
+
 <div class="row">
   <div class="col-lg-8">
     <div class="card mb-4">
@@ -58,10 +66,9 @@
     <div class="card mb-4">
       <div class="card-header pb-0">
         <h6>Kirim Email</h6>
-        <p class="text-sm mb-0">Buka Email Center dengan data lead otomatis.</p>
       </div>
       <div class="card-body">
-        <a href="{{ route('paneladmin.email-center.compose', ['to' => $lead->email, 'subject' => 'Follow Up dari PT. Bina Persada Jaya Sejahtera', 'body' => 'Yth. ' . ($lead->name ?: 'Bapak/Ibu') . ',']) }}" class="btn bg-gradient-info mb-0 w-100">Kirim via Email Center</a>
+        <a href="{{ route('paneladmin.email-center.compose', ['source' => 'lead', 'id' => $lead->id]) }}" class="btn bg-gradient-info mb-0 w-100">Kirim via Email Center</a>
       </div>
     </div>
     @endif
@@ -100,15 +107,16 @@
       </div>
       <div class="card-body">
         @forelse($lead->emailHistories as $history)
-          <div class="border rounded-3 p-3 mb-3">
+          <div class="lead-email-history-item mb-3">
             <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
-              <div>
-                <p class="text-sm font-weight-bold mb-1">{{ $history->subject }}</p>
-                <p class="text-xs text-secondary mb-0">Ke: {{ $history->to_email }} | Oleh: {{ $history->sender?->name ?: 'System' }}</p>
-              </div>
+              <p class="lead-email-subject lead-line-clamp-1 mb-0">{{ $history->subject ?: '(tanpa subject)' }}</p>
               <span class="text-xs text-secondary">{{ $history->sent_at?->format('d/m/Y H:i') ?: '-' }}</span>
             </div>
-            <p class="text-sm mb-0" style="white-space: pre-wrap;">{{ $history->body }}</p>
+            <div class="d-flex flex-wrap gap-3 mb-2">
+              <span class="lead-email-meta">Kepada: {{ $history->to_email ?: '-' }}</span>
+              <span class="lead-email-meta">Dikirim oleh: {{ $history->sender?->name ?: 'System' }}</span>
+            </div>
+            <p class="lead-email-body">{{ strip_tags($history->body ?: '-') }}</p>
           </div>
         @empty
           <p class="text-sm text-secondary mb-0">Belum ada email follow up.</p>
