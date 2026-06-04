@@ -28,6 +28,13 @@ class EmailCenterHtmlSanitizationTest extends TestCase
         $this->assertStringNotContainsString('<script', $html);
     }
 
+    public function test_it_decodes_legacy_escaped_editor_html(): void
+    {
+        $html = $this->sanitize('&lt;p class=&quot;p1&quot;&gt;Isi &lt;span style=&quot;color:red&quot;&gt;email&lt;/span&gt;&lt;/p&gt;');
+
+        $this->assertSame('<p>Isi <span>email</span></p>', $html);
+    }
+
     public function test_it_escapes_plain_text_and_keeps_line_breaks(): void
     {
         $html = $this->sanitize("Halo <user>\nBaris kedua");

@@ -157,8 +157,8 @@
                 data-to="{{ $account?->email ?: '-' }}"
                 data-subject="{{ $message->subject ?: '(tanpa subject)' }}"
                 data-date="{{ $message->date }}"
-                data-body="{{ $messageBody }}"
-                data-body-html="{{ $message->body_html ?: nl2br(e($messageBody)) }}"
+                data-body-b64="{{ base64_encode($messageBody) }}"
+                data-body-html-b64="{{ base64_encode($message->body_html ?: nl2br(e($messageBody))) }}"
                 data-preview="{{ $message->preview ?: '-' }}"
                 data-seen="{{ $message->seen ? '1' : '0' }}"
                 data-has-attachment="{{ $message->has_attachment ? '1' : '0' }}"
@@ -189,7 +189,7 @@
             @forelse($messages as $message)
               @php
                 $isActive = $selectedMessage && $selectedMessage->id === $message->id;
-                $previewText = \Illuminate\Support\Str::limit(strip_tags($message->body ?: '-'), 140);
+                $previewText = $message->display_preview ?: \Illuminate\Support\Str::limit(strip_tags($message->body ?: '-'), 140);
               @endphp
               <a class="email-list-item text-decoration-none {{ $isActive ? 'active' : '' }}" href="{{ route('paneladmin.email-center.index', ['folder' => $folder, 'account_id' => $account?->id, 'q' => $search, 'message' => $message->id]) }}">
                 <div class="d-flex justify-content-between align-items-start gap-2">
@@ -299,7 +299,7 @@
               <span class="text-sm">{{ ($selectedMessage->sent_at ?? $selectedMessage->updated_at)->format('d/m/Y H:i') }}</span>
             </div>
           </div>
-          <div class="email-preview-body p-3 text-sm mb-3">{!! nl2br(e($selectedMessage->body ?: '-')) !!}</div>
+          <div class="email-preview-body p-3 text-sm mb-3">{!! $selectedMessage->display_body_html ?: '-' !!}</div>
           @if($selectedMessage->attachments->isNotEmpty())
             <p class="text-xs text-uppercase text-secondary font-weight-bolder mb-2">Attachment</p>
             <div class="d-flex flex-wrap gap-2 mb-3">
@@ -310,7 +310,7 @@
           @endif
           <div class="d-flex flex-wrap gap-2 mt-4">
             <a href="{{ route('paneladmin.email-center.compose', ['account_id' => $account?->id, 'to' => $selectedMessage->from_email, 'subject' => 'Re: ' . $selectedMessage->subject, 'action_type' => 'reply']) }}" class="btn bg-gradient-info mb-0">Reply</a>
-            <a href="{{ route('paneladmin.email-center.compose', ['account_id' => $account?->id, 'subject' => 'Fwd: ' . $selectedMessage->subject, 'body' => $selectedMessage->body, 'action_type' => 'forward']) }}" class="btn btn-outline-secondary mb-0">Forward</a>
+            <a href="{{ route('paneladmin.email-center.compose', ['account_id' => $account?->id, 'subject' => 'Fwd: ' . $selectedMessage->subject, 'body' => $selectedMessage->display_body_html ?: $selectedMessage->body, 'action_type' => 'forward']) }}" class="btn btn-outline-secondary mb-0">Forward</a>
             @if($selectedMessage->folder === 'draft')
               <a href="{{ route('paneladmin.email-center.drafts.edit', $selectedMessage) }}" class="btn bg-gradient-info mb-0">Edit Draft</a>
             @endif
@@ -385,7 +385,9 @@
         fields.from.textContent = (row.dataset.fromName || '-') + ' <' + (row.dataset.fromEmail || '-') + '>';
         fields.to.textContent = row.dataset.to || '-';
         fields.date.textContent = row.dataset.date || '-';
-        fields.body.innerHTML = row.dataset.bodyHtml || row.dataset.body || row.dataset.preview || '-';
+        const bodyHtml = row.dataset.bodyHtmlB64 ? decodeBase64Utf8(row.dataset.bodyHtmlB64) : '';
+        const bodyText = row.dataset.bodyB64 ? decodeBase64Utf8(row.dataset.bodyB64) : '';
+        fields.body.innerHTML = bodyHtml || escapeHtml(bodyText || row.dataset.preview || '-');
         fields.reply.href = row.dataset.replyUrl || '#';
         fields.forward.href = row.dataset.forwardUrl || '#';
         fields.uid.value = row.dataset.uid || '';
@@ -403,6 +405,12 @@
         const element = document.createElement('span');
         element.textContent = value;
         return element.innerHTML;
+      }
+
+      function decodeBase64Utf8(value) {
+        const binary = atob(value);
+        const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+        return new TextDecoder('utf-8').decode(bytes);
       }
 
       rows.forEach((row) => row.addEventListener('click', () => selectEmail(row)));

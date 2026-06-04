@@ -46,11 +46,16 @@ class EmailCenterController extends Controller
                 ->latest();
 
             $messages = $query->paginate(20)->withQueryString();
+            $messages->getCollection()->transform(fn ($message) => $this->prepareStoredEmailMessage($message));
+
             $selectedMessage = EmailCenterMessage::query()
                 ->with(['account', 'attachments'])
                 ->where('folder', $folder)
                 ->when($account, fn ($query) => $query->where('email_account_id', $account->id))
-                ->find($request->query('message')) ?: $messages->first();
+                ->find($request->query('message'));
+            $selectedMessage = $selectedMessage
+                ? $this->prepareStoredEmailMessage($selectedMessage)
+                : $messages->first();
         }
 
         return view('paneladmin.email-center.index', compact('accounts', 'account', 'folder', 'search', 'messages', 'selectedMessage', 'imapNotice'));
@@ -423,6 +428,8 @@ class EmailCenterController extends Controller
     private function storeMessage(Request $request, array $validated, string $folder, string $status): EmailCenterMessage
     {
         $account = EmailAccount::find($validated['email_account_id']);
+        $body = $this->sanitizeOutgoingEmailHtml($validated['body'] ?? '');
+
         $message = EmailCenterMessage::updateOrCreate(
             ['id' => $request->input('draft_id')],
             [
@@ -434,7 +441,7 @@ class EmailCenterController extends Controller
                 'cc' => $validated['cc'] ?? null,
                 'bcc' => $validated['bcc'] ?? null,
                 'subject' => $validated['subject'] ?? null,
-                'body' => $validated['body'] ?? null,
+                'body' => $body,
                 'use_template' => $request->boolean('use_template', true),
                 'status' => $status,
             ]
@@ -450,6 +457,15 @@ class EmailCenterController extends Controller
         }
 
         return $message->load('attachments');
+    }
+
+    private function prepareStoredEmailMessage(EmailCenterMessage $message): EmailCenterMessage
+    {
+        $bodyHtml = $this->sanitizeOutgoingEmailHtml($message->body ?: '');
+        $message->setAttribute('display_body_html', $bodyHtml ?: '-');
+        $message->setAttribute('display_preview', str(strip_tags($bodyHtml ?: $message->body ?: '-'))->squish()->limit(140)->toString());
+
+        return $message;
     }
 
     private function mailableFor(EmailCenterMessage $message): BrandedTemplateMail
@@ -481,7 +497,12 @@ class EmailCenterController extends Controller
         }
 
         $html = str_replace(["\r\n", "\r"], "\n", $html);
-        $hasHtmlTags = preg_match('/<\s*\/?\s*(p|br|strong|b|em|i|u|ul|ol|li|a|blockquote|h[1-6]|table|thead|tbody|tr|td|th|span|div)\b/i', $html) === 1;
+        $decodedHtml = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if ($decodedHtml !== $html && $this->containsAllowedEmailHtml($decodedHtml)) {
+            $html = $decodedHtml;
+        }
+
+        $hasHtmlTags = $this->containsAllowedEmailHtml($html);
 
         if (! $hasHtmlTags) {
             return nl2br(e($html));
@@ -493,6 +514,11 @@ class EmailCenterController extends Controller
         $html = preg_replace('/(href|src)\s*=\s*("|\')\s*javascript:.*?\2/is', '$1="#"', $html) ?? $html;
 
         return trim(strip_tags($html, '<p><br><strong><b><em><i><u><ul><ol><li><a><blockquote><h1><h2><h3><h4><h5><h6><table><thead><tbody><tr><td><th><span><div>'));
+    }
+
+    private function containsAllowedEmailHtml(string $html): bool
+    {
+        return preg_match('/<\s*\/?\s*(p|br|strong|b|em|i|u|ul|ol|li|a|blockquote|h[1-6]|table|thead|tbody|tr|td|th|span|div)\b/i', $html) === 1;
     }
 
     private function emailList(?string $value): array

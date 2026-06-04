@@ -48,6 +48,7 @@ class BrandedTemplateMail extends Mailable
             view: 'emails.branded-template',
             with: [
                 'renderedHeaderHtml' => $this->headerHtml(),
+                'body' => $this->body(),
                 'renderedBodyHtml' => $this->body(),
                 'renderedFooterHtml' => $this->footerHtml(),
                 'renderedDisclaimerHtml' => $this->disclaimerHtml(),
