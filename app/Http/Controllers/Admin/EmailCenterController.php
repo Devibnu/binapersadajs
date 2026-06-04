@@ -264,6 +264,7 @@ class EmailCenterController extends Controller
                 'from' => $overview?->from ?? '-',
                 'subject' => imap_utf8($overview?->subject ?? '(tanpa subject)'),
                 'date' => isset($overview->date) ? date('d/m/Y H:i', strtotime($overview->date)) : '-',
+                'body' => str(strip_tags($body))->squish()->toString(),
                 'preview' => str(strip_tags($body))->squish()->limit(160)->toString(),
                 'seen' => (bool) ($overview?->seen ?? false),
                 'has_attachment' => false,
