@@ -454,9 +454,10 @@ class EmailCenterController extends Controller
 
     private function mailableFor(EmailCenterMessage $message): BrandedTemplateMail
     {
-        $body = $message->use_template
-            ? nl2br(e($message->body))
-            : '<div style="font-family:Arial,sans-serif;line-height:1.7;">' . nl2br(e($message->body)) . '</div>';
+        $body = $this->sanitizeOutgoingEmailHtml($message->body ?: '');
+        if (! $message->use_template) {
+            $body = '<div style="font-family:Arial,sans-serif;line-height:1.7;">' . $body . '</div>';
+        }
 
         return new BrandedTemplateMail(
             $message->subject ?: '(tanpa subject)',
@@ -470,6 +471,28 @@ class EmailCenterController extends Controller
             ])->all(),
             $message->use_template
         );
+    }
+
+    private function sanitizeOutgoingEmailHtml(string $html): string
+    {
+        $html = trim($html);
+        if ($html === '') {
+            return '';
+        }
+
+        $html = str_replace(["\r\n", "\r"], "\n", $html);
+        $hasHtmlTags = preg_match('/<\s*\/?\s*(p|br|strong|b|em|i|u|ul|ol|li|a|blockquote|h[1-6]|table|thead|tbody|tr|td|th|span|div)\b/i', $html) === 1;
+
+        if (! $hasHtmlTags) {
+            return nl2br(e($html));
+        }
+
+        $html = preg_replace('/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|title)[^>]*>.*?<\s*\/\s*\1\s*>/is', '', $html) ?? $html;
+        $html = preg_replace('/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|title)[^>]*\/?>/is', '', $html) ?? $html;
+        $html = preg_replace('/\s(on[a-z]+|style|class|id)\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/is', '', $html) ?? $html;
+        $html = preg_replace('/(href|src)\s*=\s*("|\')\s*javascript:.*?\2/is', '$1="#"', $html) ?? $html;
+
+        return trim(strip_tags($html, '<p><br><strong><b><em><i><u><ul><ol><li><a><blockquote><h1><h2><h3><h4><h5><h6><table><thead><tbody><tr><td><th><span><div>'));
     }
 
     private function emailList(?string $value): array

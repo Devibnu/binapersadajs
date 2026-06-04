@@ -46,10 +46,13 @@
   .email-preview-card { position: sticky; top: 1rem; }
   .email-preview-card .card-header { padding: 14px 18px 0; }
   .email-preview-card .card-body { overflow-y: auto; padding: 18px; }
-  .email-preview-subject { color: #344767; line-height: 1.35; }
-  .email-preview-meta { border-bottom: 1px solid #eef0f4; border-top: 1px solid #eef0f4; margin: 18px 0; padding: 14px 0; }
-  .email-preview-meta-row { display: grid; gap: 10px; grid-template-columns: 54px 1fr; margin-bottom: 8px; }
+  .email-preview-card .email-status-badge { flex: 0 0 auto; margin-top: 2px; }
+  .email-preview-subject { color: #344767; display: -webkit-box; font-size: 18px; line-height: 1.3; max-width: 100%; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; word-break: break-word; }
+  .email-preview-meta { border-bottom: 1px solid #eef0f4; border-top: 1px solid #eef0f4; margin: 16px 0; padding: 12px 0; }
+  .email-preview-meta-row { align-items: start; display: grid; gap: 12px; grid-template-columns: 76px minmax(0, 1fr); margin-bottom: 9px; }
   .email-preview-meta-row:last-child { margin-bottom: 0; }
+  .email-preview-meta-row > span:first-child { color: #8392ab; font-size: 11px; font-weight: 700; letter-spacing: 0; line-height: 1.35; text-transform: uppercase; white-space: nowrap; }
+  .email-preview-meta-row > span:last-child { color: #344767; font-size: 13px; line-height: 1.35; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
   .email-preview-body { background: #f8f9fa; border-radius: 8px; color: #344767; line-height: 1.65; max-height: 380px; overflow-y: auto; overflow-wrap: anywhere; }
   .email-preview-body img { height: auto; max-width: 100%; }
   .email-preview-body table { max-width: 100%; width: auto; }
@@ -59,12 +62,14 @@
   @media (max-width: 1199px) {
     .email-sidebar-card, .email-list-card, .email-preview-card { height: auto; min-height: auto; }
     .email-preview-card { position: static; }
+    .email-preview-subject { font-size: 16px; }
   }
   @media (max-width: 767px) {
     .email-list { padding: 0; }
     .email-list-item { min-height: 68px; padding: 9px 12px; }
     .email-meta-time { margin-left: 0; margin-top: 6px; }
-    .email-preview-meta-row { grid-template-columns: 1fr; gap: 2px; }
+    .email-preview-subject { font-size: 16px; }
+    .email-preview-meta-row { gap: 10px; grid-template-columns: 72px minmax(0, 1fr); }
   }
 </style>
 
