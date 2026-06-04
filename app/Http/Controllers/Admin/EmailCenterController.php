@@ -257,22 +257,152 @@ class EmailCenterController extends Controller
         rsort($uids);
         $messages = collect(array_slice($uids, 0, 50))->map(function ($uid) use ($imap) {
             $overview = imap_fetch_overview($imap, (string) $uid, FT_UID)[0] ?? null;
-            $body = quoted_printable_decode((string) imap_fetchbody($imap, (string) $uid, '1', FT_UID));
+            $parsed = $this->parsedImapMessage($imap, (int) $uid);
+            $bodyText = $parsed['text'] ?: '-';
 
             return (object) [
                 'uid' => $uid,
                 'from' => $overview?->from ?? '-',
                 'subject' => imap_utf8($overview?->subject ?? '(tanpa subject)'),
                 'date' => isset($overview->date) ? date('d/m/Y H:i', strtotime($overview->date)) : '-',
-                'body' => str(strip_tags($body))->squish()->toString(),
-                'preview' => str(strip_tags($body))->squish()->limit(160)->toString(),
+                'body' => $bodyText,
+                'body_html' => $parsed['html'],
+                'preview' => str($bodyText)->squish()->limit(160)->toString(),
                 'seen' => (bool) ($overview?->seen ?? false),
-                'has_attachment' => false,
+                'has_attachment' => count($parsed['attachments']) > 0,
+                'attachments' => $parsed['attachments'],
             ];
         });
         imap_close($imap);
 
         return [$messages, null];
+    }
+
+    private function parsedImapMessage($imap, int $uid): array
+    {
+        $structure = imap_fetchstructure($imap, (string) $uid, FT_UID);
+        $parts = [
+            'html' => null,
+            'plain' => null,
+            'attachments' => [],
+        ];
+
+        if ($structure) {
+            $this->walkImapPart($imap, $uid, $structure, '', $parts);
+        }
+
+        $plain = $this->cleanEmailText($parts['plain'] ?? '');
+        $html = $this->cleanEmailHtml($parts['html'] ?? '');
+
+        if ($html === '' && $plain !== '') {
+            $html = nl2br(e($plain));
+        }
+
+        $text = $html !== ''
+            ? $this->cleanEmailText(strip_tags($html))
+            : $plain;
+
+        return [
+            'html' => $html,
+            'text' => $text,
+            'attachments' => array_values(array_unique(array_filter($parts['attachments']))),
+        ];
+    }
+
+    private function walkImapPart($imap, int $uid, object $part, string $partNumber, array &$result): void
+    {
+        $currentPart = $partNumber !== '' ? $partNumber : '1';
+        $isAttachment = false;
+        $attachmentName = null;
+
+        foreach (['dparameters', 'parameters'] as $parameterGroup) {
+            foreach ($part->{$parameterGroup} ?? [] as $parameter) {
+                $attribute = strtolower($parameter->attribute ?? '');
+                if (in_array($attribute, ['filename', 'name'], true)) {
+                    $isAttachment = true;
+                    $attachmentName = $this->decodeMimeText((string) ($parameter->value ?? ''));
+                }
+            }
+        }
+
+        if (isset($part->disposition) && strtolower($part->disposition) === 'attachment') {
+            $isAttachment = true;
+        }
+
+        if ($isAttachment) {
+            $result['attachments'][] = $attachmentName ?: 'Attachment';
+        }
+
+        if (! empty($part->parts)) {
+            foreach ($part->parts as $index => $subPart) {
+                $nextPartNumber = $partNumber === '' ? (string) ($index + 1) : $partNumber . '.' . ($index + 1);
+                $this->walkImapPart($imap, $uid, $subPart, $nextPartNumber, $result);
+            }
+
+            return;
+        }
+
+        if ($isAttachment || (int) ($part->type ?? -1) !== TYPETEXT) {
+            return;
+        }
+
+        $subtype = strtolower($part->subtype ?? 'plain');
+        $body = imap_fetchbody($imap, (string) $uid, $currentPart, FT_UID | FT_PEEK);
+        $body = $this->decodeImapBody((string) $body, (int) ($part->encoding ?? 0));
+
+        if ($subtype === 'html' && ! filled($result['html'])) {
+            $result['html'] = $body;
+        }
+
+        if ($subtype === 'plain' && ! filled($result['plain'])) {
+            $result['plain'] = $body;
+        }
+    }
+
+    private function decodeImapBody(string $body, int $encoding): string
+    {
+        return match ($encoding) {
+            ENCBASE64 => base64_decode($body, true) ?: '',
+            ENCQUOTEDPRINTABLE => quoted_printable_decode($body),
+            default => $body,
+        };
+    }
+
+    private function cleanEmailHtml(string $html): string
+    {
+        if ($html === '') {
+            return '';
+        }
+
+        $html = preg_replace('/<\s*(script|style|meta|link|title)[^>]*>.*?<\s*\/\s*\1\s*>/is', '', $html) ?? $html;
+        $html = preg_replace('/<\s*(script|style|meta|link|title|html|head|body)[^>]*\/?>/is', '', $html) ?? $html;
+        $html = preg_replace('/<\/\s*(html|head|body)\s*>/is', '', $html) ?? $html;
+        $html = preg_replace('/\s(on[a-z]+|style|class|id)\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/is', '', $html) ?? $html;
+        $html = preg_replace('/(href|src)\s*=\s*("|\')\s*javascript:.*?\2/is', '$1="#"', $html) ?? $html;
+        $html = strip_tags($html, '<p><br><div><span><strong><b><em><i><u><a><ul><ol><li><table><thead><tbody><tr><td><th><blockquote>');
+
+        return trim($html);
+    }
+
+    private function cleanEmailText(string $text): string
+    {
+        if ($text === '') {
+            return '';
+        }
+
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/--[a-z0-9=_+\-.]{12,}.*/i', '', $text) ?? $text;
+        $text = preg_replace('/^(content-type|content-transfer-encoding|content-disposition|mime-version|boundary):.*$/mi', '', $text) ?? $text;
+        $text = preg_replace('/\b[A-Za-z0-9+\/]{120,}={0,2}\b/', '', $text) ?? $text;
+        $text = preg_replace("/[ \t]+\n/", "\n", $text) ?? $text;
+        $text = preg_replace("/\n{3,}/", "\n\n", $text) ?? $text;
+
+        return trim($text);
+    }
+
+    private function decodeMimeText(string $value): string
+    {
+        return imap_utf8($value);
     }
 
     private function validatedMessage(Request $request, bool $strict = true): array

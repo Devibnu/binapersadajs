@@ -13,44 +13,56 @@
 <style>
   .email-center-shell { min-height: 680px; }
   .email-center-shell .min-width-0 { min-width: 0; }
-  .email-sidebar-card, .email-list-card, .email-preview-card { height: calc(100vh - 160px); min-height: 620px; }
-  .email-folder-link { border-radius: 10px; color: #344767; display: flex; gap: 10px; padding: 10px 12px; transition: all .18s ease; }
+  .email-sidebar-card, .email-list-card, .email-preview-card { height: calc(100vh - 150px); min-height: 600px; }
+  .email-sidebar-card .card-body { padding: 14px; }
+  .email-sidebar-card .btn { font-size: .72rem; padding: 9px 10px; }
+  .email-sidebar-card .form-control { font-size: .75rem; min-height: 34px; padding: 6px 10px; }
+  .email-folder-link { align-items: center; border-radius: 8px; color: #344767; display: flex; font-size: .82rem; gap: 9px; padding: 8px 10px; transition: all .18s ease; }
+  .email-folder-link i { font-size: .78rem; width: 15px; }
   .email-folder-link.active, .email-folder-link:hover { background: #eef5ff; color: #2152ff; }
+  .email-list-card .card-header { padding: 14px 16px 10px; }
+  .email-list-card .form-control { font-size: .78rem; min-height: 34px; padding: 7px 10px; }
+  .email-list-card .btn { min-height: 34px; padding: 7px 12px; }
   .email-list-card .card-body { overflow-y: auto; }
-  .email-list { padding: 10px; }
-  .email-list-item { background: #fff; border: 1px solid #eef0f4; border-radius: 8px; color: #344767; display: block; margin-bottom: 8px; padding: 13px 14px; text-align: left; transition: all .18s ease; width: 100%; }
-  .email-list-item:hover { background: #f8fbff; border-color: #d8e3ff; box-shadow: 0 8px 18px rgba(20, 20, 43, .05); transform: translateY(-1px); }
-  .email-list-item.active { background: #eef5ff; border-color: #2152ff; box-shadow: 0 10px 24px rgba(33, 82, 255, .11); }
-  .email-list-item.unread { background: #fbfdff; border-left: 3px solid #2152ff; }
+  .email-list { padding: 4px 0; }
+  .email-list-item { background: #fff; border: 0; border-bottom: 1px solid #eef0f4; border-radius: 0; color: #344767; display: block; margin-bottom: 0; min-height: 64px; padding: 8px 14px 7px; text-align: left; transition: all .16s ease; width: 100%; }
+  .email-list-item:hover { background: #f8fbff; box-shadow: inset 3px 0 0 #d8e3ff; transform: none; }
+  .email-list-item.active { background: #eef5ff; box-shadow: inset 3px 0 0 #2152ff; }
+  .email-list-item.unread { background: #fbfdff; box-shadow: inset 3px 0 0 #2152ff; }
   .email-list-item.unread.active { background: #eef5ff; }
   .email-list-button { cursor: pointer; }
-  .email-sender-name { color: #344767; font-weight: 700; min-width: 0; }
+  .email-sender-name { color: #344767; font-size: .84rem; font-weight: 700; line-height: 1.2; min-width: 0; }
   .email-sender-address { color: #8392ab; min-width: 0; }
-  .email-meta-time { color: #8392ab; flex: 0 0 auto; font-size: .72rem; margin-left: 10px; white-space: nowrap; }
-  .email-subject { color: #344767; font-size: .9rem; font-weight: 700; line-height: 1.35; margin-bottom: 4px; }
-  .email-preview-text { color: #67748e; font-size: .78rem; line-height: 1.45; margin-bottom: 0; }
+  .email-meta-time { color: #8392ab; flex: 0 0 auto; font-size: .72rem; line-height: 1.2; margin-left: 10px; white-space: nowrap; }
+  .email-subject { color: #344767; font-size: .81rem; font-weight: 700; line-height: 1.25; margin-bottom: 2px; }
+  .email-preview-text { color: #67748e; font-size: .75rem; line-height: 1.25; margin-bottom: 0; }
   .email-line-clamp-1, .email-line-clamp-2 { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; }
   .email-line-clamp-1 { -webkit-line-clamp: 1; }
   .email-line-clamp-2 { -webkit-line-clamp: 2; }
-  .email-status-badge { border-radius: 999px; font-size: .63rem; font-weight: 700; letter-spacing: 0; padding: 4px 8px; text-transform: uppercase; }
+  .email-status-badge { border-radius: 999px; font-size: .58rem; font-weight: 700; letter-spacing: 0; line-height: 1; padding: 3px 7px; text-transform: uppercase; }
   .email-status-badge.read { background: #e9ecef; color: #67748e; }
   .email-status-badge.unread { background: #dfe8ff; color: #2152ff; }
   .email-attachment-icon { color: #8392ab; font-size: .78rem; }
   .email-preview-card { position: sticky; top: 1rem; }
-  .email-preview-card .card-body { overflow-y: auto; }
+  .email-preview-card .card-header { padding: 14px 18px 0; }
+  .email-preview-card .card-body { overflow-y: auto; padding: 18px; }
   .email-preview-subject { color: #344767; line-height: 1.35; }
   .email-preview-meta { border-bottom: 1px solid #eef0f4; border-top: 1px solid #eef0f4; margin: 18px 0; padding: 14px 0; }
   .email-preview-meta-row { display: grid; gap: 10px; grid-template-columns: 54px 1fr; margin-bottom: 8px; }
   .email-preview-meta-row:last-child { margin-bottom: 0; }
-  .email-preview-body { background: #f8f9fa; border-radius: 8px; color: #344767; line-height: 1.7; max-height: 380px; overflow-y: auto; white-space: pre-wrap; }
+  .email-preview-body { background: #f8f9fa; border-radius: 8px; color: #344767; line-height: 1.65; max-height: 380px; overflow-y: auto; overflow-wrap: anywhere; }
+  .email-preview-body img { height: auto; max-width: 100%; }
+  .email-preview-body table { max-width: 100%; width: auto; }
+  .email-preview-body a { color: #2152ff; }
+  .email-attachment-list { border-top: 1px solid #eef0f4; margin-top: 16px; padding-top: 14px; }
   .email-empty-state { align-items: center; color: #8392ab; display: flex; flex-direction: column; justify-content: center; min-height: 280px; text-align: center; }
   @media (max-width: 1199px) {
     .email-sidebar-card, .email-list-card, .email-preview-card { height: auto; min-height: auto; }
     .email-preview-card { position: static; }
   }
   @media (max-width: 767px) {
-    .email-list { padding: 8px; }
-    .email-list-item { padding: 12px; }
+    .email-list { padding: 0; }
+    .email-list-item { min-height: 68px; padding: 9px 12px; }
     .email-meta-time { margin-left: 0; margin-top: 6px; }
     .email-preview-meta-row { grid-template-columns: 1fr; gap: 2px; }
   }
@@ -141,9 +153,11 @@
                 data-subject="{{ $message->subject ?: '(tanpa subject)' }}"
                 data-date="{{ $message->date }}"
                 data-body="{{ $messageBody }}"
+                data-body-html="{{ $message->body_html ?: nl2br(e($messageBody)) }}"
                 data-preview="{{ $message->preview ?: '-' }}"
                 data-seen="{{ $message->seen ? '1' : '0' }}"
                 data-has-attachment="{{ $message->has_attachment ? '1' : '0' }}"
+                data-attachments="{{ base64_encode(json_encode($message->attachments)) }}"
                 data-reply-url="{{ route('paneladmin.email-center.compose', ['account_id' => $account?->id, 'to' => $fromEmail, 'subject' => 'Re: ' . $message->subject, 'action_type' => 'reply']) }}"
                 data-forward-url="{{ route('paneladmin.email-center.compose', ['account_id' => $account?->id, 'subject' => 'Fwd: ' . $message->subject, 'body' => $messageBody, 'action_type' => 'forward']) }}"
               >
@@ -154,9 +168,9 @@
                   </span>
                   <span class="email-meta-time">{{ $message->date }}</span>
                 </span>
-                <span class="email-subject email-line-clamp-1 mt-2">{{ $message->subject ?: '(tanpa subject)' }}</span>
-                <span class="email-preview-text email-line-clamp-2">{{ $message->preview ?: '-' }}</span>
-                <span class="d-flex align-items-center gap-2 mt-2">
+                <span class="email-subject email-line-clamp-1 mt-1">{{ $message->subject ?: '(tanpa subject)' }}</span>
+                <span class="email-preview-text email-line-clamp-1">{{ $message->preview ?: '-' }}</span>
+                <span class="d-flex align-items-center gap-2 mt-1">
                   <span class="email-status-badge {{ $message->seen ? 'read' : 'unread' }}">{{ $message->seen ? 'Read' : 'Unread' }}</span>
                   @if($message->has_attachment)
                     <i class="fas fa-paperclip email-attachment-icon"></i>
@@ -180,9 +194,9 @@
                   </div>
                   <span class="email-meta-time">{{ ($message->sent_at ?? $message->updated_at)->format('d/m/Y H:i') }}</span>
                 </div>
-                <div class="email-subject email-line-clamp-1 mt-2">{{ $message->subject ?: '(tanpa subject)' }}</div>
-                <p class="email-preview-text email-line-clamp-2">{{ $previewText }}</p>
-                <div class="d-flex align-items-center gap-2 mt-2">
+                <div class="email-subject email-line-clamp-1 mt-1">{{ $message->subject ?: '(tanpa subject)' }}</div>
+                <p class="email-preview-text email-line-clamp-1">{{ $previewText }}</p>
+                <div class="d-flex align-items-center gap-2 mt-1">
                   <span class="email-status-badge read">{{ ucfirst($message->status ?: $message->folder) }}</span>
                   @if($message->attachments->isNotEmpty())
                     <i class="fas fa-paperclip email-attachment-icon"></i>
@@ -239,9 +253,9 @@
             </div>
 
             <div class="email-preview-body p-3 text-sm mb-3" data-preview-body></div>
-            <div class="mb-3 d-none" data-preview-attachment>
+            <div class="email-attachment-list mb-3 d-none" data-preview-attachment>
               <p class="text-xs text-uppercase text-secondary font-weight-bolder mb-2">Attachment</p>
-              <span class="badge bg-gradient-secondary"><i class="fas fa-paperclip me-1"></i>Ada attachment</span>
+              <div class="d-flex flex-wrap gap-2" data-preview-attachment-list></div>
             </div>
 
             <div class="d-flex flex-wrap gap-2 mt-4">
@@ -343,6 +357,7 @@
         date: content.querySelector('[data-preview-date]'),
         body: content.querySelector('[data-preview-body]'),
         attachment: content.querySelector('[data-preview-attachment]'),
+        attachmentList: content.querySelector('[data-preview-attachment-list]'),
         reply: content.querySelector('[data-preview-reply]'),
         forward: content.querySelector('[data-preview-forward]'),
         uid: content.querySelector('[data-preview-uid]'),
@@ -365,18 +380,27 @@
         fields.from.textContent = (row.dataset.fromName || '-') + ' <' + (row.dataset.fromEmail || '-') + '>';
         fields.to.textContent = row.dataset.to || '-';
         fields.date.textContent = row.dataset.date || '-';
-        fields.body.textContent = row.dataset.body || row.dataset.preview || '-';
+        fields.body.innerHTML = row.dataset.bodyHtml || row.dataset.body || row.dataset.preview || '-';
         fields.reply.href = row.dataset.replyUrl || '#';
         fields.forward.href = row.dataset.forwardUrl || '#';
         fields.uid.value = row.dataset.uid || '';
         fields.deleteUid.value = row.dataset.uid || '';
         fields.readAction.value = isSeen ? 'unread' : 'read';
         fields.readLabel.textContent = isSeen ? 'Mark Unread' : 'Mark Read';
-        fields.attachment.classList.toggle('d-none', row.dataset.hasAttachment !== '1');
+        const attachments = row.dataset.attachments ? JSON.parse(atob(row.dataset.attachments)) : [];
+        fields.attachment.classList.toggle('d-none', attachments.length === 0);
+        fields.attachmentList.innerHTML = attachments.map((name) => (
+          '<span class="badge bg-gradient-secondary"><i class="fas fa-paperclip me-1"></i>' + escapeHtml(name) + '</span>'
+        )).join('');
+      }
+
+      function escapeHtml(value) {
+        const element = document.createElement('span');
+        element.textContent = value;
+        return element.innerHTML;
       }
 
       rows.forEach((row) => row.addEventListener('click', () => selectEmail(row)));
-      selectEmail(rows[0]);
     });
   </script>
 @endif
