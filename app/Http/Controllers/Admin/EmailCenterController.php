@@ -10,6 +10,7 @@ use App\Models\EmailCenterMessage;
 use App\Models\EmailTemplate;
 use App\Models\Lead;
 use App\Services\ActivityLogger;
+use App\Services\EmailBodyRendererService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -399,20 +400,11 @@ class EmailCenterController extends Controller
             $this->walkImapPart($imap, $uid, $structure, '', $parts);
         }
 
-        $plain = $this->cleanEmailText($parts['plain'] ?? '');
-        $html = $this->cleanEmailHtml($parts['html'] ?? '');
-
-        if ($html === '' && $plain !== '') {
-            $html = nl2br(e($plain));
-        }
-
-        $text = $html !== ''
-            ? $this->cleanEmailText(strip_tags($html))
-            : $plain;
+        $rendered = $this->emailRenderer()->render($parts['html'] ?? '', $parts['plain'] ?? '');
 
         return [
-            'html' => $html,
-            'text' => $text,
+            'html' => $rendered['html'],
+            'text' => $rendered['text'],
             'attachments' => array_values(array_unique(array_filter($parts['attachments']))),
         ];
     }
@@ -476,38 +468,6 @@ class EmailCenterController extends Controller
         };
     }
 
-    private function cleanEmailHtml(string $html): string
-    {
-        if ($html === '') {
-            return '';
-        }
-
-        $html = preg_replace('/<\s*(script|style|meta|link|title)[^>]*>.*?<\s*\/\s*\1\s*>/is', '', $html) ?? $html;
-        $html = preg_replace('/<\s*(script|style|meta|link|title|html|head|body)[^>]*\/?>/is', '', $html) ?? $html;
-        $html = preg_replace('/<\/\s*(html|head|body)\s*>/is', '', $html) ?? $html;
-        $html = preg_replace('/\s(on[a-z]+|style|class|id)\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/is', '', $html) ?? $html;
-        $html = preg_replace('/(href|src)\s*=\s*("|\')\s*javascript:.*?\2/is', '$1="#"', $html) ?? $html;
-        $html = strip_tags($html, '<p><br><div><span><strong><b><em><i><u><a><ul><ol><li><table><thead><tbody><tr><td><th><blockquote>');
-
-        return trim($html);
-    }
-
-    private function cleanEmailText(string $text): string
-    {
-        if ($text === '') {
-            return '';
-        }
-
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = preg_replace('/--[a-z0-9=_+\-.]{12,}.*/i', '', $text) ?? $text;
-        $text = preg_replace('/^(content-type|content-transfer-encoding|content-disposition|mime-version|boundary):.*$/mi', '', $text) ?? $text;
-        $text = preg_replace('/\b[A-Za-z0-9+\/]{120,}={0,2}\b/', '', $text) ?? $text;
-        $text = preg_replace("/[ \t]+\n/", "\n", $text) ?? $text;
-        $text = preg_replace("/\n{3,}/", "\n\n", $text) ?? $text;
-
-        return trim($text);
-    }
-
     private function decodeMimeText(string $value): string
     {
         return imap_utf8($value);
@@ -531,7 +491,7 @@ class EmailCenterController extends Controller
     private function storeMessage(Request $request, array $validated, string $folder, string $status): EmailCenterMessage
     {
         $account = EmailAccount::find($validated['email_account_id']);
-        $body = $this->sanitizeOutgoingEmailHtml($validated['body'] ?? '');
+        $body = $this->emailRenderer()->sanitizeHtml($validated['body'] ?? '');
 
         $message = EmailCenterMessage::updateOrCreate(
             ['id' => $request->input('draft_id')],
@@ -564,16 +524,16 @@ class EmailCenterController extends Controller
 
     private function prepareStoredEmailMessage(EmailCenterMessage $message): EmailCenterMessage
     {
-        $bodyHtml = $this->sanitizeOutgoingEmailHtml($message->body ?: '');
+        $bodyHtml = $this->emailRenderer()->sanitizeHtml($message->body ?: '');
         $message->setAttribute('display_body_html', $bodyHtml ?: '-');
-        $message->setAttribute('display_preview', str(strip_tags($bodyHtml ?: $message->body ?: '-'))->squish()->limit(140)->toString());
+        $message->setAttribute('display_preview', $this->emailRenderer()->preview($bodyHtml, $message->body ?: '-', 140));
 
         return $message;
     }
 
     private function mailableFor(EmailCenterMessage $message): BrandedTemplateMail
     {
-        $body = $this->sanitizeOutgoingEmailHtml($message->body ?: '');
+        $body = $this->emailRenderer()->sanitizeHtml($message->body ?: '');
         if (! $message->use_template) {
             $body = '<div style="font-family:Arial,sans-serif;line-height:1.7;">' . $body . '</div>';
         }
@@ -592,36 +552,9 @@ class EmailCenterController extends Controller
         );
     }
 
-    private function sanitizeOutgoingEmailHtml(string $html): string
+    private function emailRenderer(): EmailBodyRendererService
     {
-        $html = trim($html);
-        if ($html === '') {
-            return '';
-        }
-
-        $html = str_replace(["\r\n", "\r"], "\n", $html);
-        $decodedHtml = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        if ($decodedHtml !== $html && $this->containsAllowedEmailHtml($decodedHtml)) {
-            $html = $decodedHtml;
-        }
-
-        $hasHtmlTags = $this->containsAllowedEmailHtml($html);
-
-        if (! $hasHtmlTags) {
-            return nl2br(e($html));
-        }
-
-        $html = preg_replace('/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|title)[^>]*>.*?<\s*\/\s*\1\s*>/is', '', $html) ?? $html;
-        $html = preg_replace('/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|title)[^>]*\/?>/is', '', $html) ?? $html;
-        $html = preg_replace('/\s(on[a-z]+|style|class|id)\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/is', '', $html) ?? $html;
-        $html = preg_replace('/(href|src)\s*=\s*("|\')\s*javascript:.*?\2/is', '$1="#"', $html) ?? $html;
-
-        return trim(strip_tags($html, '<p><br><strong><b><em><i><u><ul><ol><li><a><blockquote><h1><h2><h3><h4><h5><h6><table><thead><tbody><tr><td><th><span><div>'));
-    }
-
-    private function containsAllowedEmailHtml(string $html): bool
-    {
-        return preg_match('/<\s*\/?\s*(p|br|strong|b|em|i|u|ul|ol|li|a|blockquote|h[1-6]|table|thead|tbody|tr|td|th|span|div)\b/i', $html) === 1;
+        return app(EmailBodyRendererService::class);
     }
 
     private function emailList(?string $value): array

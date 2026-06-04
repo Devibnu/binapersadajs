@@ -2,9 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Http\Controllers\Admin\EmailCenterController;
+use App\Services\EmailBodyRendererService;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 class EmailCenterHtmlSanitizationTest extends TestCase
 {
@@ -12,9 +11,8 @@ class EmailCenterHtmlSanitizationTest extends TestCase
     {
         $html = $this->sanitize('<p class="p1">Isi <strong>email</strong></p><ul><li>Item</li></ul>');
 
-        $this->assertStringContainsString('<p>Isi <strong>email</strong></p>', $html);
+        $this->assertStringContainsString('<p class="p1">Isi <strong>email</strong></p>', $html);
         $this->assertStringContainsString('<ul><li>Item</li></ul>', $html);
-        $this->assertStringNotContainsString('class=', $html);
         $this->assertStringNotContainsString('&lt;p', $html);
     }
 
@@ -32,7 +30,17 @@ class EmailCenterHtmlSanitizationTest extends TestCase
     {
         $html = $this->sanitize('&lt;p class=&quot;p1&quot;&gt;Isi &lt;span style=&quot;color:red&quot;&gt;email&lt;/span&gt;&lt;/p&gt;');
 
-        $this->assertSame('<p>Isi <span>email</span></p>', $html);
+        $this->assertSame('<p class="p1">Isi <span style="color:red">email</span></p>', $html);
+    }
+
+    public function test_it_preserves_html_email_layout_attributes(): void
+    {
+        $html = $this->sanitize('<table width="600" bgcolor="#ffffff"><tbody><tr><td align="center" style="padding:20px;"><img src="https://example.com/logo.png" width="120" height="40"><a href="https://example.com" style="background:#2152ff;color:#fff;">Open</a></td></tr></tbody></table>');
+
+        $this->assertStringContainsString('<table width="600" bgcolor="#ffffff">', $html);
+        $this->assertStringContainsString('<td align="center" style="padding:20px;">', $html);
+        $this->assertStringContainsString('<img src="https://example.com/logo.png" width="120" height="40">', $html);
+        $this->assertStringContainsString('<a href="https://example.com" style="background:#2152ff;color:#fff;">Open</a>', $html);
     }
 
     public function test_it_escapes_plain_text_and_keeps_line_breaks(): void
@@ -44,9 +52,6 @@ class EmailCenterHtmlSanitizationTest extends TestCase
 
     private function sanitize(string $html): string
     {
-        $method = new ReflectionMethod(EmailCenterController::class, 'sanitizeOutgoingEmailHtml');
-        $method->setAccessible(true);
-
-        return $method->invoke(new EmailCenterController(), $html);
+        return (new EmailBodyRendererService())->sanitizeHtml($html);
     }
 }

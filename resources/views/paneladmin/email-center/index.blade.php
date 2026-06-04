@@ -54,12 +54,8 @@
   .email-preview-meta-row:last-child { margin-bottom: 0; }
   .email-preview-meta-row > span:first-child { color: #94a3b8; font-size: 11px; font-weight: 600; letter-spacing: 0; line-height: 1.3; text-transform: uppercase; white-space: nowrap; }
   .email-preview-meta-row > span:last-child { color: #475569; font-size: 13px; font-weight: 500; line-height: 1.35; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
-  .email-preview-body { background: #f8f9fa; border-radius: 8px; color: #475569; font-size: 14px; line-height: 1.6; max-height: 380px; overflow-y: auto; overflow-wrap: anywhere; }
-  .email-preview-body p, .email-preview-body div, .email-preview-body span, .email-preview-body li, .email-preview-body table, .email-preview-body td, .email-preview-body th { color: #475569; font-size: 14px; line-height: 1.6; }
-  .email-preview-body p, .email-preview-body div { margin-bottom: 10px; }
-  .email-preview-body li { margin-bottom: 4px; }
+  .email-preview-body { background: #f8f9fa; border-radius: 8px; color: #475569; font-size: 14px; line-height: 1.6; max-height: 520px; overflow: auto; overflow-wrap: anywhere; }
   .email-preview-body img { height: auto; max-width: 100%; }
-  .email-preview-body table { max-width: 100%; width: auto; }
   .email-preview-body a { color: #2152ff; }
   .email-attachment-list { border-top: 1px solid #eef0f4; margin-top: 16px; padding-top: 14px; }
   .email-empty-state { align-items: center; color: #8392ab; display: flex; flex-direction: column; justify-content: center; min-height: 280px; text-align: center; }
@@ -67,7 +63,7 @@
     .email-sidebar-card, .email-list-card, .email-preview-card { height: auto; min-height: auto; }
     .email-preview-card { position: static; }
     .email-preview-subject { font-size: 17px; }
-    .email-preview-body, .email-preview-body p, .email-preview-body div, .email-preview-body span, .email-preview-body li, .email-preview-body table, .email-preview-body td, .email-preview-body th { font-size: 13px; }
+    .email-preview-body { font-size: 13px; }
   }
   @media (max-width: 767px) {
     .email-list { padding: 0; }
@@ -75,7 +71,7 @@
     .email-meta-time { margin-left: 0; margin-top: 6px; }
     .email-preview-subject { font-size: 16px; }
     .email-preview-meta-row { gap: 10px; grid-template-columns: 72px minmax(0, 1fr); }
-    .email-preview-body, .email-preview-body p, .email-preview-body div, .email-preview-body span, .email-preview-body li, .email-preview-body table, .email-preview-body td, .email-preview-body th { font-size: 13px; }
+    .email-preview-body { font-size: 13px; }
   }
 </style>
 
