@@ -35,7 +35,7 @@
       </div>
       <div class="card-footer pt-0 d-flex flex-wrap gap-2">
         <a href="{{ route('paneladmin.contact-messages.index') }}" class="btn btn-outline-secondary mb-0">Kembali</a>
-        <a href="#form-balasan-email" class="btn bg-gradient-info mb-0">Balas Email</a>
+        <a href="{{ route('paneladmin.email-center.compose', ['to' => $contactMessage->email, 'subject' => 'Re: ' . ($contactMessage->subject ?: 'Pesan website Bina Persada JS'), 'body' => 'Yth. ' . $contactMessage->name . ',']) }}" class="btn bg-gradient-info mb-0">Balas via Email Center</a>
         @if($contactMessage->whatsappUrl())
           <a href="{{ $contactMessage->whatsappUrl() }}" target="_blank" rel="noopener" class="btn bg-gradient-success mb-0">Chat WhatsApp</a>
         @endif

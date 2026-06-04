@@ -55,36 +55,18 @@
   @if(auth()->user()->canAccess('leads.update') || auth()->user()->canAccess('leads.email'))
   <div class="col-lg-4">
     @if(auth()->user()->canAccess('leads.email'))
-    @if(auth()->user()->canAccess('leads.update'))
     <div class="card mb-4">
       <div class="card-header pb-0">
         <h6>Kirim Email</h6>
-        <p class="text-sm mb-0">Email memakai Email Template global.</p>
+        <p class="text-sm mb-0">Buka Email Center dengan data lead otomatis.</p>
       </div>
       <div class="card-body">
-        <form method="POST" action="{{ route('paneladmin.leads.email', $lead) }}" class="js-confirm-submit">
-          @csrf
-          <div class="form-group">
-            <label>Email Tujuan</label>
-            <input type="email" name="to_email" value="{{ old('to_email', $lead->email) }}" class="form-control @error('to_email') is-invalid @enderror" required>
-            @error('to_email')<div class="invalid-feedback">{{ $message }}</div>@enderror
-          </div>
-          <div class="form-group">
-            <label>Subject</label>
-            <input type="text" name="subject" value="{{ old('subject', 'Follow Up dari PT. Bina Persada Jaya Sejahtera') }}" class="form-control @error('subject') is-invalid @enderror" maxlength="150" required>
-            @error('subject')<div class="invalid-feedback">{{ $message }}</div>@enderror
-          </div>
-          <div class="form-group">
-            <label>Isi Pesan</label>
-            <textarea name="body" rows="7" class="form-control @error('body') is-invalid @enderror" required>{{ old('body') }}</textarea>
-            @error('body')<div class="invalid-feedback">{{ $message }}</div>@enderror
-          </div>
-          <button type="submit" class="btn bg-gradient-info mb-0 w-100">Kirim Email</button>
-        </form>
+        <a href="{{ route('paneladmin.email-center.compose', ['to' => $lead->email, 'subject' => 'Follow Up dari PT. Bina Persada Jaya Sejahtera', 'body' => 'Yth. ' . ($lead->name ?: 'Bapak/Ibu') . ',']) }}" class="btn bg-gradient-info mb-0 w-100">Kirim via Email Center</a>
       </div>
     </div>
     @endif
 
+    @if(auth()->user()->canAccess('leads.update'))
     <div class="card mb-4">
       <div class="card-header pb-0">
         <h6>Update Status</h6>

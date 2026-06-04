@@ -6,6 +6,11 @@
     <title>{{ $mailSubject }}</title>
 </head>
 <body style="margin:0; padding:0; background:#f3f5f7; font-family:Arial, sans-serif; color:{{ $emailTemplate?->text_color ?? '#263544' }};">
+    @if(! $wrapTemplate)
+        <div style="padding:24px; font-size:15px; line-height:1.8; color:#263544;">
+            {!! $renderedBodyHtml !!}
+        </div>
+    @else
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f5f7; padding:28px 12px;">
         <tr>
             <td align="center">
@@ -36,5 +41,6 @@
             </td>
         </tr>
     </table>
+    @endif
 </body>
 </html>

@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageCo
 use App\Http\Controllers\Admin\ContactPageSettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailSettingController;
+use App\Http\Controllers\Admin\EmailCenterController;
 use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\EditorImageController;
 use App\Http\Controllers\Admin\HomepageSettingController;
@@ -132,6 +133,19 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/email-templates/edit', [EmailTemplateController::class, 'edit'])->middleware('permission:email-templates.view')->name('paneladmin.email-templates.edit');
         Route::put('/email-templates', [EmailTemplateController::class, 'update'])->middleware('permission:email-templates.update')->name('paneladmin.email-templates.update');
         Route::post('/email-templates/test', [EmailTemplateController::class, 'sendTest'])->middleware('permission:email-templates.test')->name('paneladmin.email-templates.test');
+        Route::get('/email-center', [EmailCenterController::class, 'index'])->middleware('permission:email-center.view')->name('paneladmin.email-center.index');
+        Route::get('/email-center/compose', [EmailCenterController::class, 'compose'])->middleware('permission:email-center.compose')->name('paneladmin.email-center.compose');
+        Route::post('/email-center/send', [EmailCenterController::class, 'send'])->middleware('permission:email-center.compose')->name('paneladmin.email-center.send');
+        Route::post('/email-center/drafts', [EmailCenterController::class, 'saveDraft'])->middleware('permission:email-center.compose')->name('paneladmin.email-center.drafts.store');
+        Route::get('/email-center/drafts/{message}/edit', [EmailCenterController::class, 'editDraft'])->middleware('permission:email-center.compose')->name('paneladmin.email-center.drafts.edit');
+        Route::patch('/email-center/messages/{message}/delete', [EmailCenterController::class, 'deleteMessage'])->middleware('permission:email-center.delete')->name('paneladmin.email-center.messages.delete');
+        Route::patch('/email-center/messages/{message}/restore', [EmailCenterController::class, 'restoreMessage'])->middleware('permission:email-center.delete')->name('paneladmin.email-center.messages.restore');
+        Route::delete('/email-center/messages/{message}/force-delete', [EmailCenterController::class, 'forceDeleteMessage'])->middleware('permission:email-center.delete')->name('paneladmin.email-center.messages.force-delete');
+        Route::post('/email-center/imap-action', [EmailCenterController::class, 'imapAction'])->middleware('permission:email-center.view')->name('paneladmin.email-center.imap-action');
+        Route::get('/email-center/accounts', [EmailCenterController::class, 'accounts'])->middleware('permission:email-center.manage-accounts')->name('paneladmin.email-center.accounts');
+        Route::post('/email-center/accounts', [EmailCenterController::class, 'storeAccount'])->middleware('permission:email-center.manage-accounts')->name('paneladmin.email-center.accounts.store');
+        Route::put('/email-center/accounts/{account}', [EmailCenterController::class, 'updateAccount'])->middleware('permission:email-center.manage-accounts')->name('paneladmin.email-center.accounts.update');
+        Route::delete('/email-center/accounts/{account}', [EmailCenterController::class, 'destroyAccount'])->middleware('permission:email-center.manage-accounts')->name('paneladmin.email-center.accounts.destroy');
         Route::get('/homepage-sections', [HomepageSettingController::class, 'edit'])->middleware('permission:homepage-sections.view')->name('paneladmin.homepage-sections.edit');
         Route::put('/homepage-sections', [HomepageSettingController::class, 'update'])->middleware('permission:homepage-sections.update')->name('paneladmin.homepage-sections.update');
         Route::get('/homepage-video', [HomepageVideoController::class, 'index'])->middleware('permission:homepage-video.view')->name('paneladmin.homepage-video.index');

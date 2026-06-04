@@ -80,7 +80,7 @@
                   <td class="align-middle text-nowrap">
                     <a href="{{ route('paneladmin.leads.show', $lead) }}" class="text-secondary font-weight-bold text-xs me-3">Lihat</a>
                     @if(auth()->user()->canAccess('leads.email'))
-                      <a href="{{ route('paneladmin.leads.show', $lead) }}" class="text-info font-weight-bold text-xs me-3">Kirim Email</a>
+                      <a href="{{ route('paneladmin.email-center.compose', ['to' => $lead->email, 'subject' => 'Follow Up dari PT. Bina Persada Jaya Sejahtera', 'body' => 'Yth. ' . ($lead->name ?: 'Bapak/Ibu') . ',']) }}" class="text-info font-weight-bold text-xs me-3">Kirim Email</a>
                     @endif
                     @if(auth()->user()->canAccess('leads.delete'))
                       <form method="POST" action="{{ route('paneladmin.leads.destroy', $lead) }}" class="d-inline js-confirm-delete">
