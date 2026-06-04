@@ -43,6 +43,80 @@ class EmailCenterHtmlSanitizationTest extends TestCase
         $this->assertStringContainsString('<a href="https://example.com" style="background:#2152ff;color:#fff;">Open</a>', $html);
     }
 
+    public function test_it_renders_only_body_content_from_full_html_email_documents(): void
+    {
+        $html = $this->sanitize(<<<'HTML'
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional //EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Facebook</title>
+    <!-- tracking comment -->
+  </head>
+  <body>
+    <table width="600" bgcolor="#ffffff">
+      <tbody>
+        <tr>
+          <td align="center" style="padding:20px;">
+            <div>Business Manager</div>
+            <p>Please confirm your email address</p>
+            <a href="https://facebook.com/confirm" style="background:#1877f2;color:#fff;">Confirm Now</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
+HTML);
+
+        $this->assertStringContainsString('<table width="600" bgcolor="#ffffff">', $html);
+        $this->assertStringContainsString('<div>Business Manager</div>', $html);
+        $this->assertStringContainsString('<p>Please confirm your email address</p>', $html);
+        $this->assertStringContainsString('<a href="https://facebook.com/confirm" style="background:#1877f2;color:#fff;">Confirm Now</a>', $html);
+        $this->assertStringNotContainsStringIgnoringCase('doctype', $html);
+        $this->assertStringNotContainsStringIgnoringCase('html public', $html);
+        $this->assertStringNotContainsStringIgnoringCase('<html', $html);
+        $this->assertStringNotContainsStringIgnoringCase('<head', $html);
+        $this->assertStringNotContainsStringIgnoringCase('<meta', $html);
+        $this->assertStringNotContainsStringIgnoringCase('<title', $html);
+        $this->assertStringNotContainsString('tracking comment', $html);
+    }
+
+    public function test_it_removes_document_artifacts_from_preview_text(): void
+    {
+        $preview = (new EmailBodyRendererService())->preview(<<<'HTML'
+< HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional //EN">Facebook
+<html><head><title>Facebook</title></head><body>
+<table><tr><td>Business Manager</td></tr></table>
+<p>Please confirm your email address</p>
+<a href="https://facebook.com/confirm">Confirm Now</a>
+</body></html>
+HTML);
+
+        $this->assertStringContainsString('Business Manager', $preview);
+        $this->assertStringContainsString('Please confirm your email address', $preview);
+        $this->assertStringContainsString('Confirm Now', $preview);
+        $this->assertStringNotContainsStringIgnoringCase('html public', $preview);
+        $this->assertStringNotContainsStringIgnoringCase('doctype', $preview);
+        $this->assertStringNotContainsString('<html', $preview);
+    }
+
+    public function test_it_cleans_document_artifacts_from_plain_text_fallback(): void
+    {
+        $rendered = (new EmailBodyRendererService())->render(null, <<<'TEXT'
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional //EN">
+<html><head><title>Facebook</title></head><body>
+<p>Please confirm your email address</p>
+</body></html>
+TEXT);
+
+        $this->assertSame('Please confirm your email address', $rendered['text']);
+        $this->assertStringContainsString('Please confirm your email address', $rendered['html']);
+        $this->assertStringNotContainsStringIgnoringCase('html public', $rendered['html']);
+        $this->assertStringNotContainsStringIgnoringCase('doctype', $rendered['html']);
+        $this->assertStringNotContainsString('&lt;html', $rendered['html']);
+    }
+
     public function test_it_escapes_plain_text_and_keeps_line_breaks(): void
     {
         $html = $this->sanitize("Halo <user>\nBaris kedua");

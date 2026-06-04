@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class EmailBodyRendererService
 {
-    private const ALLOWED_TAGS = '<html><body><head><style><table><thead><tbody><tfoot><tr><td><th><div><span><img><a><p><br><ul><ol><li><strong><b><em><i><u><blockquote><center><font><hr><h1><h2><h3><h4><h5><h6>';
+    private const ALLOWED_TAGS = '<style><table><thead><tbody><tfoot><tr><td><th><div><span><img><a><p><br><ul><ol><li><strong><b><em><i><u><blockquote><center><font><hr><h1><h2><h3><h4><h5><h6>';
 
     public function render(?string $htmlBody = null, ?string $plainBody = null): array
     {
@@ -46,11 +46,13 @@ class EmailBodyRendererService
             return nl2br(e($html));
         }
 
+        $html = $this->cleanDocumentHtml($html);
         $html = preg_replace('/<\s*(script|iframe|object|embed)[^>]*>.*?<\s*\/\s*\1\s*>/is', '', $html) ?? $html;
         $html = preg_replace('/<\s*(script|iframe|object|embed)[^>]*\/?>/is', '', $html) ?? $html;
         $html = preg_replace('/\s(on[a-z]+)\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/is', '', $html) ?? $html;
         $html = preg_replace('/(href|src)\s*=\s*("|\')\s*javascript:.*?\2/is', '$1="#"', $html) ?? $html;
         $html = strip_tags($html, self::ALLOWED_TAGS);
+        $html = $this->removeDocumentArtifacts($html);
 
         return trim($html);
     }
@@ -62,6 +64,16 @@ class EmailBodyRendererService
         }
 
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = $this->removeDocumentArtifacts($text);
+        $text = preg_replace('/<!--.*?-->/s', ' ', $text) ?? $text;
+        $text = preg_replace('/<\s*head\b[^>]*>.*?<\s*\/\s*head\s*>/is', ' ', $text) ?? $text;
+        $text = preg_replace('/<\s*title\b[^>]*>.*?<\s*\/\s*title\s*>/is', ' ', $text) ?? $text;
+        $text = preg_replace('/<\s*(meta|html|body)\b[^>]*\/?>/is', ' ', $text) ?? $text;
+        $text = preg_replace('/<\s*\/\s*(title|html|body)\s*>/is', ' ', $text) ?? $text;
+        if ($this->containsHtml($text)) {
+            $text = $this->spaceHtmlBlocks($text);
+            $text = strip_tags($text);
+        }
         $text = preg_replace('/--[a-z0-9=_+\-.]{12,}.*/i', '', $text) ?? $text;
         $text = preg_replace('/^(content-type|content-transfer-encoding|content-disposition|mime-version|boundary):.*$/mi', '', $text) ?? $text;
         $text = preg_replace('/\b[A-Za-z0-9+\/]{120,}={0,2}\b/', '', $text) ?? $text;
@@ -77,10 +89,14 @@ class EmailBodyRendererService
             return '';
         }
 
+        $html = $this->cleanDocumentHtml($html);
         $html = preg_replace('/<\s*(style|script)[^>]*>.*?<\s*\/\s*\1\s*>/is', ' ', $html) ?? $html;
+        $html = $this->spaceHtmlBlocks($html);
         $text = strip_tags($html);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = $this->removeDocumentArtifacts($text);
 
-        return Str::of(html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8'))->squish()->toString();
+        return Str::of($text)->squish()->toString();
     }
 
     public function preview(?string $htmlBody = null, ?string $plainBody = null, int $limit = 160): string
@@ -94,5 +110,41 @@ class EmailBodyRendererService
     {
         return preg_match('/<\s*\/?\s*(html|body|head|style|table|thead|tbody|tfoot|tr|td|th|div|span|img|a|p|br|ul|ol|li|strong|b|em|i|u|blockquote|center|font|hr|h[1-6])\b/i', $html) === 1
             || preg_match('/<\s*[a-z][a-z0-9:-]*\s+[^>]*>/i', $html) === 1;
+    }
+
+    private function cleanDocumentHtml(string $html): string
+    {
+        $html = preg_replace('/<!--.*?-->/s', '', $html) ?? $html;
+        $html = $this->removeDocumentArtifacts($html);
+
+        if (preg_match('/<\s*body\b[^>]*>(.*?)<\s*\/\s*body\s*>/is', $html, $matches) === 1) {
+            return $this->removeDocumentArtifacts($matches[1]);
+        }
+
+        $html = preg_replace('/<\s*head\b[^>]*>.*?<\s*\/\s*head\s*>/is', '', $html) ?? $html;
+        $html = preg_replace('/<\s*meta\b[^>]*\/?>/is', '', $html) ?? $html;
+        $html = preg_replace('/<\s*title\b[^>]*>.*?<\s*\/\s*title\s*>/is', '', $html) ?? $html;
+        $html = preg_replace('/<\s*\/?\s*(html|head|body)\b[^>]*>/is', '', $html) ?? $html;
+
+        return $this->removeDocumentArtifacts($html);
+    }
+
+    private function removeDocumentArtifacts(string $value): string
+    {
+        $value = preg_replace('/&lt;!\s*doctype.*?&gt;/is', ' ', $value) ?? $value;
+        $value = preg_replace('/<!\s*doctype[^>]*>/is', ' ', $value) ?? $value;
+        $value = preg_replace('/<\s*html\s+public\s+["\'][^"\']+["\'][^>]*>/is', ' ', $value) ?? $value;
+        $value = preg_replace('/<\s*html\s+public\b[^>]*>/is', ' ', $value) ?? $value;
+        $value = preg_replace('/\bhtml\s+public\s+["\'][^"\']+["\'][^\n<]*/is', ' ', $value) ?? $value;
+
+        return $value;
+    }
+
+    private function spaceHtmlBlocks(string $html): string
+    {
+        $html = preg_replace('/<\s*br\s*\/?>/i', ' ', $html) ?? $html;
+        $html = preg_replace('/<\s*\/\s*(p|div|td|th|tr|table|li|ul|ol|blockquote|h[1-6])\s*>/i', ' ', $html) ?? $html;
+
+        return $html;
     }
 }
