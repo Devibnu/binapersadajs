@@ -36,7 +36,7 @@
 
   .iqm-login-logo {
     display: inline-block;
-    max-height: 70px;
+    max-height: 80px;
     max-width: 240px;
     object-fit: contain;
     width: auto;
@@ -47,8 +47,9 @@
 @section('content')
 @php
   $iqmDefaultLogoPath = public_path('web/images/logo.png');
-  $iqmLoginLogoUrl = !empty($websiteSetting?->logo) ? $websiteSetting->logoUrl() : asset('web/images/logo.png');
-  $iqmLoginLogoVersion = !empty($websiteSetting?->logo) ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
+  $iqmHasPrimaryLogo = $websiteSetting?->hasPrimaryLogo() ?? false;
+  $iqmLoginLogoUrl = $websiteSetting?->logoUrl() ?? asset('web/images/logo.png');
+  $iqmLoginLogoVersion = $iqmHasPrimaryLogo ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
   $iqmLoginLogoAlt = $websiteSetting?->nama_perusahaan ?? 'PT Bina Persada JS';
 @endphp
 <section class="py-5">

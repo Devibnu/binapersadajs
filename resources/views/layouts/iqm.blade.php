@@ -4,6 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'IQM Portal') - PT Bina Persada JS</title>
+  @php
+    $websiteSetting = $websiteSetting ?? \App\Models\WebsiteSetting::first();
+    $iqmFaviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
+    $iqmAppleTouchIconUrl = $websiteSetting?->appleTouchIconUrl() ?? asset('icons/apple-touch-icon.png');
+  @endphp
+  <link rel="icon" type="image/png" href="{{ $iqmFaviconUrl }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ $iqmAppleTouchIconUrl }}?v={{ time() }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,7 +19,7 @@
   <style>
     body { font-family: Inter, system-ui, sans-serif; background: #f5f7fb; color: #172033; font-size: 14px; }
     .iqm-navbar { background: #0f2742; box-shadow: 0 10px 24px rgba(15,39,66,.14); }
-    .iqm-brand-logo { display: block; width: auto; max-width: 210px; max-height: 42px; object-fit: contain; background: transparent; border: none; box-shadow: none; padding: 0; }
+    .iqm-brand-logo { display: block; width: auto; max-width: 210px; max-height: 48px; object-fit: contain; background: transparent; border: none; box-shadow: none; padding: 0; }
     .iqm-nav-link { color: rgba(255,255,255,.78) !important; border-radius: 8px; padding: .55rem .75rem !important; font-size: 13px; font-weight: 600; }
     .iqm-nav-link.active, .iqm-nav-link:hover { color: #fff !important; background: rgba(255,255,255,.12); }
     .iqm-shell { min-height: calc(100vh - 190px); }
@@ -40,10 +47,10 @@
 </head>
 <body>
   @php
-    $websiteSetting = $websiteSetting ?? \App\Models\WebsiteSetting::first();
     $iqmDefaultLogoPath = public_path('web/images/logo.png');
-    $iqmLogoUrl = !empty($websiteSetting?->logo) ? $websiteSetting->logoUrl() : asset('web/images/logo.png');
-    $iqmLogoVersion = !empty($websiteSetting?->logo) ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
+    $iqmHasPrimaryLogo = $websiteSetting?->hasPrimaryLogo() ?? false;
+    $iqmLogoUrl = $websiteSetting?->logoUrl() ?? asset('web/images/logo.png');
+    $iqmLogoVersion = $iqmHasPrimaryLogo ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
     $iqmLogoAlt = $websiteSetting?->nama_perusahaan ?? $websiteSetting?->company_name ?? 'PT Bina Persada Jaya Sejahtera';
     $iqmNav = [
       ['label' => 'Dashboard', 'url' => route('iqm.dashboard'), 'pattern' => 'iqm/dashboard', 'icon' => 'fa-chart-line'],

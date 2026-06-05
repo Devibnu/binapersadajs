@@ -4,6 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'IQM Portal') - PT Bina Persada JS</title>
+  @php
+    $websiteSetting = $websiteSetting ?? \App\Models\WebsiteSetting::first();
+    $iqmFaviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
+    $iqmAppleTouchIconUrl = $websiteSetting?->appleTouchIconUrl() ?? asset('icons/apple-touch-icon.png');
+  @endphp
+  <link rel="icon" type="image/png" href="{{ $iqmFaviconUrl }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ $iqmAppleTouchIconUrl }}?v={{ time() }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,7 +21,7 @@
     .iqm-navbar { background: #0f2742; }
     .iqm-card { border: 0; border-radius: 16px; box-shadow: 0 14px 40px rgba(15, 39, 66, .08); }
     .iqm-pill { border-radius: 999px; font-size: 12px; padding: .4rem .65rem; }
-    .iqm-logo { display: block; max-height: 42px; max-width: 210px; object-fit: contain; width: auto; }
+    .iqm-logo { display: block; max-height: 48px; max-width: 210px; object-fit: contain; width: auto; }
     .iqm-shell { min-height: 100vh; }
     .table th { font-size: 12px; text-transform: uppercase; color: #64748b; white-space: nowrap; }
     .table td { font-size: 13px; vertical-align: middle; }
@@ -22,10 +29,10 @@
 </head>
 <body>
   @php
-    $websiteSetting = $websiteSetting ?? \App\Models\WebsiteSetting::first();
     $iqmDefaultLogoPath = public_path('web/images/logo.png');
-    $iqmLogoUrl = !empty($websiteSetting?->logo) ? $websiteSetting->logoUrl() : asset('web/images/logo.png');
-    $iqmLogoVersion = !empty($websiteSetting?->logo) ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
+    $iqmHasPrimaryLogo = $websiteSetting?->hasPrimaryLogo() ?? false;
+    $iqmLogoUrl = $websiteSetting?->logoUrl() ?? asset('web/images/logo.png');
+    $iqmLogoVersion = $iqmHasPrimaryLogo ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
     $iqmLogoAlt = $websiteSetting?->nama_perusahaan ?? 'PT Bina Persada JS';
   @endphp
   <nav class="navbar navbar-expand-lg iqm-navbar navbar-dark">
