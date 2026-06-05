@@ -9,6 +9,15 @@
         <p class="text-sm mb-0">Kelola identitas, kontak, logo, favicon, dan sosial media website.</p>
       </div>
       <div class="card-body">
+        @if(session('success'))
+          <div class="alert alert-success text-white">{{ session('success') }}</div>
+        @endif
+        @if(session('warning'))
+          <div class="alert alert-warning text-white">{{ session('warning') }}</div>
+        @endif
+        @if(session('error'))
+          <div class="alert alert-danger text-white">{{ session('error') }}</div>
+        @endif
         <form method="POST" action="{{ route('paneladmin.settings.update') }}" enctype="multipart/form-data" class="js-confirm-submit">
           @csrf
           @method('PUT')
@@ -50,7 +59,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label>Favicon</label>
-                <input type="file" name="favicon" class="form-control" accept="image/*">
+                <input type="file" name="favicon" class="form-control" accept="image/*,.ico">
                 @if($setting->favicon)
                   <img src="{{ Storage::url($setting->favicon) }}?v={{ optional($setting->updated_at)->timestamp ?? time() }}" alt="Favicon" class="mt-3" style="max-height: 40px;">
                 @endif

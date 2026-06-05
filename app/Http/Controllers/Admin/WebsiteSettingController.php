@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\WebsiteSetting;
 use App\Services\ActivityLogger;
 use App\Services\PwaIconGenerator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class WebsiteSettingController extends Controller
@@ -24,7 +27,7 @@ class WebsiteSettingController extends Controller
             'nama_perusahaan' => ['nullable', 'string', 'max:255'],
             'deskripsi_perusahaan' => ['nullable', 'string'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'favicon' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'favicon' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,ico', 'max:1024'],
             'email' => ['nullable', 'email', 'max:255'],
             'telepon' => ['nullable', 'string', 'max:50'],
             'whatsapp' => ['nullable', 'string', 'max:50'],
@@ -40,30 +43,99 @@ class WebsiteSettingController extends Controller
         ]);
 
         $setting = WebsiteSetting::firstOrNew();
-
         $logoWasUploaded = $request->hasFile('logo');
+        $oldFiles = [];
+        $pwaIconWarning = null;
 
-        foreach (['logo', 'favicon'] as $field) {
-            if ($request->hasFile($field)) {
-                if ($setting->{$field}) {
-                    Storage::disk('public')->delete($setting->{$field});
+        File::ensureDirectoryExists(Storage::disk('public')->path('settings'));
+        File::ensureDirectoryExists(public_path('icons'));
+
+        try {
+            foreach (['logo', 'favicon'] as $field) {
+                if (! $request->hasFile($field)) {
+                    continue;
                 }
 
-                $validated[$field] = $request->file($field)->store('settings', 'public');
+                $uploadedFile = $request->file($field);
+                Log::info("Uploading {$field}...", [
+                    'original_name' => $uploadedFile->getClientOriginalName(),
+                    'mime_type' => $uploadedFile->getClientMimeType(),
+                    'extension' => $uploadedFile->getClientOriginalExtension(),
+                    'size' => $uploadedFile->getSize(),
+                ]);
+
+                if ($field === 'favicon' && $this->isIcoFile($uploadedFile)) {
+                    Log::info('Favicon is .ico, storing without resize or image processing.');
+                }
+
+                $oldFiles[$field] = $setting->{$field};
+                $validated[$field] = $uploadedFile->store('settings', 'public');
             }
+        } catch (\Throwable $e) {
+            Log::error('Website settings file upload failed.', [
+                'exception' => $e,
+            ]);
+
+            return redirect()
+                ->route('paneladmin.settings.edit')
+                ->withInput()
+                ->with('error', 'Upload logo/favicon gagal. Pengaturan belum disimpan. Silakan cek file dan coba lagi.');
         }
 
         $setting->fill($validated);
-        $setting->save();
+
+        try {
+            $setting->save();
+        } catch (\Throwable $e) {
+            foreach (array_intersect_key($validated, array_flip(['logo', 'favicon'])) as $path) {
+                Storage::disk('public')->delete($path);
+            }
+
+            Log::error('Website settings save failed.', [
+                'exception' => $e,
+            ]);
+
+            return redirect()
+                ->route('paneladmin.settings.edit')
+                ->withInput()
+                ->with('error', 'Pengaturan website gagal disimpan. Silakan coba lagi.');
+        }
+
+        foreach ($oldFiles as $field => $oldPath) {
+            if ($oldPath && $oldPath !== $setting->{$field}) {
+                Storage::disk('public')->delete($oldPath);
+            }
+        }
 
         if ($logoWasUploaded) {
-            app(PwaIconGenerator::class)->generateFromWebsiteSetting($setting);
+            Log::info('Generating PWA icons...', [
+                'logo' => $setting->logo,
+            ]);
+
+            try {
+                app(PwaIconGenerator::class)->generateFromWebsiteSetting($setting);
+            } catch (\Throwable $e) {
+                Log::error('PWA icon generation failed after website settings update.', [
+                    'exception' => $e,
+                    'logo' => $setting->logo,
+                ]);
+
+                $pwaIconWarning = 'Pengaturan berhasil disimpan, tetapi icon PWA gagal dibuat ulang. Icon PWA lama tetap digunakan.';
+            }
         }
 
         app(ActivityLogger::class)->log('update', 'Website Settings', 'Pengaturan website diperbarui.', $setting);
 
-        return redirect()
+        $redirect = redirect()
             ->route('paneladmin.settings.edit')
             ->with('success', 'Pengaturan website berhasil disimpan.');
+
+        return $pwaIconWarning ? $redirect->with('warning', $pwaIconWarning) : $redirect;
+    }
+
+    private function isIcoFile(UploadedFile $file): bool
+    {
+        return strtolower($file->getClientOriginalExtension()) === 'ico'
+            || in_array($file->getClientMimeType(), ['image/x-icon', 'image/vnd.microsoft.icon'], true);
     }
 }
