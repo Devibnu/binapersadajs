@@ -12,7 +12,7 @@
   <style>
     body { font-family: Inter, system-ui, sans-serif; background: #f5f7fb; color: #172033; font-size: 14px; }
     .iqm-navbar { background: #0f2742; box-shadow: 0 10px 24px rgba(15,39,66,.14); }
-    .iqm-brand-logo { width: auto; height: 42px; object-fit: contain; background: transparent; border: none; box-shadow: none; padding: 0; }
+    .iqm-brand-logo { display: block; width: auto; max-width: 210px; max-height: 42px; object-fit: contain; background: transparent; border: none; box-shadow: none; padding: 0; }
     .iqm-nav-link { color: rgba(255,255,255,.78) !important; border-radius: 8px; padding: .55rem .75rem !important; font-size: 13px; font-weight: 600; }
     .iqm-nav-link.active, .iqm-nav-link:hover { color: #fff !important; background: rgba(255,255,255,.12); }
     .iqm-shell { min-height: calc(100vh - 190px); }
@@ -41,7 +41,9 @@
 <body>
   @php
     $websiteSetting = $websiteSetting ?? \App\Models\WebsiteSetting::first();
-    $iqmLogoUrl = $websiteSetting?->logoUrl() ?? asset('web/images/logo.png');
+    $iqmDefaultLogoPath = public_path('web/images/logo.png');
+    $iqmLogoUrl = !empty($websiteSetting?->logo) ? $websiteSetting->logoUrl() : asset('web/images/logo.png');
+    $iqmLogoVersion = !empty($websiteSetting?->logo) ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
     $iqmLogoAlt = $websiteSetting?->nama_perusahaan ?? $websiteSetting?->company_name ?? 'PT Bina Persada Jaya Sejahtera';
     $iqmNav = [
       ['label' => 'Dashboard', 'url' => route('iqm.dashboard'), 'pattern' => 'iqm/dashboard', 'icon' => 'fa-chart-line'],
@@ -55,7 +57,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark iqm-navbar sticky-top">
     <div class="container iqm-container">
       <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ route('iqm.landing') }}">
-        <img src="{{ $iqmLogoUrl }}?v={{ optional($websiteSetting?->updated_at)->timestamp }}" class="iqm-brand-logo" alt="{{ $iqmLogoAlt }}">
+        <img src="{{ $iqmLogoUrl }}?v={{ $iqmLogoVersion }}" class="iqm-brand-logo" alt="{{ $iqmLogoAlt }}" decoding="async">
         <span>IQM Portal</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#iqmNavbar" aria-controls="iqmNavbar" aria-expanded="false" aria-label="Toggle navigation">

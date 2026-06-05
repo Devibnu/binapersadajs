@@ -33,10 +33,24 @@
     color: #0f2742;
     outline: 0;
   }
+
+  .iqm-login-logo {
+    display: inline-block;
+    max-height: 70px;
+    max-width: 240px;
+    object-fit: contain;
+    width: auto;
+  }
 </style>
 @endpush
 
 @section('content')
+@php
+  $iqmDefaultLogoPath = public_path('web/images/logo.png');
+  $iqmLoginLogoUrl = !empty($websiteSetting?->logo) ? $websiteSetting->logoUrl() : asset('web/images/logo.png');
+  $iqmLoginLogoVersion = !empty($websiteSetting?->logo) ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
+  $iqmLoginLogoAlt = $websiteSetting?->nama_perusahaan ?? 'PT Bina Persada JS';
+@endphp
 <section class="py-5">
   <div class="container py-lg-5">
     <div class="row justify-content-center">
@@ -44,7 +58,7 @@
         <div class="card iqm-card">
           <div class="card-body p-4 p-lg-5">
             <div class="text-center mb-4">
-              <img src="{{ $websiteSetting?->logoUrl() ?? asset('web/images/logo.png') }}" style="max-height:70px;object-fit:contain" class="mb-3" alt="PT Bina Persada JS">
+              <img src="{{ $iqmLoginLogoUrl }}?v={{ $iqmLoginLogoVersion }}" class="iqm-login-logo mb-3" alt="{{ $iqmLoginLogoAlt }}" decoding="async">
               <h4 class="fw-bold mb-1">Login IQM</h4>
               <p class="text-secondary mb-0">Masuk ke portal client Inquiry & Quotation.</p>
             </div>

@@ -14,17 +14,24 @@
     .iqm-navbar { background: #0f2742; }
     .iqm-card { border: 0; border-radius: 16px; box-shadow: 0 14px 40px rgba(15, 39, 66, .08); }
     .iqm-pill { border-radius: 999px; font-size: 12px; padding: .4rem .65rem; }
-    .iqm-logo { max-height: 48px; object-fit: contain; }
+    .iqm-logo { display: block; max-height: 42px; max-width: 210px; object-fit: contain; width: auto; }
     .iqm-shell { min-height: 100vh; }
     .table th { font-size: 12px; text-transform: uppercase; color: #64748b; white-space: nowrap; }
     .table td { font-size: 13px; vertical-align: middle; }
   </style>
 </head>
 <body>
+  @php
+    $websiteSetting = $websiteSetting ?? \App\Models\WebsiteSetting::first();
+    $iqmDefaultLogoPath = public_path('web/images/logo.png');
+    $iqmLogoUrl = !empty($websiteSetting?->logo) ? $websiteSetting->logoUrl() : asset('web/images/logo.png');
+    $iqmLogoVersion = !empty($websiteSetting?->logo) ? $websiteSetting->assetVersion() : (is_file($iqmDefaultLogoPath) ? filemtime($iqmDefaultLogoPath) : time());
+    $iqmLogoAlt = $websiteSetting?->nama_perusahaan ?? 'PT Bina Persada JS';
+  @endphp
   <nav class="navbar navbar-expand-lg iqm-navbar navbar-dark">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ route('iqm.landing') }}">
-        <img src="{{ ($websiteSetting ?? null)?->logoUrl() ?? asset('web/images/logo.png') }}" class="iqm-logo" alt="Bina Persada JS">
+        <img src="{{ $iqmLogoUrl }}?v={{ $iqmLogoVersion }}" class="iqm-logo" alt="{{ $iqmLogoAlt }}" decoding="async">
         <span>IQM Portal</span>
       </a>
       <div class="ms-auto d-flex gap-2">
