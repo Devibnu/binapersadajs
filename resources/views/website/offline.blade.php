@@ -10,7 +10,7 @@
             ? filemtime(public_path('icons/icon-512x512.png'))
             : time();
     @endphp
-    <link rel="manifest" href="/manifest.json?v={{ $pwaIconVersion }}">
+    <link rel="manifest" href="/manifest.json?v=20260604">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}?v={{ $pwaIconVersion }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ $pwaIconVersion }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}?v={{ $pwaIconVersion }}">

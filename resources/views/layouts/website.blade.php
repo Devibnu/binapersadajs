@@ -107,7 +107,7 @@
             return asset($path) . '?v=' . (file_exists($fullPath) ? filemtime($fullPath) : time());
         };
     @endphp
-    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ $pwaIconVersion }}">
+    <link rel="manifest" href="/manifest.json?v=20260604">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}?v={{ $pwaIconVersion }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/favicon-16x16.png') }}?v={{ $pwaIconVersion }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ $pwaIconVersion }}">
@@ -927,11 +927,46 @@
         });
     </script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function () {
-                navigator.serviceWorker.register('/sw.js');
+        (function () {
+            if (!('serviceWorker' in navigator)) {
+                return;
+            }
+
+            var reloadKey = 'binapersadajs-sw-v5-reloaded';
+            var refreshing = false;
+
+            navigator.serviceWorker.addEventListener('controllerchange', function () {
+                if (refreshing || sessionStorage.getItem(reloadKey) === '1') {
+                    return;
+                }
+
+                refreshing = true;
+                sessionStorage.setItem(reloadKey, '1');
+                window.location.reload();
             });
-        }
+
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js?v=20260604').then(function (registration) {
+                    if (registration.waiting) {
+                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    }
+
+                    registration.addEventListener('updatefound', function () {
+                        var worker = registration.installing;
+
+                        if (!worker) {
+                            return;
+                        }
+
+                        worker.addEventListener('statechange', function () {
+                            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                                worker.postMessage({ type: 'SKIP_WAITING' });
+                            }
+                        });
+                    });
+                });
+            });
+        })();
     </script>
     @if($musicPlaylists->isNotEmpty())
         <script>

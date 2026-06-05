@@ -1,6 +1,6 @@
 {
-  "name": "PT. Bina Persada Jaya Sejahtera",
-  "short_name": "Bina Persada",
+  "name": "PT Bina Persada Jaya Sejahtera",
+  "short_name": "Bina Persada JS",
   "description": "Industrial Contractor, Fabrication, Maintenance, Construction, dan General Supplier.",
   "id": "/",
   "lang": "id-ID",
@@ -54,10 +54,16 @@
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/icons/icon-192-v2.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-384x384.png",
@@ -66,10 +72,16 @@
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/icons/icon-512-v2.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

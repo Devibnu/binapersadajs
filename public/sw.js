@@ -1,10 +1,8 @@
-const CACHE_NAME = 'binapersadajs-v3';
+const CACHE_NAME = 'binapersadajs-v5';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [
   OFFLINE_URL,
-  '/manifest.json',
-  '/site.webmanifest',
   '/web/css/style.css',
   '/web/plugins/bootstrap/bootstrap.min.css',
   '/web/plugins/fontawesome/css/all.min.css',
@@ -17,10 +15,10 @@ const PRECACHE_URLS = [
   '/assets/js/core/popper.min.js',
   '/favicon.ico',
   '/icons/favicon-32x32.png',
-  '/icons/apple-touch-icon.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/icons/apple-touch-icon.png'
 ];
+
+self.skipWaiting();
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -50,6 +48,15 @@ function isAdminRequest(url) {
   return url.pathname === '/paneladmin' || url.pathname.startsWith('/paneladmin/');
 }
 
+function isPwaMetadataRequest(url) {
+  return url.pathname === '/manifest.json'
+    || url.pathname === '/site.webmanifest'
+    || url.pathname.startsWith('/icons/icon-')
+    || url.pathname.startsWith('/icons/maskable-')
+    || url.pathname.startsWith('/icons/maskable-icon-')
+    || url.pathname.startsWith('/icons/android-chrome-');
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -67,6 +74,11 @@ self.addEventListener('fetch', (event) => {
       fetch(request, { cache: 'no-store' })
         .catch(() => caches.match(request))
     );
+    return;
+  }
+
+  if (isPwaMetadataRequest(url)) {
+    event.respondWith(fetch(request, { cache: 'reload' }));
     return;
   }
 

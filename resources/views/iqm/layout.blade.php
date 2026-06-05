@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1e35">
   <title>@yield('title', 'IQM Portal') - PT Bina Persada JS</title>
   @php
     $websiteSetting = $websiteSetting ?? \App\Models\WebsiteSetting::first();
     $iqmFaviconUrl = $websiteSetting?->faviconUrl() ?? asset('icons/favicon-32x32.png');
     $iqmAppleTouchIconUrl = $websiteSetting?->appleTouchIconUrl() ?? asset('icons/apple-touch-icon.png');
   @endphp
+  <link rel="manifest" href="/manifest.json?v=20260604">
   <link rel="icon" type="image/png" href="{{ $iqmFaviconUrl }}?v={{ time() }}">
   <link rel="apple-touch-icon" href="{{ $iqmAppleTouchIconUrl }}?v={{ time() }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,5 +55,47 @@
   </nav>
   <main class="iqm-shell">@yield('content')</main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function () {
+      if (!('serviceWorker' in navigator)) {
+        return;
+      }
+
+      var reloadKey = 'binapersadajs-sw-v5-reloaded';
+      var refreshing = false;
+
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (refreshing || sessionStorage.getItem(reloadKey) === '1') {
+          return;
+        }
+
+        refreshing = true;
+        sessionStorage.setItem(reloadKey, '1');
+        window.location.reload();
+      });
+
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js?v=20260604').then(function (registration) {
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+
+          registration.addEventListener('updatefound', function () {
+            var worker = registration.installing;
+
+            if (!worker) {
+              return;
+            }
+
+            worker.addEventListener('statechange', function () {
+              if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                worker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

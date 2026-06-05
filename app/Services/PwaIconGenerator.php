@@ -44,6 +44,12 @@ class PwaIconGenerator
         copy("{$iconsPath}/icon-512x512.png", "{$iconsPath}/android-chrome-512x512.png");
         copy("{$iconsPath}/icon-192x192.png", "{$iconsPath}/maskable-icon-192x192.png");
         copy("{$iconsPath}/icon-512x512.png", "{$iconsPath}/maskable-icon-512x512.png");
+        copy("{$iconsPath}/icon-192x192.png", "{$iconsPath}/maskable-192x192.png");
+        copy("{$iconsPath}/icon-512x512.png", "{$iconsPath}/maskable-512x512.png");
+        copy("{$iconsPath}/icon-192x192.png", "{$iconsPath}/icon-192-v2.png");
+        copy("{$iconsPath}/icon-512x512.png", "{$iconsPath}/icon-512-v2.png");
+        copy("{$iconsPath}/icon-192x192.png", "{$iconsPath}/maskable-192-v2.png");
+        copy("{$iconsPath}/icon-512x512.png", "{$iconsPath}/maskable-512-v2.png");
 
         $this->writePngIcon($source, $sourceWidth, $sourceHeight, "{$iconsPath}/favicon-16x16.png", 16);
         $this->writePngIcon($source, $sourceWidth, $sourceHeight, "{$iconsPath}/favicon-32x32.png", 32);
@@ -112,8 +118,8 @@ class PwaIconGenerator
         $version = time();
         $serviceWorker = File::get($serviceWorkerPath);
         $serviceWorker = preg_replace(
-            "/const CACHE_NAME = 'bpjs-pwa-v[^']+';/",
-            "const CACHE_NAME = 'bpjs-pwa-v{$version}';",
+            "/const CACHE_NAME = 'binapersadajs-v[^']+';/",
+            "const CACHE_NAME = 'binapersadajs-v{$version}';",
             $serviceWorker,
             1
         );
