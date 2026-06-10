@@ -42,6 +42,7 @@ use App\Http\Controllers\BlogCommentController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\IqmPortalController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\PortalConversationController;
 use App\Http\Controllers\ResetController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\WebsiteBlogController;
@@ -102,9 +103,12 @@ Route::prefix('iqm')->name('iqm.')->group(function () {
         Route::put('/profile/password', [IqmPortalController::class, 'updateProfilePassword'])->name('profile.password.update');
         Route::get('/project-reports', [IqmPortalController::class, 'projectReports'])->name('project-reports.index');
         Route::get('/project-reports/{projectReport}', [IqmPortalController::class, 'showProjectReport'])->name('project-reports.show');
+        Route::post('/project-reports/{projectReport}/conversations', [PortalConversationController::class, 'storeClientProjectReport'])->name('project-reports.conversations.store');
         Route::get('/invoice-reports', [IqmPortalController::class, 'invoiceReports'])->name('invoice-reports.index');
         Route::get('/invoice-reports/{invoiceReport}', [IqmPortalController::class, 'showInvoiceReport'])->name('invoice-reports.show');
+        Route::post('/invoice-reports/{invoiceReport}/conversations', [PortalConversationController::class, 'storeClientInvoiceReport'])->name('invoice-reports.conversations.store');
         Route::get('/inquiries/{inquiryQuotation}', [IqmPortalController::class, 'show'])->name('inquiries.show');
+        Route::post('/inquiries/{inquiryQuotation}/conversations', [PortalConversationController::class, 'storeClientInquiry'])->name('inquiries.conversations.store');
     });
 });
 
@@ -317,6 +321,7 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/project-reports/create', [ProjectReportController::class, 'create'])->middleware('permission:project-reports.create')->name('paneladmin.project-reports.create');
         Route::post('/project-reports', [ProjectReportController::class, 'store'])->middleware('permission:project-reports.create')->name('paneladmin.project-reports.store');
         Route::get('/project-reports/{projectReport}', [ProjectReportController::class, 'show'])->middleware('permission:project-reports.view')->name('paneladmin.project-reports.show');
+        Route::post('/project-reports/{projectReport}/conversations', [PortalConversationController::class, 'storeAdminProjectReport'])->middleware('permission:project-reports.view')->name('paneladmin.project-reports.conversations.store');
         Route::get('/project-reports/{projectReport}/edit', [ProjectReportController::class, 'edit'])->middleware('permission:project-reports.update')->name('paneladmin.project-reports.edit');
         Route::put('/project-reports/{projectReport}', [ProjectReportController::class, 'update'])->middleware('permission:project-reports.update')->name('paneladmin.project-reports.update');
         Route::delete('/project-reports/{projectReport}', [ProjectReportController::class, 'destroy'])->middleware('permission:project-reports.delete')->name('paneladmin.project-reports.destroy');
@@ -324,6 +329,7 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/invoice-reports/create', [InvoiceReportController::class, 'create'])->middleware('permission:invoice-reports.create')->name('paneladmin.invoice-reports.create');
         Route::post('/invoice-reports', [InvoiceReportController::class, 'store'])->middleware('permission:invoice-reports.create')->name('paneladmin.invoice-reports.store');
         Route::get('/invoice-reports/{invoiceReport}', [InvoiceReportController::class, 'show'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-reports.show');
+        Route::post('/invoice-reports/{invoiceReport}/conversations', [PortalConversationController::class, 'storeAdminInvoiceReport'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-reports.conversations.store');
         Route::get('/invoice-reports/{invoiceReport}/edit', [InvoiceReportController::class, 'edit'])->middleware('permission:invoice-reports.update')->name('paneladmin.invoice-reports.edit');
         Route::put('/invoice-reports/{invoiceReport}', [InvoiceReportController::class, 'update'])->middleware('permission:invoice-reports.update')->name('paneladmin.invoice-reports.update');
         Route::delete('/invoice-reports/{invoiceReport}', [InvoiceReportController::class, 'destroy'])->middleware('permission:invoice-reports.delete')->name('paneladmin.invoice-reports.destroy');
@@ -333,6 +339,7 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/inquiries/create', [InquiryQuotationController::class, 'create'])->middleware('permission:inquiry-quotation.create')->name('admin.inquiries.create');
         Route::post('/inquiries', [InquiryQuotationController::class, 'store'])->middleware('permission:inquiry-quotation.create')->name('admin.inquiries.store');
         Route::get('/inquiries/{inquiryQuotation}', [InquiryQuotationController::class, 'show'])->middleware('permission:inquiry-quotation.view')->name('admin.inquiries.show');
+        Route::post('/inquiries/{inquiryQuotation}/conversations', [PortalConversationController::class, 'storeAdminInquiry'])->middleware('permission:inquiry-quotation.view')->name('admin.inquiries.conversations.store');
         Route::get('/inquiries/{inquiryQuotation}/edit', [InquiryQuotationController::class, 'edit'])->middleware('permission:inquiry-quotation.edit')->name('admin.inquiries.edit');
         Route::put('/inquiries/{inquiryQuotation}', [InquiryQuotationController::class, 'update'])->middleware('permission:inquiry-quotation.edit')->name('admin.inquiries.update');
         Route::delete('/inquiries/{inquiryQuotation}', [InquiryQuotationController::class, 'destroy'])->middleware('permission:inquiry-quotation.delete')->name('admin.inquiries.destroy');
@@ -344,6 +351,9 @@ Route::prefix('paneladmin')->group(function () {
             'names' => 'paneladmin.inquiry-quotations',
             'parameters' => ['inquiry-quotations' => 'inquiryQuotation']
         ]);
+        Route::post('/inquiry-quotations/{inquiryQuotation}/conversations', [PortalConversationController::class, 'storeAdminInquiry'])
+            ->middleware('permission:inquiry-quotation.view')
+            ->name('paneladmin.inquiry-quotations.conversations.store');
 
         Route::get('/profile', [ProfileController::class, 'show'])->name('paneladmin.profile');
         Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('paneladmin.profile.edit');

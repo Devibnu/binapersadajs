@@ -50,6 +50,29 @@
         </div>
     </div>
 
+    @if($canViewPortalQuestions)
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                            <div>
+                                <p class="text-sm text-secondary mb-1">Pertanyaan Belum Dibaca</p>
+                                <h6 class="font-weight-bolder mb-0">Pertanyaan Baru: {{ $portalQuestionSummary['total'] }}</h6>
+                                <p class="text-xs text-secondary mb-0">Pesan Terbaru: {{ $portalQuestionSummary['latest_at'] ? \Illuminate\Support\Carbon::parse($portalQuestionSummary['latest_at'])->format('d M Y H:i') : '-' }}</p>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                @foreach($portalQuestionSummary['items'] as $item)
+                                    <span class="badge bg-gradient-light text-dark">{{ $item['label'] }}: {{ $item['count'] }} pesan baru</span>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="row mb-4">
         <div class="col-lg-7 mb-lg-0 mb-4">
             <div class="card h-100">

@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasIqmPortalAccess;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class InvoiceReport extends Model
 {
+    use HasIqmPortalAccess;
+
     protected $fillable = [
         'client',
         'invoice_no',
@@ -46,6 +50,13 @@ class InvoiceReport extends Model
     {
         return $this->belongsToMany(IqmUser::class, 'invoice_report_iqm_user')
             ->withTimestamps();
+    }
+
+    public function portalConversations(): HasMany
+    {
+        return $this->hasMany(PortalConversation::class, 'module_id')
+            ->where('module_type', PortalConversation::MODULE_INVOICE_REPORT)
+            ->orderBy('created_at');
     }
 
     public function isPublic(): bool

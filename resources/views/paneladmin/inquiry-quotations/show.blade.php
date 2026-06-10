@@ -185,5 +185,10 @@
             </div>
         </div>
     </div>
+
+    @include('paneladmin.partials.portal-conversations', [
+        'conversations' => $entry->portalConversations,
+        'storeRoute' => route('paneladmin.inquiry-quotations.conversations.store', $entry),
+    ])
 </div>
 @endsection

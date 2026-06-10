@@ -27,6 +27,12 @@
         <p class="text-secondary mb-0">Belum ada attachment.</p>
       @endforelse
     </div></div></div></div>
+    <div class="col-12">
+      @include('iqm.partials.conversations', [
+        'conversations' => $entry->portalConversations,
+        'storeRoute' => route('iqm.inquiries.conversations.store', $entry),
+      ])
+    </div>
   </div>
 </div>
 @endsection

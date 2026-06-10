@@ -47,5 +47,12 @@
       </div>
     </div>
   </div>
+
+  <div class="mt-4">
+    @include('iqm.partials.conversations', [
+      'conversations' => $projectReport->portalConversations,
+      'storeRoute' => route('iqm.project-reports.conversations.store', $projectReport),
+    ])
+  </div>
 </div>
 @endsection

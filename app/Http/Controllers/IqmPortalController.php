@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Iqm\DashboardController as IqmDashboardController;
 use App\Models\InquiryQuotation;
 use App\Models\InquiryQuotationAttachment;
 use App\Models\InvoiceReport;
 use App\Models\IqmUser;
+use App\Models\PortalConversation;
 use App\Models\ProjectReport;
 use App\Models\WebsiteSetting;
 use Illuminate\Http\Request;
@@ -67,17 +69,7 @@ class IqmPortalController extends Controller
 
     public function dashboard()
     {
-        $user = Auth::guard('iqm')->user();
-        $query = $this->ownedInquiries($user->id)->with('attachments');
-
-        return view('iqm.dashboard', [
-            'user' => $user,
-            'inquiries' => (clone $query)->paginate(10),
-            'totalInquiry' => (clone $query)->count(),
-            'siteSurvey' => (clone $query)->where('site_survey_status', 'scheduled')->count(),
-            'quotationActive' => (clone $query)->whereIn('quotation_status', ['draft', 'process', 'submitted', 'revision'])->count(),
-            'quotationDone' => (clone $query)->whereIn('quotation_status', ['approved', 'closed'])->count(),
-        ]);
+        return app(IqmDashboardController::class)->index();
     }
 
     public function inquiries()
@@ -109,7 +101,7 @@ class IqmPortalController extends Controller
         return view('iqm.attachments', [
             'user' => $user,
             'attachments' => InquiryQuotationAttachment::query()
-                ->whereHas('inquiryQuotation', fn ($query) => $this->applyVisibleToIqmUser($query, $user->id))
+                ->whereHas('inquiryQuotation', fn ($query) => $query->visibleToIqmUser($user))
                 ->with('inquiryQuotation')
                 ->latest()
                 ->paginate(12),
@@ -158,13 +150,10 @@ class IqmPortalController extends Controller
     {
         $user = Auth::guard('iqm')->user();
 
-        abort_unless(
-            $inquiryQuotation->isPublic()
-                || $inquiryQuotation->iqmUsers()->where('iqm_users.id', $user->id)->exists(),
-            403
-        );
+        abort_unless($inquiryQuotation->canBeViewedByIqmUser($user), 403);
 
-        $inquiryQuotation->load('attachments');
+        $this->markClientReadableMessages($inquiryQuotation, PortalConversation::MODULE_INQUIRY);
+        $inquiryQuotation->load(['attachments', 'portalConversations.senderAdmin', 'portalConversations.senderClient']);
 
         return view('iqm.show', ['entry' => $inquiryQuotation, 'user' => $user]);
     }
@@ -183,7 +172,10 @@ class IqmPortalController extends Controller
     {
         $user = Auth::guard('iqm')->user();
 
-        abort_unless($this->projectReportVisibleToUser($projectReport, $user->id), 403);
+        abort_unless($projectReport->canBeViewedByIqmUser($user), 403);
+
+        $this->markClientReadableMessages($projectReport, PortalConversation::MODULE_PROJECT_REPORT);
+        $projectReport->load(['portalConversations.senderAdmin', 'portalConversations.senderClient']);
 
         return view('iqm.project-reports.show', [
             'user' => $user,
@@ -205,7 +197,10 @@ class IqmPortalController extends Controller
     {
         $user = Auth::guard('iqm')->user();
 
-        abort_unless($this->invoiceReportVisibleToUser($invoiceReport, $user->id), 403);
+        abort_unless($invoiceReport->canBeViewedByIqmUser($user), 403);
+
+        $this->markClientReadableMessages($invoiceReport, PortalConversation::MODULE_INVOICE_REPORT);
+        $invoiceReport->load(['portalConversations.senderAdmin', 'portalConversations.senderClient']);
 
         return view('iqm.invoice-reports.show', [
             'user' => $user,
@@ -215,60 +210,28 @@ class IqmPortalController extends Controller
 
     private function ownedInquiries(int $iqmUserId)
     {
-        return $this->applyVisibleToIqmUser(InquiryQuotation::query(), $iqmUserId)->latest();
-    }
-
-    private function applyVisibleToIqmUser($query, int $iqmUserId)
-    {
-        return $query->where(function ($query) use ($iqmUserId) {
-            $query->where('visibility', 'public')
-                ->orWhereHas('iqmUsers', function ($query) use ($iqmUserId) {
-                    $query->where('iqm_users.id', $iqmUserId);
-                });
-        });
+        return InquiryQuotation::query()->visibleToIqmUser($iqmUserId)->latest();
     }
 
     private function visibleProjectReports(int $iqmUserId)
     {
         return ProjectReport::active()
-            ->where(function ($query) use ($iqmUserId) {
-                $query->where('visibility', 'public')
-                    ->orWhereHas('iqmUsers', function ($query) use ($iqmUserId) {
-                        $query->where('iqm_users.id', $iqmUserId);
-                    });
-            })
+            ->visibleToIqmUser($iqmUserId)
             ->ordered();
-    }
-
-    private function projectReportVisibleToUser(ProjectReport $projectReport, int $iqmUserId): bool
-    {
-        if (! $projectReport->is_active) {
-            return false;
-        }
-
-        return $projectReport->isPublic()
-            || $projectReport->iqmUsers()->where('iqm_users.id', $iqmUserId)->exists();
     }
 
     private function visibleInvoiceReports(int $iqmUserId)
     {
         return InvoiceReport::active()
-            ->where(function ($query) use ($iqmUserId) {
-                $query->where('visibility', 'public')
-                    ->orWhereHas('iqmUsers', function ($query) use ($iqmUserId) {
-                        $query->where('iqm_users.id', $iqmUserId);
-                    });
-            })
+            ->visibleToIqmUser($iqmUserId)
             ->ordered();
     }
 
-    private function invoiceReportVisibleToUser(InvoiceReport $invoiceReport, int $iqmUserId): bool
+    private function markClientReadableMessages($module, string $moduleType): void
     {
-        if (! $invoiceReport->is_active) {
-            return false;
-        }
-
-        return $invoiceReport->isPublic()
-            || $invoiceReport->iqmUsers()->where('iqm_users.id', $iqmUserId)->exists();
+        PortalConversation::forModule($moduleType, $module->id)
+            ->where('sender_type', 'admin')
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
     }
 }

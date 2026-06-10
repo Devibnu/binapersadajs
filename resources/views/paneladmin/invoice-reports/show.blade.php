@@ -45,5 +45,10 @@
       @endif
     </div>
   </div>
+
+  @include('paneladmin.partials.portal-conversations', [
+    'conversations' => $invoiceReport->portalConversations,
+    'storeRoute' => route('paneladmin.invoice-reports.conversations.store', $invoiceReport),
+  ])
 </div>
 @endsection

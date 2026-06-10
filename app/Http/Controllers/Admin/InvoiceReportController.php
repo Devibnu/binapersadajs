@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\InvoiceReport;
 use App\Models\IqmUser;
+use App\Models\PortalConversation;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -62,7 +63,12 @@ class InvoiceReportController extends Controller
 
     public function show(InvoiceReport $invoiceReport)
     {
-        $invoiceReport->load('iqmUsers');
+        PortalConversation::forModule(PortalConversation::MODULE_INVOICE_REPORT, $invoiceReport->id)
+            ->where('sender_type', 'client')
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        $invoiceReport->load(['iqmUsers', 'portalConversations.senderAdmin', 'portalConversations.senderClient']);
 
         return view('paneladmin.invoice-reports.show', compact('invoiceReport'));
     }

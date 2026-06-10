@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\IqmUser;
+use App\Models\PortalConversation;
 use App\Models\ProjectReport;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
@@ -72,7 +73,12 @@ class ProjectReportController extends Controller
 
     public function show(ProjectReport $projectReport)
     {
-        $projectReport->load('iqmUsers');
+        PortalConversation::forModule(PortalConversation::MODULE_PROJECT_REPORT, $projectReport->id)
+            ->where('sender_type', 'client')
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        $projectReport->load(['iqmUsers', 'portalConversations.senderAdmin', 'portalConversations.senderClient']);
 
         return view('paneladmin.project-reports.show', compact('projectReport'));
     }

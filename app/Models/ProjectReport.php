@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasIqmPortalAccess;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProjectReport extends Model
 {
+    use HasIqmPortalAccess;
+
     protected $fillable = [
         'project_no',
         'job_title',
@@ -48,6 +52,13 @@ class ProjectReport extends Model
     {
         return $this->belongsToMany(IqmUser::class, 'project_report_iqm_user')
             ->withTimestamps();
+    }
+
+    public function portalConversations(): HasMany
+    {
+        return $this->hasMany(PortalConversation::class, 'module_id')
+            ->where('module_type', PortalConversation::MODULE_PROJECT_REPORT)
+            ->orderBy('created_at');
     }
 
     public function isPublic(): bool

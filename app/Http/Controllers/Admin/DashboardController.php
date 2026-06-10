@@ -12,6 +12,7 @@ use App\Models\EmailSetting;
 use App\Models\HeroBanner;
 use App\Models\HomepageSetting;
 use App\Models\Lead;
+use App\Models\PortalConversation;
 use App\Models\Project;
 use App\Models\Service;
 use App\Models\WebsiteSetting;
@@ -27,6 +28,10 @@ class DashboardController extends Controller
         $canViewComments = $user->canAccess('blog-comments.view');
         $canViewAnalytics = $user->canAccess('analytics.view');
         $canViewLeads = $user->canAccess('leads.view');
+        $canViewPortalQuestions = $user->canAccess('inquiry-quotation.view')
+            || $user->canAccess('project-reports.view')
+            || $user->canAccess('invoice-reports.view');
+        $portalQuestionSummary = $this->portalQuestionSummary($user);
 
         $counts = [
             'services' => Service::count(),
@@ -46,6 +51,7 @@ class DashboardController extends Controller
             'total_leads' => $canViewLeads ? Lead::count() : 0,
             'new_leads' => $canViewLeads ? Lead::where('status', 'new')->count() : 0,
             'month_leads' => $canViewLeads ? Lead::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count() : 0,
+            'portal_questions' => $canViewPortalQuestions ? $portalQuestionSummary['total'] : 0,
         ];
 
         $summaryCards = [
@@ -68,6 +74,10 @@ class DashboardController extends Controller
             $summaryCards[] = ['key' => 'total_leads', 'label' => 'Total Leads', 'value' => $counts['total_leads'], 'icon' => 'fa-user-plus', 'color' => 'bg-gradient-success'];
             $summaryCards[] = ['key' => 'new_leads', 'label' => 'Leads Baru', 'value' => $counts['new_leads'], 'icon' => 'fa-bullseye', 'color' => 'bg-gradient-warning'];
             $summaryCards[] = ['key' => 'month_leads', 'label' => 'Leads Bulan Ini', 'value' => $counts['month_leads'], 'icon' => 'fa-calendar-check', 'color' => 'bg-gradient-info'];
+        }
+
+        if ($canViewPortalQuestions) {
+            $summaryCards[] = ['key' => 'portal_questions', 'label' => 'Pertanyaan IQM Baru', 'value' => $counts['portal_questions'], 'icon' => 'fa-message', 'color' => 'bg-gradient-warning'];
         }
 
         $latestContactMessages = $canViewContacts ? ContactMessage::latest()->limit(5)->get() : collect();
@@ -112,8 +122,47 @@ class DashboardController extends Controller
             'pendingComments',
             'latestBlogs',
             'setupChecklist',
-            'quickActions'
+            'quickActions',
+            'portalQuestionSummary',
+            'canViewPortalQuestions'
         ));
+    }
+
+    private function portalQuestionSummary($user): array
+    {
+        $modules = collect([
+            PortalConversation::MODULE_INQUIRY => [
+                'label' => 'Inquiry',
+                'permission' => 'inquiry-quotation.view',
+            ],
+            PortalConversation::MODULE_PROJECT_REPORT => [
+                'label' => 'Project Report',
+                'permission' => 'project-reports.view',
+            ],
+            PortalConversation::MODULE_INVOICE_REPORT => [
+                'label' => 'Invoice Report',
+                'permission' => 'invoice-reports.view',
+            ],
+        ])->filter(fn (array $module) => $user->canAccess($module['permission']));
+
+        $items = $modules->map(function (array $module, string $moduleType) {
+            $query = PortalConversation::query()
+                ->where('module_type', $moduleType)
+                ->where('sender_type', 'client')
+                ->where('is_read', false);
+
+            return [
+                'label' => $module['label'],
+                'count' => (clone $query)->count(),
+                'latest_at' => (clone $query)->latest('created_at')->value('created_at'),
+            ];
+        })->values();
+
+        return [
+            'total' => $items->sum('count'),
+            'latest_at' => $items->pluck('latest_at')->filter()->max(),
+            'items' => $items,
+        ];
     }
 
     private function checklistItem(string $label, bool $complete): array

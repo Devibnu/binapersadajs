@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\InquiryQuotationRequest;
 use App\Models\InquiryQuotation;
 use App\Models\IqmUser;
+use App\Models\PortalConversation;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -95,7 +96,12 @@ class InquiryQuotationController extends Controller
 
     public function show(InquiryQuotation $inquiryQuotation)
     {
-        $inquiryQuotation->load(['attachments', 'iqmUsers']);
+        PortalConversation::forModule(PortalConversation::MODULE_INQUIRY, $inquiryQuotation->id)
+            ->where('sender_type', 'client')
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        $inquiryQuotation->load(['attachments', 'iqmUsers', 'portalConversations.senderAdmin', 'portalConversations.senderClient']);
         return view('paneladmin.inquiry-quotations.show', compact('inquiryQuotation'));
     }
 

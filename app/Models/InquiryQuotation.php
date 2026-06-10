@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasIqmPortalAccess;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class InquiryQuotation extends Model
 {
     use HasFactory;
+    use HasIqmPortalAccess;
 
     protected $table = 'inquiry_quotations';
 
@@ -48,6 +50,13 @@ class InquiryQuotation extends Model
     {
         return $this->belongsToMany(IqmUser::class, 'inquiry_quotation_iqm_user')
             ->withTimestamps();
+    }
+
+    public function portalConversations(): HasMany
+    {
+        return $this->hasMany(PortalConversation::class, 'module_id')
+            ->where('module_type', PortalConversation::MODULE_INQUIRY)
+            ->orderBy('created_at');
     }
 
     public function isPublic(): bool
