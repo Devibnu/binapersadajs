@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\EmailSetting;
 use App\Models\WebsiteSetting;
+use App\Services\AdminNotificationService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
@@ -39,5 +40,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         View::share('websiteSetting', $setting);
+
+        View::composer('layouts.navbars.auth.nav', function ($view) {
+            $view->with('adminNotifications', app(AdminNotificationService::class)->forUser(auth()->user()));
+        });
     }
 }

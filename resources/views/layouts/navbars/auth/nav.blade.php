@@ -1,4 +1,12 @@
 <!-- Navbar -->
+<style>
+    .admin-notification-menu { width: min(360px, calc(100vw - 28px)); max-height: 430px; overflow-y: auto; }
+    .admin-notification-trigger { position: relative; line-height: 1; }
+    .admin-notification-badge { position: absolute; top: -7px; right: -9px; min-width: 18px; height: 18px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; padding: 0 5px; }
+    .admin-notification-icon { width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 34px; }
+    .admin-notification-text { min-width: 0; }
+    .admin-notification-description { white-space: normal; overflow-wrap: anywhere; }
+</style>
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" navbar-scroll="true">
     <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
@@ -16,6 +24,41 @@
                 </div>
             </div>
             <ul class="navbar-nav justify-content-end align-items-center">
+                @php($adminNotifications = $adminNotifications ?? ['totalUnread' => 0, 'latestNotifications' => collect()])
+                <li class="nav-item dropdown d-flex align-items-center me-3">
+                    <a href="#" class="nav-link text-body p-0 admin-notification-trigger" id="adminNotificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi admin">
+                        <i class="fa fa-bell"></i>
+                        @if(($adminNotifications['totalUnread'] ?? 0) > 0)
+                            <span class="admin-notification-badge bg-gradient-danger text-white">
+                                {{ ($adminNotifications['totalUnread'] ?? 0) > 99 ? '99+' : $adminNotifications['totalUnread'] }}
+                            </span>
+                        @endif
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end p-0 admin-notification-menu" aria-labelledby="adminNotificationDropdown">
+                        <div class="px-3 py-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <h6 class="mb-0">Notifikasi</h6>
+                                <span class="badge bg-gradient-danger">{{ $adminNotifications['totalUnread'] ?? 0 }} baru</span>
+                            </div>
+                        </div>
+                        @forelse(($adminNotifications['latestNotifications'] ?? collect()) as $notification)
+                            <a href="{{ $notification['url'] }}" class="dropdown-item border-bottom py-3">
+                                <div class="d-flex gap-3">
+                                    <span class="admin-notification-icon {{ $notification['badge_color'] }}">
+                                        <i class="fas {{ $notification['icon'] }} text-white text-sm"></i>
+                                    </span>
+                                    <span class="admin-notification-text">
+                                        <span class="d-block text-sm font-weight-bold text-dark">{{ $notification['title'] }}</span>
+                                        <span class="d-block text-xs text-secondary admin-notification-description">{{ $notification['description'] }}</span>
+                                        <span class="d-block text-xxs text-muted mt-1">{{ optional($notification['time'])->diffForHumans() }}</span>
+                                    </span>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="px-3 py-4 text-center text-secondary text-sm">Tidak ada notifikasi baru.</div>
+                        @endforelse
+                    </div>
+                </li>
                 <li class="nav-item d-flex align-items-center me-3">
                     <a href="{{ route('paneladmin.profile') }}" class="nav-link text-body font-weight-bold px-0">
                         <i class="fa fa-user-circle me-sm-1"></i>
