@@ -103,6 +103,57 @@
   </div>
 </div>
 
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-transparent border-0 pb-0"><h6 class="mb-0">Lampiran Invoice</h6></div>
+  <div class="card-body">
+    @if($invoiceReport->exists && $invoiceReport->attachments?->isNotEmpty())
+      <div class="row g-3 mb-3">
+        @foreach($invoiceReport->attachments as $attachment)
+          <div class="col-sm-6 col-lg-4">
+            <div class="border rounded p-3 h-100">
+              <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden mb-3" style="height: 140px;">
+                @if($attachment->isImage())
+                  <img src="{{ route('paneladmin.invoice-report-attachments.preview', $attachment) }}" alt="{{ $attachment->original_name }}" class="w-100 h-100" style="object-fit: cover;">
+                @elseif($attachment->isPdf())
+                  <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                @else
+                  <i class="fas fa-file fa-3x text-secondary"></i>
+                @endif
+              </div>
+              <h6 class="text-sm font-weight-bold mb-1">{{ $attachment->original_name }}</h6>
+              <p class="text-xs text-muted mb-3">{{ $attachment->formattedSize() }} - {{ strtoupper($attachment->file_type) }}</p>
+              <div class="d-flex align-items-center justify-content-between gap-2">
+                <a href="{{ route('paneladmin.invoice-report-attachments.download', $attachment) }}" class="btn btn-sm btn-outline-primary mb-0">
+                  <i class="fas fa-download me-1"></i> Download
+                </a>
+                <label class="text-danger text-xs mb-0 d-flex align-items-center gap-1">
+                  <input type="checkbox" name="delete_attachment_ids[]" value="{{ $attachment->id }}" class="form-check-input mt-0">
+                  Hapus
+                </label>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+      <div class="alert alert-secondary text-sm">
+        Centang attachment yang ingin dihapus, lalu klik Simpan Invoice Report.
+      </div>
+    @elseif($invoiceReport->exists)
+      <p class="text-sm text-secondary">Belum ada attachment.</p>
+    @endif
+
+    <div class="mb-3">
+      <label class="form-label" for="attachments">Lampiran Invoice</label>
+      <input type="file" id="attachments" name="attachments[]" class="form-control @error('attachments') is-invalid @enderror @error('attachments.*') is-invalid @enderror" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png">
+      <div class="form-text">Format: PDF, JPG, JPEG, PNG. Maksimal 10MB per file.</div>
+      @error('attachments')<div class="invalid-feedback">{{ $message }}</div>@enderror
+      @foreach($errors->get('attachments.*', []) as $message)
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+      @endforeach
+    </div>
+  </div>
+</div>
+
 <div class="d-flex justify-content-end gap-2">
   <a href="{{ route('paneladmin.invoice-reports.index') }}" class="btn btn-light mb-0">Batal</a>
   <button type="submit" class="btn bg-gradient-primary mb-0">Simpan Invoice Report</button>

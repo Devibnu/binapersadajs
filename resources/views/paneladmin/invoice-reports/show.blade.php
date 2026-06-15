@@ -43,6 +43,36 @@
           <p class="text-sm text-secondary">Belum ada IQM user dipilih.</p>
         @endforelse
       @endif
+
+      <div class="mt-4">
+        <p class="text-xs text-uppercase text-secondary mb-2">Lampiran Invoice</p>
+        @if($invoiceReport->attachments->isEmpty())
+          <p class="text-sm text-secondary mb-0">Belum ada attachment.</p>
+        @else
+          <div class="row g-3">
+            @foreach($invoiceReport->attachments as $attachment)
+              <div class="col-sm-6 col-lg-4">
+                <div class="border rounded p-3 h-100">
+                  <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden mb-3" style="height: 150px;">
+                    @if($attachment->isImage())
+                      <img src="{{ route('paneladmin.invoice-report-attachments.preview', $attachment) }}" alt="{{ $attachment->original_name }}" class="w-100 h-100" style="object-fit: cover;">
+                    @elseif($attachment->isPdf())
+                      <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    @else
+                      <i class="fas fa-file fa-3x text-secondary"></i>
+                    @endif
+                  </div>
+                  <h6 class="text-sm font-weight-bold mb-1">{{ $attachment->original_name }}</h6>
+                  <p class="text-xs text-muted mb-3">{{ $attachment->formattedSize() }} - {{ strtoupper($attachment->file_type) }}</p>
+                  <a href="{{ route('paneladmin.invoice-report-attachments.download', $attachment) }}" class="btn btn-sm btn-outline-primary w-100 mb-0">
+                    <i class="fas fa-download me-1"></i> Download
+                  </a>
+                </div>
+              </div>
+            @endforeach
+          </div>
+        @endif
+      </div>
     </div>
   </div>
 

@@ -38,6 +38,39 @@
           </div>
         @endforeach
       </div>
+
+      <div class="mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Lampiran Invoice</h5>
+          <span class="badge bg-light text-dark">{{ $invoiceReport->attachments->count() }} file</span>
+        </div>
+        @if($invoiceReport->attachments->isEmpty())
+          <div class="border rounded p-3 text-secondary small">Belum ada lampiran invoice.</div>
+        @else
+          <div class="row g-3">
+            @foreach($invoiceReport->attachments as $attachment)
+              <div class="col-sm-6 col-lg-4">
+                <div class="border rounded p-3 h-100">
+                  <div class="bg-light rounded d-flex align-items-center justify-content-center overflow-hidden mb-3" style="height: 150px;">
+                    @if($attachment->isImage())
+                      <img src="{{ route('iqm.invoice-report-attachments.preview', $attachment) }}" alt="{{ $attachment->original_name }}" class="w-100 h-100" style="object-fit: cover;">
+                    @elseif($attachment->isPdf())
+                      <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    @else
+                      <i class="fas fa-file fa-3x text-secondary"></i>
+                    @endif
+                  </div>
+                  <h6 class="fw-semibold mb-1">{{ $attachment->original_name }}</h6>
+                  <p class="text-secondary small mb-3">{{ $attachment->formattedSize() }} - {{ strtoupper($attachment->file_type) }}</p>
+                  <a href="{{ route('iqm.invoice-report-attachments.download', $attachment) }}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="fas fa-download me-1"></i> Download
+                  </a>
+                </div>
+              </div>
+            @endforeach
+          </div>
+        @endif
+      </div>
     </div>
   </div>
 

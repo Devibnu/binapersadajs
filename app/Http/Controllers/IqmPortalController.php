@@ -6,13 +6,16 @@ use App\Http\Controllers\Iqm\DashboardController as IqmDashboardController;
 use App\Models\InquiryQuotation;
 use App\Models\InquiryQuotationAttachment;
 use App\Models\InvoiceReport;
+use App\Models\InvoiceReportAttachment;
 use App\Models\IqmUser;
 use App\Models\PortalConversation;
 use App\Models\ProjectReport;
+use App\Models\ProjectReportAttachment;
 use App\Models\WebsiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class IqmPortalController extends Controller
 {
@@ -175,12 +178,30 @@ class IqmPortalController extends Controller
         abort_unless($projectReport->canBeViewedByIqmUser($user), 403);
 
         $this->markClientReadableMessages($projectReport, PortalConversation::MODULE_PROJECT_REPORT);
-        $projectReport->load(['portalConversations.senderAdmin', 'portalConversations.senderClient']);
+        $projectReport->load(['attachments', 'portalConversations.senderAdmin', 'portalConversations.senderClient']);
 
         return view('iqm.project-reports.show', [
             'user' => $user,
             'projectReport' => $projectReport,
         ]);
+    }
+
+    public function previewProjectReportAttachment(ProjectReportAttachment $attachment)
+    {
+        $this->authorizeProjectReportAttachment($attachment);
+
+        abort_unless(Storage::disk('local')->exists($attachment->file_path), 404);
+
+        return Storage::disk('local')->response($attachment->file_path, $attachment->original_name);
+    }
+
+    public function downloadProjectReportAttachment(ProjectReportAttachment $attachment)
+    {
+        $this->authorizeProjectReportAttachment($attachment);
+
+        abort_unless(Storage::disk('local')->exists($attachment->file_path), 404);
+
+        return Storage::disk('local')->download($attachment->file_path, $attachment->original_name);
     }
 
     public function invoiceReports()
@@ -200,12 +221,30 @@ class IqmPortalController extends Controller
         abort_unless($invoiceReport->canBeViewedByIqmUser($user), 403);
 
         $this->markClientReadableMessages($invoiceReport, PortalConversation::MODULE_INVOICE_REPORT);
-        $invoiceReport->load(['portalConversations.senderAdmin', 'portalConversations.senderClient']);
+        $invoiceReport->load(['attachments', 'portalConversations.senderAdmin', 'portalConversations.senderClient']);
 
         return view('iqm.invoice-reports.show', [
             'user' => $user,
             'invoiceReport' => $invoiceReport,
         ]);
+    }
+
+    public function previewInvoiceReportAttachment(InvoiceReportAttachment $attachment)
+    {
+        $this->authorizeInvoiceReportAttachment($attachment);
+
+        abort_unless(Storage::disk('public')->exists($attachment->file_path), 404);
+
+        return Storage::disk('public')->response($attachment->file_path, $attachment->original_name);
+    }
+
+    public function downloadInvoiceReportAttachment(InvoiceReportAttachment $attachment)
+    {
+        $this->authorizeInvoiceReportAttachment($attachment);
+
+        abort_unless(Storage::disk('public')->exists($attachment->file_path), 404);
+
+        return Storage::disk('public')->download($attachment->file_path, $attachment->original_name);
     }
 
     private function ownedInquiries(int $iqmUserId)
@@ -233,5 +272,19 @@ class IqmPortalController extends Controller
             ->where('sender_type', 'admin')
             ->where('is_read', false)
             ->update(['is_read' => true]);
+    }
+
+    private function authorizeProjectReportAttachment(ProjectReportAttachment $attachment): void
+    {
+        $user = Auth::guard('iqm')->user();
+
+        abort_unless($attachment->projectReport?->canBeViewedByIqmUser($user), 403);
+    }
+
+    private function authorizeInvoiceReportAttachment(InvoiceReportAttachment $attachment): void
+    {
+        $user = Auth::guard('iqm')->user();
+
+        abort_unless($attachment->invoiceReport?->canBeViewedByIqmUser($user), 403);
     }
 }

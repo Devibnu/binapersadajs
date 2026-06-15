@@ -52,6 +52,11 @@ class InvoiceReport extends Model
             ->withTimestamps();
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(InvoiceReportAttachment::class);
+    }
+
     public function portalConversations(): HasMany
     {
         return $this->hasMany(PortalConversation::class, 'module_id')

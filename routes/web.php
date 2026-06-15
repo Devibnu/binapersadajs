@@ -102,9 +102,13 @@ Route::prefix('iqm')->name('iqm.')->group(function () {
         Route::get('/profile', [IqmPortalController::class, 'profile'])->name('profile');
         Route::put('/profile/password', [IqmPortalController::class, 'updateProfilePassword'])->name('profile.password.update');
         Route::get('/project-reports', [IqmPortalController::class, 'projectReports'])->name('project-reports.index');
+        Route::get('/project-report-attachments/{attachment}/preview', [IqmPortalController::class, 'previewProjectReportAttachment'])->name('project-report-attachments.preview');
+        Route::get('/project-report-attachments/{attachment}/download', [IqmPortalController::class, 'downloadProjectReportAttachment'])->name('project-report-attachments.download');
         Route::get('/project-reports/{projectReport}', [IqmPortalController::class, 'showProjectReport'])->name('project-reports.show');
         Route::post('/project-reports/{projectReport}/conversations', [PortalConversationController::class, 'storeClientProjectReport'])->name('project-reports.conversations.store');
         Route::get('/invoice-reports', [IqmPortalController::class, 'invoiceReports'])->name('invoice-reports.index');
+        Route::get('/invoice-report-attachments/{attachment}/preview', [IqmPortalController::class, 'previewInvoiceReportAttachment'])->name('invoice-report-attachments.preview');
+        Route::get('/invoice-report-attachments/{attachment}/download', [IqmPortalController::class, 'downloadInvoiceReportAttachment'])->name('invoice-report-attachments.download');
         Route::get('/invoice-reports/{invoiceReport}', [IqmPortalController::class, 'showInvoiceReport'])->name('invoice-reports.show');
         Route::post('/invoice-reports/{invoiceReport}/conversations', [PortalConversationController::class, 'storeClientInvoiceReport'])->name('invoice-reports.conversations.store');
         Route::get('/inquiries/{inquiryQuotation}', [IqmPortalController::class, 'show'])->name('inquiries.show');
@@ -320,6 +324,9 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/project-reports', [ProjectReportController::class, 'index'])->middleware('permission:project-reports.view')->name('paneladmin.project-reports.index');
         Route::get('/project-reports/create', [ProjectReportController::class, 'create'])->middleware('permission:project-reports.create')->name('paneladmin.project-reports.create');
         Route::post('/project-reports', [ProjectReportController::class, 'store'])->middleware('permission:project-reports.create')->name('paneladmin.project-reports.store');
+        Route::get('/project-report-attachments/{attachment}/preview', [ProjectReportController::class, 'previewAttachment'])->middleware('permission:project-reports.view')->name('paneladmin.project-report-attachments.preview');
+        Route::get('/project-report-attachments/{attachment}/download', [ProjectReportController::class, 'downloadAttachment'])->middleware('permission:project-reports.view')->name('paneladmin.project-report-attachments.download');
+        Route::delete('/project-report-attachments/{attachment}', [ProjectReportController::class, 'destroyAttachment'])->middleware('permission:project-reports.update')->name('paneladmin.project-report-attachments.destroy');
         Route::get('/project-reports/{projectReport}', [ProjectReportController::class, 'show'])->middleware('permission:project-reports.view')->name('paneladmin.project-reports.show');
         Route::post('/project-reports/{projectReport}/conversations', [PortalConversationController::class, 'storeAdminProjectReport'])->middleware('permission:project-reports.view')->name('paneladmin.project-reports.conversations.store');
         Route::get('/project-reports/{projectReport}/edit', [ProjectReportController::class, 'edit'])->middleware('permission:project-reports.update')->name('paneladmin.project-reports.edit');
@@ -328,6 +335,9 @@ Route::prefix('paneladmin')->group(function () {
         Route::get('/invoice-reports', [InvoiceReportController::class, 'index'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-reports.index');
         Route::get('/invoice-reports/create', [InvoiceReportController::class, 'create'])->middleware('permission:invoice-reports.create')->name('paneladmin.invoice-reports.create');
         Route::post('/invoice-reports', [InvoiceReportController::class, 'store'])->middleware('permission:invoice-reports.create')->name('paneladmin.invoice-reports.store');
+        Route::get('/invoice-report-attachments/{attachment}/preview', [InvoiceReportController::class, 'previewAttachment'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-report-attachments.preview');
+        Route::get('/invoice-report-attachments/{attachment}/download', [InvoiceReportController::class, 'downloadAttachment'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-report-attachments.download');
+        Route::delete('/invoice-report-attachments/{attachment}', [InvoiceReportController::class, 'destroyAttachment'])->middleware('permission:invoice-reports.update')->name('paneladmin.invoice-report-attachments.destroy');
         Route::get('/invoice-reports/{invoiceReport}', [InvoiceReportController::class, 'show'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-reports.show');
         Route::post('/invoice-reports/{invoiceReport}/conversations', [PortalConversationController::class, 'storeAdminInvoiceReport'])->middleware('permission:invoice-reports.view')->name('paneladmin.invoice-reports.conversations.store');
         Route::get('/invoice-reports/{invoiceReport}/edit', [InvoiceReportController::class, 'edit'])->middleware('permission:invoice-reports.update')->name('paneladmin.invoice-reports.edit');

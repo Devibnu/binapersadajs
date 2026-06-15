@@ -6,7 +6,7 @@
     <div class="card mb-4">
       <div class="card-header pb-0"><h6>Tambah Invoice Report</h6></div>
       <div class="card-body">
-        <form method="POST" action="{{ route('paneladmin.invoice-reports.store') }}" class="js-confirm-submit">
+        <form method="POST" action="{{ route('paneladmin.invoice-reports.store') }}" class="js-confirm-submit" enctype="multipart/form-data">
           @include('paneladmin.invoice-reports._form')
         </form>
       </div>

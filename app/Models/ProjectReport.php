@@ -54,6 +54,11 @@ class ProjectReport extends Model
             ->withTimestamps();
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(ProjectReportAttachment::class);
+    }
+
     public function portalConversations(): HasMany
     {
         return $this->hasMany(PortalConversation::class, 'module_id')
